@@ -25,7 +25,15 @@ app.engine('ejs', ejsMate);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.info = req.flash('info');
+    next();
+  });
+
 app.get('/', (req, res)=>{
+    req.flash('success', 'The Homepage')
     res.render('home', {title : 'The Homepage'})
 });
 
