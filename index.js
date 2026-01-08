@@ -25,6 +25,10 @@ app.engine('ejs', ejsMate);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res)=>{
+    res.render('home', {title : 'The Homepage'})
+});
+
 const PORT = process.env.PORT;
 app.listen(PORT, ()=>{
     console.log(`App is listening on PORT ${PORT}`)
