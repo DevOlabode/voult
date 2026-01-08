@@ -47,3 +47,12 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.plugin(passportLocalMongoose, {
+    usernameField: 'email',
+    usernameLowerCase: true,
+    errorMessages: {
+      UserExistsError: 'A developer with this email already exists',
+    },
+  });
+  
