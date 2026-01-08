@@ -3,7 +3,7 @@ const User = require('../models/user');
 const passport = require('passport');
 
 module.exports.loginForm = (req, res)=>{
-    res.render('auth/login')
+    res.render('auth/login', {title : "Login Page"})
 };
 
 module.exports.login = async (req, res) => {
@@ -15,7 +15,7 @@ module.exports.login = async (req, res) => {
 };
 
 module.exports.registerForm = (req, res)=>{
-    res.render('auth/register');
+    res.render('auth/register', {title : 'Register Form'});
 };
 
 module.exports.register =  async (req, res) => {
@@ -40,7 +40,7 @@ module.exports.register =  async (req, res) => {
       req.login(user, err => {
         if (err) throw err;
         req.flash('success', 'Account created successfully');
-        res.redirect('/dashboard');
+        res.redirect('/');
       });
   
     } catch (err) {

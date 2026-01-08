@@ -1,10 +1,21 @@
 <% layout('layout/boilerplate.ejs') %>
 
 <section class="auth-container">
-  <h1>Welcome Back</h1>
-  <p class="auth-subtext">Login to your developer dashboard.</p>
+  <h1>Create Developer Account</h1>
+  <p class="auth-subtext">Get your API key and start building.</p>
 
-  <form action="/login" method="POST" class="auth-form">
+  <form action="/register" method="POST" class="auth-form">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        required
+        placeholder="Your name"
+      />
+    </div>
+
     <div class="form-group">
       <label for="email">Email</label>
       <input
@@ -23,17 +34,18 @@
         id="password"
         name="password"
         required
+        minlength="6"
         placeholder="••••••••"
       />
     </div>
 
     <button type="submit" class="btn-primary">
-      Login
+      Create Account
     </button>
   </form>
 
   <p class="auth-footer">
-    Don’t have an account?
-    <a href="/register">Create one</a>
+    Already have an account?
+    <a href="/login">Login</a>
   </p>
 </section>
