@@ -39,12 +39,19 @@ app.use((req, res, next) => {
 
 const {isLoggedIn} = require('./middleware')  
 
-app.use('/', isLoggedIn);
-
-app.get('/', (req, res)=>{
-    req.flash('success', 'The Homepage')
-    res.render('home', {title : 'The Homepage'})
-});
+app.get('/', (req, res) => {
+    if (req.isAuthenticated()) {
+      return res.render('home-logged-in', {
+        user: req.user,
+        title: 'AuthWay',
+      });
+    }
+  
+    res.render('home-guest', {
+      title: 'AuthWay',
+    });
+  });
+  
 
 const PORT = process.env.PORT;
 app.listen(PORT, ()=>{
