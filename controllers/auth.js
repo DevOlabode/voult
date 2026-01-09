@@ -2,6 +2,8 @@ const User = require('../models/user');
 
 const passport = require('passport');
 
+const {welcomeEmail} = require('../services/emailService')
+
 module.exports.loginForm = (req, res)=>{
     res.render('auth/login', {title : "Login Page"})
 };
@@ -29,14 +31,13 @@ module.exports.register =  async (req, res) => {
   
       const user = new User({ email, name });
   
-      // passport-local-mongoose handles hashing
       await User.register(user, password);
   
-      // Generate API key after successful registration
       user.generateApiKey();
       await user.save();
+
+      await welcomeEmail(user.email, user.name)
   
-      // Auto-login after register
       req.login(user, err => {
         if (err) throw err;
         req.flash('success', 'Account created successfully');
