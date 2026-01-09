@@ -37,7 +37,8 @@ app.use((req, res, next) => {
     next();
   });
 
-const {isLoggedIn} = require('./middleware')  
+app.use('/', require('./routes/auth'));  
+
 
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
