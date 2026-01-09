@@ -12,7 +12,7 @@ function generateResetToken() {
 };
 
 module.exports.forgotPasswordForm = async(req, res)=>{
-    res.render('forgottenPassword/forgot-password')
+    res.render('forgottenPassword/forgot-password', {title : 'Forgot Password'})
 };
 
 module.exports.forgotPassword = async (req, res) => {
@@ -32,11 +32,11 @@ module.exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 1000 * 60 * 30; // 30 minutes
     await user.save();
   
-    const resetUrl = `https://localhost:3000/reset-password/${token}`;
+    const resetUrl = `http://localhost:3000/reset-password/${token}`;
 
-    const forgottenPasswordEmail = require('../services/passwordResetEmail');
+    const {forgottenPasswordEmail} = require('../services/passwordResetEmail');
 
-    await forgottenPasswordEmail(email);
+    await forgottenPasswordEmail(user.name, email, resetUrl);
   
     req.flash('success', 'A reset link has been sent to your email.');
     res.redirect('/forgot-password');
@@ -54,6 +54,7 @@ module.exports.forgotPassword = async (req, res) => {
     }
   
     res.render('forgottenPassword/reset-password', {
+      title : 'Reset Password',
       token: req.params.token,
     });
   };

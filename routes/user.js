@@ -10,7 +10,7 @@ const { isLoggedIn } = require('../middleware');
 
 router.get('/dashboard',isLoggedIn, catchAsync(controller.dashboard));
 
-router.get('/forgot-password', controller.forgotPassword);
+router.get('/forgot-password', controller.forgotPasswordForm);
 
 router.post('/forgot-password',catchAsync(controller.forgotPassword));
 
