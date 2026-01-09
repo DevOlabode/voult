@@ -1,24 +1,23 @@
-<% if (locals.success && success.length) { %>
-    <div class="flash flash-success">
-      <% success.forEach(msg => { %>
-        <p><%= msg %></p>
-      <% }) %>
-    </div>
-  <% } %>
-  
-  <% if (locals.error && error.length) { %>
-    <div class="flash flash-error">
-      <% error.forEach(msg => { %>
-        <p><%= msg %></p>
-      <% }) %>
-    </div>
-  <% } %>
-  
-  <% if (locals.info && info.length) { %>
-    <div class="flash flash-info">
-      <% info.forEach(msg => { %>
-        <p><%= msg %></p>
-      <% }) %>
-    </div>
-  <% } %>
-  
+<% if (success && success.length) { %>
+  <div class="flash flash-success">
+    <% success.forEach(msg => { %>
+      <p><%= msg %></p>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (error && error.length) { %>
+  <div class="flash flash-error">
+    <% error.forEach(msg => { %>
+      <p><%= msg %></p>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (info && info.length) { %>
+  <div class="flash flash-info">
+    <% info.forEach(msg => { %>
+      <p><%= msg %></p>
+    <% }) %>
+  </div>
+<% } %>
