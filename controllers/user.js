@@ -11,7 +11,7 @@ function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 };
 
-module.exports.forgotPasswordForm = async(res, res)=>{
+module.exports.forgotPasswordForm = async(req, res)=>{
     res.render('forgottenPassword/forgot-password')
 };
 
@@ -33,16 +33,10 @@ module.exports.forgotPassword = async (req, res) => {
     await user.save();
   
     const resetUrl = `https://localhost:3000/reset-password/${token}`;
-  
-    await sendEmail({
-      to: user.email,
-      subject: 'Reset your AuthWay password',
-      html: `
-        <p>You requested a password reset.</p>
-        <p>This link expires in 30 minutes.</p>
-        <a href="${resetUrl}">Reset Password</a>
-      `,
-    });
+
+    const forgottenPasswordEmail = require('../services/passwordResetEmail');
+
+    await forgottenPasswordEmail(email);
   
     req.flash('success', 'A reset link has been sent to your email.');
     res.redirect('/forgot-password');

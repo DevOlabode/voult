@@ -21,10 +21,10 @@ module.exports.welcomeEmail = async(to, name) =>{
             </p>
       
             <ul style="font-size: 15px; color: #374151; padding-left: 18px; line-height: 1.6;">
-              <li>🔐 Manage secure user authentication with Passport.js</li>
-              <li>🧠 Handle sessions, login states, and protected routes</li>
-              <li>⚡ Support both web and API-based authentication</li>
-              <li>🧩 Easily plug AuthWay into your Express applications</li>
+              <li> Manage secure user authentication with Passport.js</li>
+              <li> Handle sessions, login states, and protected routes</li>
+              <li> Support both web and API-based authentication</li>
+              <li> Easily plug AuthWay into your Express applications</li>
             </ul>
       
             <a href="https://yourwebsite.com/login"
@@ -43,6 +43,5 @@ module.exports.welcomeEmail = async(to, name) =>{
           </div>
         </div>
       `
-      
     })
-}
+};
