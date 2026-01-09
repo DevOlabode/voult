@@ -21,4 +21,6 @@ router.post('/register', catchAsync(controller.register));
 
 router.get('/dashboard', catchAsync(controller.dashboard));
 
+router.post('/logout', controller.logout)
+
 module.exports = router;

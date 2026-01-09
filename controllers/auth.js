@@ -53,3 +53,14 @@ module.exports.dashboard = async(req, res)=>{
     const user = await User.findById(req.user._id);
     res.render('user/dashboard', {user, title : 'Dashboard'})
 };
+
+module.exports.logout = (req, res, next) => {
+  req.logout(err => {
+    if (err) {
+      return next(err);
+    }
+
+    req.flash('success', 'You have logged out successfully');
+    res.redirect('/');
+  });
+}
