@@ -12,4 +12,10 @@ module.exports.isLoggedIn = (req, res, next) => {
   
     next();
   };
-  
+
+module.exports.redirectIfLoggedIn = (req, res, next)=>{
+  if(req.isAuthenticated()){
+    return res.redirect('/')
+  };
+  next();
+}  

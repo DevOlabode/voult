@@ -7,7 +7,9 @@ const controller = require('../controllers/auth');
 
 const catchAsync = require('../utils/catchAsync');
 
-router.get('/login', controller.loginForm);
+const {redirectIfLoggedIn} = require('../middleware');
+
+router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
 router.post('/login',  passport.authenticate('local', {
     failureRedirect: '/login',
@@ -15,7 +17,7 @@ router.post('/login',  passport.authenticate('local', {
   }), 
   controller.login);
 
-router.get('/register',controller.registerForm);
+router.get('/register',redirectIfLoggedIn, controller.registerForm);
 
 router.post('/register', catchAsync(controller.register));
 
