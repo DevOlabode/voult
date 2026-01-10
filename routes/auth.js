@@ -21,4 +21,7 @@ router.post('/register', catchAsync(controller.register));
 
 router.post('/logout', controller.logout);
 
+router.get('/verify/:token', catchAsync(controller.verifyAccount));
+
+
 module.exports = router;

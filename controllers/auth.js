@@ -2,7 +2,9 @@ const User = require('../models/user');
 
 const passport = require('passport');
 
-const {welcomeEmail} = require('../services/emailService')
+const {welcomeEmail} = require('../services/emailService');
+
+const crypto = require('crypto');
 
 module.exports.loginForm = (req, res)=>{
     res.render('auth/login', {title : "Login Page"})
@@ -27,16 +29,27 @@ module.exports.register =  async (req, res) => {
       if (!email || !name || !password) {
         req.flash('error', 'All fields are required');
         return res.redirect('/register');
-      }
-  
-      const user = new User({ email, name });
+      };
+
+      const verifyToken = crypto.randomBytes(32).toString('hex');
+
+      const user = new User({
+        name,
+        email,
+        verifyToken,
+        verifyTokenExpires: Date.now() + 1000 * 60 * 60 * 24 // 24h
+      });
+
+      const verifyUrl = `${
+        process.env.NODE_ENV === 'production' ? 'https' : 'http'
+      }://${req.headers.host}/verify/${verifyToken}`;
   
       await User.register(user, password);
   
       user.generateApiKey();
       await user.save();
 
-      await welcomeEmail(user.email, user.name)
+      await welcomeEmail(user.email, user.name, verifyUrl);
   
       req.login(user, err => {
         if (err) throw err;
@@ -59,4 +72,25 @@ module.exports.logout = (req, res, next) => {
     req.flash('success', 'You have logged out successfully');
     res.redirect('/');
   });
-}
+};
+
+module.exports.verifyAccount = async (req, res) => {
+  const user = await User.findOne({
+    verifyToken: req.params.token,
+    verifyTokenExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    req.flash('error', 'Verification link is invalid or expired.');
+    return res.redirect('/login');
+  }
+
+  user.isVerified = true;
+  user.verifyToken = undefined;
+  user.verifyTokenExpires = undefined;
+
+  await user.save();
+
+  req.flash('success', 'Your account has been verified. You can now log in.');
+  res.redirect('/login');
+};
