@@ -13,4 +13,6 @@ router.get('/new', controller.newForm);
 
 router.post('/', catchAsync(controller.newApp));
 
+router.get('/:id', catchAsync(controller.manage));
+
 module.exports = router;

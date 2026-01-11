@@ -19,3 +19,8 @@ module.exports.newApp = async(req, res)=>{
     req.flash('success', 'App created successdfully')
     res.redirect('/dashboard');
 };
+
+module.exports.manage = async(req, res)=>{
+    const app = await App.findById(req.params.id);
+    res.render('app/manage', {app, title : `Manage ${app.name}`})
+};
