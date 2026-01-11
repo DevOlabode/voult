@@ -4,13 +4,15 @@ const router = express.Router();
 //   Web Routes (sessions + EJS)
 
 const webAuthRoutes = require('./web/auth');
-const webUserRoutes = require('./web/user')
+const webUserRoutes = require('./web/user');
+const webAppRoutes = require('./web/app')
 
 
 //    Mount Web Routes
 
 router.use('/', webAuthRoutes);
 router.use('/', webUserRoutes);
+router.use('/', webAppRoutes);
 
 //    Mount API Routes
 
