@@ -16,5 +16,6 @@ module.exports.newApp = async(req, res)=>{
 
     await app.save();
 
+    req.flash('success', 'App created successdfully')
     res.redirect('/dashboard');
 };
