@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const controller = require('../../controllers/user');
+const controller = require('../../controllers/web/user');
 const catchAsync = require('../../utils/catchAsync');
 
 const { isLoggedIn } = require('../../middleware');

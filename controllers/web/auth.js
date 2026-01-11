@@ -1,8 +1,8 @@
-const User = require('../models/user');
+const User = require('../../models/user');
 
 const passport = require('passport');
 
-const {welcomeEmail} = require('../services/emailService');
+const {welcomeEmail} = require('../../services/emailService');
 
 const crypto = require('crypto');
 

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const passport = require('passport');
 
-const controller = require('../../controllers/auth');
+const controller = require('../../controllers/web/auth');
 
 const catchAsync = require('../../utils/catchAsync');
 
