@@ -3,7 +3,9 @@ const plm = require('passport-local-mongoose');
 const passportLocalMongoose = plm.default || plm;
 const crypto = require('crypto');
 
-const userSchema = new mongoose.Schema(
+const {Schema} = mongoose;
+
+const developerSchema = new Schema(
   {
     email: {
       type: String,
@@ -61,7 +63,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.plugin(passportLocalMongoose, {
+developerSchema.plugin(passportLocalMongoose, {
     usernameField: 'email',
     usernameLowerCase: true,
     errorMessages: {
@@ -69,10 +71,10 @@ userSchema.plugin(passportLocalMongoose, {
     },
   });
 
-userSchema.methods.generateApiKey = function () {
+developerSchema.methods.generateApiKey = function () {
     const key = crypto.randomBytes(32).toString('hex');
     this.apiKey = key;
     return key;
 };
   
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Developer', developerSchema);
