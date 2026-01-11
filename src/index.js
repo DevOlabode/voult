@@ -13,6 +13,8 @@ const passport = require('../config/passport');
 
 const sessionConfig = require('../config/session');
 
+const methodOverride = require('method-override')
+
 const routes = require('../routes/index');
 
 app.use(express.json());
@@ -31,6 +33,8 @@ app.set('view engine', 'ejs');
 app.engine('ejs', ejsMate);
 
 app.use(express.static(path.join(__dirname, '../public')));
+
+app.use(methodOverride('_method'));
 
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');

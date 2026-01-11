@@ -24,3 +24,17 @@ module.exports.manage = async(req, res)=>{
     const app = await App.findById(req.params.id);
     res.render('app/manage', {app, title : `Manage ${app.name}`})
 };
+
+module.exports.deleteApp = async(req, res)=>{
+    const app = await App.findById(req.params.id);
+
+    if(!app){
+        req.flash('error', 'App not found');
+        return res.redirect('/dashboard');
+    };
+
+    await App.findByIdAndDelete(req.params._id);
+    
+    req.flash('success', 'App deleted successfully');
+    res.redirect('/dashboard')
+}

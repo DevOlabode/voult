@@ -15,4 +15,6 @@ router.post('/', catchAsync(controller.newApp));
 
 router.get('/:id', catchAsync(controller.manage));
 
+router.delete('/:id', catchAsync(controller.deleteApp));
+
 module.exports = router;
