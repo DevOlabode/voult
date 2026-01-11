@@ -35,7 +35,7 @@ module.exports.deleteApp = async (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  // 🔐 Ownership check
+  // Ownership check
   if (!app.owner.equals(req.user._id)) {
     req.flash('error', 'You are not authorized to delete this app');
     return res.redirect('/dashboard');
