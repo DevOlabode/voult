@@ -1,6 +1,7 @@
 <% layout('layout/boilerplate.ejs') %>
 
 <section class="dashboard">
+
   <header class="dashboard-header">
     <h1>Developer Dashboard</h1>
     <p class="dashboard-subtext">
@@ -8,23 +9,65 @@
     </p>
   </header>
 
-  <div class="dashboard-grid">
-
-    <!-- API Key Card -->
-    <div class="card">
-      <h2>Your API Key</h2>
-
-      <% if (user.apiKeyActive) { %>
-        <div class="api-key-box">
-          <code id="apiKey"><%= user.apiKey %></code>
-        </div>
-        <p class="hint">Keep this key private. Never expose it in client-side code.</p>
-      <% } else { %>
-        <p class="warning">Your API key is currently disabled.</p>
-      <% } %>
+  <!-- =====================
+       Apps Section
+       ===================== -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2>Your Apps</h2>
+      <a href="/apps/new" class="btn-primary btn-sm">
+        + New App
+      </a>
     </div>
 
-    <!-- Account Info -->
+    <% if (apps.length === 0) { %>
+      <!-- Empty State -->
+      <div class="empty-state">
+        <h3>No apps yet</h3>
+        <p>
+          Create your first app to start authenticating users with AuthWay.
+        </p>
+        <a href="/apps/new" class="btn-primary">
+          Create Your First App
+        </a>
+      </div>
+    <% } else { %>
+      <div class="apps-grid">
+        <% apps.forEach(app => { %>
+          <div class="card app-card">
+            <h3><%= app.name %></h3>
+
+            <% if (app.description) { %>
+              <p class="text-muted"><%= app.description %></p>
+            <% } %>
+
+            <ul class="info-list">
+              <li>
+                <strong>Status:</strong>
+                <span class="<%= app.isActive ? 'status-active' : 'status-disabled' %>">
+                  <%= app.isActive ? 'Active' : 'Disabled' %>
+                </span>
+              </li>
+              <li>
+                <strong>Created:</strong>
+                <%= app.createdAt.toDateString() %>
+              </li>
+            </ul>
+
+            <a href="/apps/<%= app._id %>" class="btn-secondary btn-sm">
+              Manage App →
+            </a>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- =====================
+       Account Info
+       ===================== -->
+  <div class="dashboard-grid">
+
     <div class="card">
       <h2>Account</h2>
       <ul class="info-list">
@@ -38,7 +81,6 @@
       </ul>
     </div>
 
-    <!-- Quick Actions -->
     <div class="card">
       <h2>Quick Actions</h2>
       <ul class="action-list">
@@ -52,8 +94,9 @@
   </div>
 
   <form action="/logout" method="POST" class="logout-form">
-    <button type="submit" class="btn-danger mb-3">Logout</button>
+    <button type="submit" class="btn-danger">
+      Logout
+    </button>
   </form>
 
-  <a href="/app/new" class="btn btn-primary mt-3">New App</a>
 </section>
