@@ -1,14 +1,16 @@
 <% layout('layout/boilerplate') %>
 
-<section class="container" style="max-width: 720px; margin-top: 40px;">
-  
-  <h1>Create a New App</h1>
-  <p class="text-muted">
-    Create an app to start authenticating users with AuthWay.
-  </p>
+<section class="container app-container">
 
-  <form action="/apps" method="POST" class="card" style="margin-top: 24px;">
-    
+  <div class="app-header">
+    <h1>Create a New App</h1>
+    <p class="text-muted">
+      Create an app to start authenticating users with AuthWay.
+    </p>
+  </div>
+
+  <form action="/apps" method="POST" class="card app-form">
+
     <div class="form-group">
       <label for="name">App Name</label>
       <input
@@ -46,7 +48,7 @@
       </small>
     </div>
 
-    <div style="margin-top: 28px; display: flex; gap: 12px;">
+    <div class="form-actions">
       <button type="submit" class="btn-primary">
         Create App
       </button>
