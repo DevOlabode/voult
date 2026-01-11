@@ -9,6 +9,7 @@
   </header>
 
   <div class="dashboard-grid">
+
     <!-- API Key Card -->
     <div class="card">
       <h2>Your API Key</h2>
@@ -17,7 +18,7 @@
         <div class="api-key-box">
           <code id="apiKey"><%= user.apiKey %></code>
         </div>
-        <p class="hint">Keep this key secret. Do not expose it in frontend code.</p>
+        <p class="hint">Keep this key private. Never expose it in client-side code.</p>
       <% } else { %>
         <p class="warning">Your API key is currently disabled.</p>
       <% } %>
@@ -30,8 +31,9 @@
         <li><strong>Email:</strong> <%= user.email %></li>
         <li><strong>Plan:</strong> <%= user.plan %></li>
         <li><strong>Joined:</strong> <%= user.createdAt.toDateString() %></li>
+
         <% if (user.lastLoginAt) { %>
-          <li><strong>Last login:</strong> <%= user.lastLoginAt.toDateString() %></li>
+          <li><strong>Last Login:</strong> <%= user.lastLoginAt.toDateString() %></li>
         <% } %>
       </ul>
     </div>
@@ -46,9 +48,12 @@
         <li>Account Settings</li>
       </ul>
     </div>
+
   </div>
 
   <form action="/logout" method="POST" class="logout-form">
-    <button type="submit" class="btn-danger">Logout</button>
+    <button type="submit" class="btn-danger mb-3">Logout</button>
   </form>
+
+  <a href="/app/new" class="btn btn-primary mt-3">New App</a>
 </section>
