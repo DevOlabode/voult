@@ -16,7 +16,7 @@ module.exports.newApp = async(req, res)=>{
 
     await app.save();
 
-    req.flash('success', 'App created successdfully')
+    req.flash('success', 'App created successdfully');
     res.redirect(`/app/${app._id}`);
 };
 
@@ -25,16 +25,24 @@ module.exports.manage = async(req, res)=>{
     res.render('app/manage', {app, title : `Manage ${app.name}`})
 };
 
-module.exports.deleteApp = async(req, res)=>{
-    const app = await App.findById(req.params.id);
+module.exports.deleteApp = async (req, res) => {
+  const { id } = req.params;
 
-    if(!app){
-        req.flash('error', 'App not found');
-        return res.redirect('/dashboard');
-    };
+  const app = await App.findById(id);
 
-    await App.findByIdAndDelete(req.params._id);
-    
-    req.flash('success', 'App deleted successfully');
-    res.redirect('/dashboard')
-}
+  if (!app) {
+    req.flash('error', 'App not found');
+    return res.redirect('/dashboard');
+  }
+
+  // 🔐 Ownership check
+  if (!app.owner.equals(req.user._id)) {
+    req.flash('error', 'You are not authorized to delete this app');
+    return res.redirect('/dashboard');
+  }
+
+  await App.findByIdAndDelete(id);
+
+  req.flash('success', 'App deleted successfully');
+  res.redirect('/dashboard');
+};
