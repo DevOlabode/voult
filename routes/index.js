@@ -23,13 +23,13 @@ router.use('/', webUserRoutes);
 
 router.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-      return res.render('home-logged-in', {
+      return res.render('home/home-logged-in', {
         user: req.user,
         title: 'AuthWay',
       });
     }
   
-    res.render('home-guest', {
+    res.render('home/home-guest', {
       title: 'AuthWay',
     });
   });
