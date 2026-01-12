@@ -51,11 +51,15 @@
       <code><%= app.clientId %></code>
       <small>Client ID</small>
     </div>
-
+    
     <div class="api-box">
-      <code><%= app.clientSecretHash %></code>
+      <code>••••••••••••••••</code>
       <small>Client Secret</small>
     </div>
+    
+    <form action="/app/<%= app._id %>/rotate-secret" method="POST">
+      <button class="btn-secondary">Rotate Client Secret</button>
+    </form>
 
     <p class="hint">
       Never expose your client secret in frontend code.

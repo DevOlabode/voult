@@ -4,24 +4,31 @@ module.exports.newForm = (req, res)=>{
     res.render('app/new', {title : 'New App'});
 };
 
-module.exports.newApp = async(req, res)=>{
-    const { name, description, callbackUrl} = req.body;
-    const app = new App({
-        name,
-        description,
-        callbackUrl,
-        owner : req.user._id,
-        isActive : true
-    });
+module.exports.newApp = async (req, res) => {
+  const { name, description, callbackUrl } = req.body;
 
-    app.generateClientId();
-    app.generateClientSecret();
+  const app = new App({
+    name,
+    description,
+    callbackUrl,
+    owner: req.user._id,
+    isActive: true
+  });
 
-    await app.save();
+  app.generateClientId();
 
-    req.flash('success', 'App created successdfully');
-    res.redirect(`/app/${app._id}`);
+  const rawClientSecret = app.generateClientSecret(); // ← STORE IT
+
+  await app.save();
+
+  // ❗ Render ONCE with the secret
+  res.render('app/created', {
+    app,
+    clientSecret: rawClientSecret,
+    title : `${app.name} client secret`
+  });
 };
+
 
 module.exports.manage = async(req, res)=>{
     const app = await App.findById(req.params.id);

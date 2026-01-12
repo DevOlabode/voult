@@ -1,0 +1,35 @@
+<% layout('layout/boilerplate.ejs') %>
+
+<section class="card warning">
+
+  <h1>App Created 🎉</h1>
+
+  <p class="danger">
+    This client secret will be shown <strong>only once</strong>.
+    Copy it now and store it in your <code>.env</code> file.
+  </p>
+
+  <div class="credential-box">
+    <label>Client ID</label>
+    <code><%= app.clientId %></code>
+  </div>
+
+  <div class="credential-box highlight">
+    <label>Client Secret</label>
+    <code id="secret"><%= clientSecret %></code>
+    <button onclick="copySecret()">Copy</button>
+  </div>
+
+  <a href="/app/<%= app._id %>" class="btn-primary">
+    I’ve saved it
+  </a>
+
+</section>
+
+<script>
+  function copySecret() {
+    const text = document.getElementById('secret').innerText;
+    navigator.clipboard.writeText(text);
+    alert('Client secret copied!');
+  }
+</script>
