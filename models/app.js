@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const crypto = require('crypto');
+
 const AppSchema = new Schema(
   {
     name: {
@@ -23,7 +25,7 @@ const AppSchema = new Schema(
       default: true
     },
 
-    // 🔑 App credentials
+    //  App credentials
     clientId: {
       type: String,
       unique: true,
