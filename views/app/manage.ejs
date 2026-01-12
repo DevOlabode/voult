@@ -57,10 +57,8 @@
   <section class="card">
     <h2>Actions</h2>
 
-    <form action="/app/<%= app._id %>/toggle" method="POST">
-      <button
-        class="btn <%= app.isActive ? 'btn-warning' : 'btn-success' %>"
-      >
+    <form action="/app/<%= app._id %>/toggle" method="POST" class="action-spacing">
+      <button class="btn <%= app.isActive ? 'btn-danger' : 'btn-secondary' %> ">
         <%= app.isActive ? 'Disable App' : 'Enable App' %>
       </button>
     </form>

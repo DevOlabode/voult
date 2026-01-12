@@ -106,5 +106,5 @@ module.exports.updateApp = async (req, res) => {
       `App ${app.isActive ? 'enabled' : 'disabled'} successfully`
     );
   
-    res.redirect('/dashboard');
+    res.redirect(`/app/${app._id}`);
 };
