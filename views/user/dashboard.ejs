@@ -40,9 +40,15 @@
               </span>
             </div>
 
-            <a href="/app/<%= app._id %>" class="link">
-              Manage →
-            </a>
+            <div class="app-actions">
+              <a href="/app/<%= app._id %>" class="link">
+                Manage →
+              </a>
+            
+              <a href="/apps/<%= app._id %>/edit" class="btn-link">
+                Edit
+              </a>
+            </div>
           </div>
         <% }) %>
       </div>

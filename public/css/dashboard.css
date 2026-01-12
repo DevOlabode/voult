@@ -198,4 +198,22 @@
   .logout-form {
     margin-top: 24px;
   }
+
+  .app-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 12px;
+  }
+  
+  .btn-link {
+    font-size: 14px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .btn-link:hover {
+    text-decoration: underline;
+  }
+  
     
