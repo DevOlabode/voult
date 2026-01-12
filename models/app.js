@@ -26,4 +26,10 @@ const AppSchema = new Schema({
     deletedAt : Date
 },{timestamps : true});
 
+AppSchema.methods.generateApiKey = function () {
+    const key = crypto.randomBytes(32).toString('hex');
+    this.apiKey = key;
+    return key;
+};
+
 module.exports = mongoose.model('App', AppSchema);

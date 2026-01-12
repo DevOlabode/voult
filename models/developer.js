@@ -64,17 +64,11 @@ const developerSchema = new Schema(
 );
 
 developerSchema.plugin(passportLocalMongoose, {
-    usernameField: 'email',
-    usernameLowerCase: true,
-    errorMessages: {
-      UserExistsError: 'A developer with this email already exists',
-    },
-  });
-
-developerSchema.methods.generateApiKey = function () {
-    const key = crypto.randomBytes(32).toString('hex');
-    this.apiKey = key;
-    return key;
-};
+  usernameField: 'email',
+  usernameLowerCase: true,
+  errorMessages: {
+    UserExistsError: 'A developer with this email already exists',
+  },
+});
   
 module.exports = mongoose.model('Developer', developerSchema);
