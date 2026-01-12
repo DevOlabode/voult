@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const AppSchema = new Schema(
   {
@@ -49,25 +50,13 @@ AppSchema.methods.generateClientId = function () {
 };
 
 AppSchema.methods.generateClientSecret = function () {
-    const secret = `sk_${crypto.randomBytes(32).toString('hex')}`;
-  
-    const hash = crypto
-      .createHash('sha256')
-      .update(secret)
-      .digest('hex');
-  
-    this.clientSecretHash = hash;
-  
-    return secret;
+  const secret = crypto.randomBytes(32).toString('hex');
+  this.clientSecretHash = bcrypt.hashSync(secret, 12);
+  return secret; 
 };
-  
-AppSchema.methods.verifyClientSecret = function (secret) {
-    const hash = crypto
-      .createHash('sha256')
-      .update(secret)
-      .digest('hex');
-  
-    return hash === this.clientSecretHash;
-};  
+
+AppSchema.methods.verifyClientSecret = async function (secret) {
+  return bcrypt.compare(secret, this.clientSecretHash);
+};
 
 module.exports = mongoose.model('App', AppSchema);
