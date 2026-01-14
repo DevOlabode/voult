@@ -95,4 +95,13 @@ module.exports.me = (req, res) => {
     email: req.endUser.email,
     app: req.app.name
   })
-}
+};
+
+module.exports.logout = async (req, res) => {
+  req.endUser.tokenVersion += 1;
+  await req.endUser.save();
+
+  res.json({
+    message: 'Logged out successfully'
+  });
+};

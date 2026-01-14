@@ -12,7 +12,8 @@ module.exports.signEndUserToken = (endUser, app) => {
     {
       sub: endUser._id,
       app: app._id,
-      email: endUser.email
+      email: endUser.email,
+      tokenVersion: endUser.tokenVersion
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
