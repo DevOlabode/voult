@@ -9,17 +9,20 @@ const catchAsync = require('../../utils/catchAsync');
 
 const {redirectIfLoggedIn, storeReturnTo} = require('../../middleware');
 
+const { webAuthLimiter } = require('../../middleware/rateLimiters')
+
 router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
 router.post('/login', storeReturnTo, passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true,
   }), 
+  webAuthLimiter,
   controller.login);
 
 router.get('/register',redirectIfLoggedIn, controller.registerForm);
 
-router.post('/register', catchAsync(controller.register));
+router.post('/register', webAuthLimiter, catchAsync(controller.register));
 
 router.post('/logout', controller.logout);
 
