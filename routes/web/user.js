@@ -8,8 +8,6 @@ const { isLoggedIn } = require('../../middleware');
 
 const { webAuthLimiter } = require('../../middleware/rateLimiters')
 
-// router.use(isLoggedIn);
-
 router.get('/dashboard',isLoggedIn, catchAsync(controller.dashboard));
 
 router.get('/forgot-password', controller.forgotPasswordForm);
