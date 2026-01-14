@@ -35,7 +35,7 @@ This document tracks what is done and what remains for AuthWay as an authenticat
 ## ⚠️ MVP+ (Strongly Recommended Next)
 
 ### Security & Stability
-- [ ] Rate limiting on auth endpoints (login/register)
+- [x] Rate limiting on auth endpoints (login/register)
 - [ ] Input validation (Joi / Zod)
 - [ ] Consistent API error format
 - [ ] Token expiration handling

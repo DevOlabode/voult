@@ -43,7 +43,7 @@ module.exports.forgotPassword = async (req, res) => {
   
     const resetUrl = `http://localhost:3000/reset-password/${token}`;
 
-    const {forgottenPasswordEmail} = require('../services/passwordResetEmail');
+    const {forgottenPasswordEmail} = require('../../services/passwordResetEmail');
 
     await forgottenPasswordEmail(user.name, email, resetUrl);
   

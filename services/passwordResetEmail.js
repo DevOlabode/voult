@@ -1,4 +1,4 @@
-const { transporter } = require('../config/email');
+const { transporter } = require('../config/mailer');
 
 module.exports.forgottenPasswordEmail = (name, to, resetUrl)=>{
     return transporter.sendMail({
