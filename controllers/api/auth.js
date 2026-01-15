@@ -37,6 +37,9 @@ module.exports.register = async (req, res) => {
   });
 
   await user.setPassword(password);
+
+  app.usage.totalRegistrations += 1;
+
   await user.save();
 
   const token = signEndUserToken(user, app);
@@ -91,6 +94,9 @@ module.exports.login = async (req, res) => {
   }
 
   user.lastLoginAt = new Date();
+
+  app.usage.totalLogins += 1;
+
   await user.save();
 
   const token = signEndUserToken(user, app);

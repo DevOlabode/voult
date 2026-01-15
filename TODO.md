@@ -54,9 +54,9 @@ This document tracks what is done and what remains for AuthWay as an authenticat
 
 ### App Management Improvements
 - [x] Restrict callback URLs (allowlist)
-- [ ] Rotate Client ID (optional)
-- [ ] View app usage stats (logins, registrations)
-- [ ] Audit log per app
+- [x] Rotate Client ID (optional)
+- [x] View app usage stats (logins, registrations)
+- [x] Audit log per app
 
 ---
 

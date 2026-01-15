@@ -93,6 +93,11 @@ const AppSchema = new mongoose.Schema({
     index: true
   },
 
+  usage: {
+    totalRegistrations: { type: Number, default: 0 },
+    totalLogins: { type: Number, default: 0 }
+  },
+
   clientSecretHash: {
     type: String,
     select: false
@@ -118,4 +123,4 @@ AppSchema.methods.verifyClientSecret = function (secret) {
   return bcrypt.compare(secret, this.clientSecretHash);
 };
 
-module.exports = mongoose.model('App', AppSchema);
+module.exports = mongoose.models.App || mongoose.model('App', AppSchema);
