@@ -1,61 +1,70 @@
 const EndUser = require('../../models/endUser');
+const { signEndUserToken } = require('../../utils/jwt');
+const { ApiError } = require('../../utils/apiError');
 
-const {signEndUserToken} = require('../../utils/jwt');
 
+// =======================
+// REGISTER
+// =======================
+module.exports.register = async (req, res) => {
+  const { email, password } = req.body;
+  const app = req.appClient;
 
-//Register Route
-module.exports.register = async(req, res)=>{
-    const {email, password} = req.body;
+  if (!email || !password) {
+    throw new ApiError(
+      400,
+      'VALIDATION_ERROR',
+      'Email and password are required'
+    );
+  }
 
-    const app = req.appClient;
+  const existingUser = await EndUser.findOne({
+    app: app._id,
+    email
+  });
 
-    if (!email || !password) {
-        return res.status(400).json({
-          error: 'Email and password are required'
-        });
-    };
+  if (existingUser) {
+    throw new ApiError(
+      409,
+      'USER_EXISTS',
+      'User with that email already exists'
+    );
+  }
 
-    const existingUser = await EndUser.findOne({
-        app : app._id,
-        email
-    });
+  const user = new EndUser({
+    app: app._id,
+    email
+  });
 
-    if(existingUser){
-        return res.status(409).json({
-            error : 'User with that email already exists'
-        });
+  await user.setPassword(password);
+  await user.save();
+
+  const token = signEndUserToken(user, app);
+
+  res.status(201).json({
+    message: 'User registered successfully',
+    token,
+    user: {
+      id: user._id,
+      email: user.email
     }
-
-    const user = new EndUser({
-        app : app._id,
-        email
-    });
-
-    await user.setPassword(password);
-    await user.save();
-  
-    const token = signEndUserToken(user, app);
-  
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user._id,
-        email: user.email
-      }
-    });
+  });
 };
 
 
-//login Controller 
+// =======================
+// LOGIN
+// =======================
 module.exports.login = async (req, res) => {
   const { email, password } = req.body;
   const app = req.appClient;
 
   if (!email || !password) {
-    return res.status(400).json({
-      error: 'Email and password are required'
-    });
+    throw new ApiError(
+      400,
+      'VALIDATION_ERROR',
+      'Email and password are required'
+    );
   }
 
   const user = await EndUser.findOne({
@@ -65,17 +74,20 @@ module.exports.login = async (req, res) => {
   }).select('+passwordHash');
 
   if (!user) {
-    return res.status(401).json({
-      error: 'Invalid credentials'
-    });
+    throw new ApiError(
+      401,
+      'INVALID_CREDENTIALS',
+      'Invalid email or password'
+    );
   }
 
   const isValid = await user.verifyPassword(password);
-
   if (!isValid) {
-    return res.status(401).json({
-      error: 'Invalid credentials'
-    });
+    throw new ApiError(
+      401,
+      'INVALID_CREDENTIALS',
+      'Invalid email or password'
+    );
   }
 
   user.lastLoginAt = new Date();
@@ -94,28 +106,45 @@ module.exports.login = async (req, res) => {
 };
 
 
-//Profile Controller.
+// =======================
+// ME
+// =======================
 module.exports.me = async (req, res) => {
+  if (!req.endUser) {
+    throw new ApiError(
+      401,
+      'UNAUTHORIZED',
+      'Authentication required'
+    );
+  }
+
   const user = await req.endUser.populate('app');
 
   res.status(200).json({
     id: user._id,
     email: user.email,
     createdAt: user.createdAt,
-    app : user.app
+    app: user.app
   });
 };
 
 
-// logout controller
+// =======================
+// LOGOUT
+// =======================
 module.exports.logout = async (req, res) => {
-  const user = req.endUser;
+  if (!req.endUser) {
+    throw new ApiError(
+      401,
+      'UNAUTHORIZED',
+      'Authentication required'
+    );
+  }
 
-  user.tokenVersion += 1;
-  await user.save();
+  req.endUser.tokenVersion += 1;
+  await req.endUser.save();
 
   res.status(200).json({
     message: 'Logged out successfully'
   });
 };
-

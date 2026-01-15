@@ -51,6 +51,13 @@ app.use(routes);
 
 // Error Handler.  
 
+const { sendError } = require('../utils/apiError');
+
+app.use('/api', (err, req, res, next) => {
+  console.error('API ERROR:', err);
+  return sendError(res, err);
+});
+
 app.use((req, res, next) => {
   next(new ExpressError('Page Not Found', 404));
 });

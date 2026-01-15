@@ -24,7 +24,7 @@ router.use('/api/auth', apiAuthRoutes);
 // router.use('/api/users', apiUserRoutes);
 // router.use('/api/health', healthRoutes);
 
-app.use(require('./middleware/apiErrorHandler'));
+router.use(require('../middleware/apiErrorHandler'));
 
 //Home Page Route
 
