@@ -10,9 +10,9 @@ module.exports.newApp = async (req, res) => {
   const app = new App({
     name,
     description,
-    callbackUrl,
     owner: req.user._id,
-    isActive: true
+    isActive: true,
+    allowedCallbackUrls : callbackUrl
   });
 
   app.generateClientId();
