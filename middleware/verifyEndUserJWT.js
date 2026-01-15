@@ -26,7 +26,7 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
       throw new ApiError(
         401,
         'INVALID_TOKEN',
-        'Invalid or expired token'
+        'Invalid authentication token'
       );
     }
 
@@ -40,9 +40,18 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
 
     req.endUser = endUser;
     req.tokenPayload = payload;
-
     next();
+
   } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      console.warn(`[AUTH] Expired token used`);
+      throw new ApiError(
+        401,
+        'TOKEN_EXPIRED',
+        'Authentication token has expired'
+      );
+    }
+
     if (err instanceof ApiError) {
       throw err;
     }
@@ -50,7 +59,7 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
     throw new ApiError(
       401,
       'INVALID_TOKEN',
-      'Invalid or expired token'
+      'Invalid authentication token'
     );
   }
 };

@@ -46,8 +46,10 @@ app.use((req, res, next) => {
     next();
   });
 
-app.use(routes);  
+const {requestLogger} = require('../middleware/requestLogger');
+app.use(requestLogger)
 
+app.use(routes);  
 
 // Error Handler.  
 

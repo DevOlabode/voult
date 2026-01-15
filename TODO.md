@@ -37,9 +37,9 @@ This document tracks what is done and what remains for AuthWay as an authenticat
 ### Security & Stability
 - [x] Rate limiting on auth endpoints (login/register)
 - [x] Input validation (Joi / Zod)
-- [ ] Consistent API error format
-- [ ] Token expiration handling
-- [ ] Better logging (request + auth failures)
+- [x] Consistent API error format
+- [x] Token expiration handling
+- [x] Better logging (request + auth failures)
 
 ---
 
