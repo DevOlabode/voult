@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const components = require('./components');
 
 module.exports = swaggerJsdoc({
   definition: {
@@ -6,24 +7,17 @@ module.exports = swaggerJsdoc({
     info: {
       title: 'AuthWay API',
       version: '1.0.0',
-      description: `
-AuthWay is a multi-tenant authentication API for managing end-user authentication
-across multiple applications.
-
-### Authentication Types
-- **Client Authentication** (X-Client-Id + Client Secret)
-- **End User Authentication** (JWT)
-      `,
-      contact: {
-        name: 'AuthWay',
-      }
+      description: 'Multi-tenant authentication API'
     },
     servers: [
       {
         url: 'http://localhost:3000',
         description: 'Local development'
       }
-    ]
+    ],
+
+    components
   },
+
   apis: ['./docs/swagger/**/*.js']
 });
