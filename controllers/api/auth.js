@@ -40,7 +40,7 @@ module.exports.register = async (req, res) => {
   await user.setPassword(password);
 
   const appO = await App.findById(app._id);
-  appO.usage.registrations += 1;
+  appO.usage.totalRegistrations += 1;
 
   await appO.save();
 
