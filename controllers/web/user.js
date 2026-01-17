@@ -41,7 +41,7 @@ module.exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 1000 * 60 * 30; // 30 minutes
     await user.save();
   
-    const resetUrl = `http://localhost:3000/reset-password/${token}`;
+    const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
 
     const {forgottenPasswordEmail} = require('../../services/passwordResetEmail');
 
