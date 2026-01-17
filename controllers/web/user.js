@@ -71,7 +71,7 @@ module.exports.forgotPassword = async (req, res) => {
 
 
   module.exports.resetPassword = async (req, res) => {
-    const { password, confirmPassword } = req.body;
+    const { password } = req.body;
 
     if (password !== confirmPassword) {
       req.flash('error', 'Passwords do not match');
@@ -110,15 +110,37 @@ module.exports.forgotPassword = async (req, res) => {
     res.render('user/enterPassword', {title : 'Enter Password To Delete Account'})
   };
 
-  module.exports.deleteAccount = async(req, res)=>{
-    const {password} = req.body;
-    const user = await User.findById(req.user._id);
+  module.exports.deleteAccount = async (req, res, next) => {
+    try {
+      const { password } = req.body;
+  
+      const user = await User.findById(req.user._id);
+  
+      if (!user) {
+        req.flash('error', 'User does not exist');
+        return res.redirect('/dashboard');
+      }
+  
+      const { error } = await user.authenticate(password);
+  
+      if (error) {
+        req.flash('error', 'Incorrect password');
+        return res.redirect('/dashboard');
+      }
+  
+      req.logout(async err => {
+        if (err) return next(err);
 
-    const isMatch = await passport.compare(password, user.password);
+        await App.deleteMany({ owner: user._id });
+        await User.findByIdAndDelete(user._id);
 
-    if(!isMatch){
-      res.send('Incorrect Password')
-    }else{
-      res.send('Correct Password')
+        req.flash('success', 'Account deleted successfully');
+        res.redirect('/');
+      });
+  
+    } catch (err) {
+      next(err);
     }
   };
+  
+  
