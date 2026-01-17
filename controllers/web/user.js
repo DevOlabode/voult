@@ -85,7 +85,7 @@ module.exports.forgotPassword = async (req, res) => {
     if (!user) {
       req.flash('error', 'Password reset token is invalid or expired');
       return res.redirect('/forgot-password');
-    }
+    };
   
     await user.setPassword(password);
   
@@ -104,7 +104,12 @@ module.exports.forgotPassword = async (req, res) => {
     if(!user){
       req.flash('error', 'User Not Found!');
       res.redirect('/dashboard');
-    }
+    };
 
     res.render('user/enterPassword', {title : 'Enter Password To Delete Account'})
-  }
+  };
+
+  module.exports.deleteAccount = async(req, res)=>{
+    const {password} = req.body;
+    res.send(req.body);
+  };
