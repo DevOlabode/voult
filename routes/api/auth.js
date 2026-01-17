@@ -38,4 +38,6 @@ router.get('/me', verifyEndUserJWT, authController.me);
 
 router.post('/logout', requireEndUserAuth, authController.logout);
 
+router.get('/verify-email', authController.verifyEmail);
+
 module.exports = router;

@@ -3,7 +3,9 @@ const { signEndUserToken } = require('../../utils/jwt');
 const { ApiError } = require('../../utils/apiError');
 const App = require('../../models/app');
 
-const {verifyEndUsers} = require('../../services/emailService')
+const crypto = require('crypto');
+
+const {verifyEndUsers} = require('../../services/emailService');
 
 
 // =======================
@@ -50,7 +52,7 @@ module.exports.register = async (req, res) => {
 
   const verifyToken = await user.generateEmailVerificationToken();
 
-  const verifyUrl = `${process.env.BASE_URL}/api/authverify-email?token=${verifyToken}&appId=${app._id}`;
+  const verifyUrl = `${process.env.BASE_URL}/api/auth/verify-email?token=${verifyToken}&appId=${app._id}`;
 
   const token = signEndUserToken(user, app);
 
@@ -221,6 +223,51 @@ module.exports.verifyEmail = async (req, res) => {
   user.isEmailVerified = true;
   user.emailVerificationToken = undefined;
   user.emailVerificationExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    message: 'Email verified successfully'
+  });
+}
+
+
+//Verify Email.
+
+module.exports.verifyEmail = async (req, res) => {
+  const { token, appId } = req.query;
+
+  if (!token || !appId) {
+    throw new ApiError(
+      400,
+      'INVALID_REQUEST',
+      'Token and appId are required'
+    );
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const user = await EndUser.findOne({
+    app: appId,
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpiresAt: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new ApiError(
+      400,
+      'INVALID_OR_EXPIRED_TOKEN',
+      'Verification link is invalid or has expired'
+    );
+  }
+
+  // ✅ Mark verified
+  user.emailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationTokenExpiresAt = undefined;
 
   await user.save();
 
