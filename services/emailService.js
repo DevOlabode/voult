@@ -59,13 +59,51 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
 
 module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
   return transporter.sendMail({
-    from : `${process.env.EMAIL_FROM}`,
+    from : '"AuthWay" <solabode499@gmail.com>',
+    subject : `Welcome to ${name}`,
     to,
     html : `
-    <p>Welcome to ${app.name}</p>
-    <p>Please verify your email:</p>
-    <a href="${verifyUrl}">Verify Email</a>
-    <p>This link expires in 24 hours.</p>
-    `
+<div style="font-family: Arial, Helvetica, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #111827;">
+  
+  <h2 style="margin-bottom: 8px;">Welcome to ${name} 👋</h2>
+
+  <p style="font-size: 14px; line-height: 1.6; color: #374151;">
+    Thanks for signing up! Please confirm your email address to activate your account.
+  </p>
+
+  <div style="margin: 24px 0;">
+    <a
+      href="${verifyUrl}"
+      style="
+        display: inline-block;
+        background-color: #2563eb;
+        color: #ffffff;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 14px;
+      "
+    >
+      Verify Email
+    </a>
+  </div>
+
+  <p style="font-size: 13px; color: #6b7280;">
+    This verification link will expire in <strong>24 hours</strong>.
+  </p>
+
+  <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;" />
+
+  <p style="font-size: 12px; color: #9ca3af;">
+    If you didn’t create an account, you can safely ignore this email.
+  </p>
+
+  <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
+    — The ${name} Team
+  </p>
+</div>
+`
+
   })
 };

@@ -48,15 +48,17 @@ module.exports.register = async (req, res) => {
 
   await user.save();
 
+  const verifyToken = await user.generateEmailVerificationToken();
+
   const verifyUrl = `${process.env.BASE_URL}/api/authverify-email?token=${verifyToken}&appId=${app._id}`;
 
   const token = signEndUserToken(user, app);
 
-  await verifyEndUsers({
-    to : user.email,
+  await verifyEndUsers(
+    user.email,
+    app.name,
     verifyUrl,
-    name : app.name
-  });
+  );
 
   res.status(201).json({
     message: 'User registered successfully',
