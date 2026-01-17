@@ -59,7 +59,7 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
 
 module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
   return transporter.sendMail({
-    from : "",
+    from : `${process.env.EMAIL_FROM}`,
     to,
     html : `
     <p>Welcome to ${app.name}</p>
