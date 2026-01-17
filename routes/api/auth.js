@@ -32,6 +32,8 @@ router.post('/register', validate(schemas.registerSchema), verifyClient, validat
 
 router.post('/login', validate(schemas.loginSchema), verifyClient, authLimiter, validateCallbackUrl, authController.login);
 
+router.get('/verify-email', authController.verifyEmail);
+
 router.get('/me', verifyEndUserJWT, authController.me);
 
 router.post('/logout', requireEndUserAuth, authController.logout);

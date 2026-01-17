@@ -56,3 +56,16 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
       
     })
 };
+
+module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
+  return transporter.sendMail({
+    from : "",
+    to,
+    html : `
+    <p>Welcome to ${app.name}</p>
+    <p>Please verify your email:</p>
+    <a href="${verifyUrl}">Verify Email</a>
+    <p>This link expires in 24 hours.</p>
+    `
+  })
+};

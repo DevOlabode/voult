@@ -1,7 +1,9 @@
 const EndUser = require('../../models/endUser');
 const { signEndUserToken } = require('../../utils/jwt');
 const { ApiError } = require('../../utils/apiError');
-const App = require('../../models/app')
+const App = require('../../models/app');
+
+const {verifyEndUsers} = require('../../services/emailService')
 
 
 // =======================
@@ -46,7 +48,15 @@ module.exports.register = async (req, res) => {
 
   await user.save();
 
+  const verifyUrl = `${process.env.BASE_URL}/api/authverify-email?token=${verifyToken}&appId=${app._id}`;
+
   const token = signEndUserToken(user, app);
+
+  await verifyEndUsers({
+    to : user.email,
+    verifyUrl,
+    name : app.name
+  });
 
   res.status(201).json({
     message: 'User registered successfully',
@@ -95,7 +105,16 @@ module.exports.login = async (req, res) => {
       'INVALID_CREDENTIALS',
       'Invalid email or password'
     );
+  };
+
+  if (!user.isEmailVerified) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_VERIFIED',
+      'Please verify your email before logging in'
+    );
   }
+  
 
   user.lastLoginAt = new Date();
 
@@ -131,6 +150,15 @@ module.exports.me = async (req, res) => {
     );
   }
 
+  if (!user.isEmailVerified) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_VERIFIED',
+      'Please verify your email before logging in'
+    );
+  }
+  
+
   const user = await req.endUser.populate('app');
 
   res.status(200).json({
@@ -159,5 +187,42 @@ module.exports.logout = async (req, res) => {
 
   res.status(200).json({
     message: 'Logged out successfully'
+  });
+};
+
+module.exports.verifyEmail = async (req, res) => {
+  const { token, appId } = req.query;
+
+  if (!token || !appId) {
+    throw new ApiError(400, 'INVALID_TOKEN', 'Invalid verification link');
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const user = await EndUser.findOne({
+    app: appId,
+    emailVerificationToken: hashedToken,
+    emailVerificationExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new ApiError(
+      400,
+      'TOKEN_EXPIRED',
+      'Verification link is invalid or expired'
+    );
+  }
+
+  user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    message: 'Email verified successfully'
   });
 };
