@@ -59,7 +59,9 @@ module.exports.register = async (req, res) => {
   await user.setPassword(password);
 
   const appO = await App.findById(app._id);
-  appO.usage.totalRegistrations += 1;
+
+  const userPerApp = await EndUser.countDocuments({app : appO._id});
+  appO.usage.totalRegistrations = userPerApp;
 
   await appO.save();
 
