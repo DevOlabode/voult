@@ -145,3 +145,65 @@ paths:
       responses:
         200:
           description: Logged out
+
+  /api/auth/forgot-password:
+    post:
+      tags: [End Users]
+      summary: Request password reset
+      security:
+        - ClientAuth: []
+          ClientId: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  example: user@test.com
+      responses:
+        200:
+          description: Reset link sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Validation error
+
+  /api/auth/reset-password:
+    post:
+      tags: [End Users]
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, appId, password]
+              properties:
+                token:
+                  type: string
+                appId:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Validation error

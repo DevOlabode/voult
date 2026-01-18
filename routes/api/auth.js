@@ -38,9 +38,9 @@ router.get('/verify-email', catchAsync(authController.verifyEmail));
 
 router.get('/me', verifyEndUserJWT, catchAsync(authController.me));
 
-router.post('/forgot-password', verifyClient, catchAsync(auth.forgotPassword));
+router.post('/forgot-password', verifyClient, catchAsync(authController.forgotPassword));
 
-router.post('/reset-password', verifyClient, catchAsync(auth.resetPassword));
+router.post('/reset-password', verifyClient, catchAsync(authController.resetPassword));
 
 router.post('/logout', requireEndUserAuth, catchAsync(authController.logout));
 
