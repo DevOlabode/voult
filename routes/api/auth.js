@@ -18,7 +18,7 @@ const { authLimiter } = require('../../middleware/rateLimiters');
 const { validate } = require('../../validators/validate');
 const schemas = require('../../validators/api/endUserAuth');
 
-const catchAsync  = require('../../utils/catchAsync')
+const catchAsync  = require('../../utils/catchAsync');
 
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 
@@ -45,5 +45,7 @@ router.post('/reset-password', verifyClient, catchAsync(authController.resetPass
 router.post('/logout', requireEndUserAuth, catchAsync(authController.logout));
 
 router.get('/verify-email', catchAsync(authController.verifyEmail));
+
+router.post('/disable', catchAsync(authController.disableAccount));
 
 module.exports = router;

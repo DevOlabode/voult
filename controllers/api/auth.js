@@ -346,3 +346,29 @@ module.exports.resetPassword = async (req, res) => {
     message: 'Password reset successful'
   });
 };
+
+
+// Disable Account.
+
+module.exports.disableAccount = async (req, res) => {
+  const user = req.user;
+
+  if (!user.isActive) {
+    throw new ApiError(
+      400,
+      'ACCOUNT_ALREADY_DISABLED',
+      'Account is already disabled'
+    );
+  }
+
+  user.isActive = false;
+  user.disabledAt = new Date();
+  user.disabledReason = 'User requested';
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Account disabled successfully'
+  });
+};

@@ -12,6 +12,11 @@ const EndUserSchema = new Schema(
       required: true
     },
 
+    isActive : {
+      type : Boolean,
+      deffault : true
+    },
+
     email: {
       type: String,
       required: true
