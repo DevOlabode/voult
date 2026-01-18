@@ -1,4 +1,4 @@
-const passwordInput = document.querySelector('#password');
+const passwordInput = document.querySelector('#registerPassword');
 
 passwordInput?.addEventListener('input', () => {
   const value = passwordInput.value;
