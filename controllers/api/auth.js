@@ -297,9 +297,6 @@ module.exports.resetPassword = async (req, res) => {
   const {  password } = req.body;
   const {token, appId} = req.query
 
-  console.log('Query : ',req.query);
-  console.log('Body : ', req.body);
-
   if (!token || !appId || !password) {
     throw new ApiError(
       400,
@@ -339,7 +336,7 @@ module.exports.resetPassword = async (req, res) => {
 
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
-  user.tokenVersion += 1; // invalidate existing JWTs
+  user.tokenVersion += 1; 
 
   await user.save();
 
