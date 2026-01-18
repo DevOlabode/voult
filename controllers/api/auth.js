@@ -210,9 +210,6 @@ module.exports.verifyEmail = async (req, res) => {
     .update(token)
     .digest('hex');
 
-    console.log(hashedToken);
-    console.log(appId);
-
   const user = await EndUser.findOne({
     app: appId,
     isEmailVerified : false,
@@ -220,7 +217,6 @@ module.exports.verifyEmail = async (req, res) => {
   });
 
   console.log('The User', user);
-  // 13675448408d0ff7dce9ce30f9ac3394963f975337c28ec1a731de1d546b482b
 
   if (!user) {
     throw new ApiError(
