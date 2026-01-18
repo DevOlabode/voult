@@ -44,10 +44,10 @@ This document tracks what is done and what remains for AuthWay as an authenticat
 ---
 
 ### End User Account Management
-- [ ] Forgot password API
-- [ ] Password reset with token
-- [ ] Email verification for end users
-- [ ] Optional server-side logout (token versioning)
+- [x] Forgot password API
+- [x] Password reset with token
+- [x] Email verification for end users
+- [x] Optional server-side logout (token versioning)
 - [ ] Account disable / soft delete
 
 ---
@@ -88,6 +88,11 @@ This document tracks what is done and what remains for AuthWay as an authenticat
 - [ ] Load testing auth endpoints
 
 ---
+
+## MVP Blockers
+- [ ] Refresh tokens
+- [ ] App-level domain allowlist
+- [ ] Usage analytics UI
 
 ## 📦 Deployment
 - [ ] Environment variable validation
