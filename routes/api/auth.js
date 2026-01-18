@@ -18,6 +18,8 @@ const { authLimiter } = require('../../middleware/rateLimiters');
 const { validate } = require('../../validators/validate');
 const schemas = require('../../validators/api/endUserAuth');
 
+const catchAsync  = require('../../utils/catchAsync')
+
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 
 router.use(apiLimiter);
@@ -28,16 +30,16 @@ router.use(apiLimiter);
   Authorization: Bearer client_secret
 */
 
-router.post('/register', validate(schemas.registerSchema), verifyClient, validateCallbackUrl, authLimiter, authController.register);
+router.post('/register', validate(schemas.registerSchema), verifyClient, validateCallbackUrl, authLimiter, catchAsync(authController.register));
 
-router.post('/login', validate(schemas.loginSchema), verifyClient, authLimiter, validateCallbackUrl, authController.login);
+router.post('/login', validate(schemas.loginSchema), verifyClient, authLimiter, validateCallbackUrl, catchAsync(authController.login));
 
-router.get('/verify-email', authController.verifyEmail);
+router.get('/verify-email', catchAsync(authController.verifyEmail));
 
-router.get('/me', verifyEndUserJWT, authController.me);
+router.get('/me', verifyEndUserJWT, catchAsync(authController.me));
 
-router.post('/logout', requireEndUserAuth, authController.logout);
+router.post('/logout', requireEndUserAuth, catchAsync(authController.logout));
 
-router.get('/verify-email', authController.verifyEmail);
+router.get('/verify-email', catchAsync(authController.verifyEmail));
 
 module.exports = router;
