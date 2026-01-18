@@ -7,6 +7,9 @@ const crypto = require('crypto');
 
 const {verifyEndUsers} = require('../../services/emailService');
 
+const { validatePassword } = require('../../validators/password');
+const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
+
 
 // =======================
 // REGISTER
@@ -34,7 +37,16 @@ module.exports.register = async (req, res) => {
       'USER_EXISTS',
       'User with that email already exists'
     );
+  };
+
+  if (!validatePassword(password)) {
+    throw new ApiError(
+      400,
+      'WEAK_PASSWORD',
+      PASSWORD_RULES_MESSAGE
+    );
   }
+  
 
   const user = new EndUser({
     app: app._id,
