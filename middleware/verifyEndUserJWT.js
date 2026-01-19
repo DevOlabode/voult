@@ -30,6 +30,15 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
       );
     }
 
+    if (!endUser.isActive) {
+      throw new ApiError(
+        403,
+        'ACCOUNT_DISABLED',
+        'This account has been disabled'
+      );
+    }
+    
+
     if (endUser.tokenVersion !== payload.tokenVersion) {
       throw new ApiError(
         401,

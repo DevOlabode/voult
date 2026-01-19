@@ -372,3 +372,34 @@ module.exports.disableAccount = async (req, res) => {
     message: 'Account disabled successfully'
   });
 };
+
+
+// =======================
+// RE-ENABLE ACCOUNT
+// =======================
+module.exports.reenableAccount = async (req, res) => {
+  const user = req.endUser;
+
+  if (user.isActive) {
+    throw new ApiError(
+      400,
+      'ACCOUNT_ALREADY_ACTIVE',
+      'Account is already active'
+    );
+  }
+
+  user.isActive = true;
+  user.disabledAt = null;
+  user.disabledReason = null;
+
+  // Force re-login everywhere
+  user.tokenVersion += 1;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Account re-enabled successfully. Please log in again.'
+  });
+};
+

@@ -48,4 +48,6 @@ router.get('/verify-email', catchAsync(authController.verifyEmail));
 
 router.post('/disable', requireEndUserAuth, catchAsync(authController.disableAccount));
 
+router.post('/reenable', requireEndUserAuth, catchAsync(authController.reenableAccount));
+
 module.exports = router;
