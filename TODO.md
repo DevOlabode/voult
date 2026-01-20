@@ -1,116 +1,150 @@
-# voult.dev – TODO / Roadmap
+# voult.dev – Product Roadmap
 
-This document tracks what is done and what remains for voult.dev as an authentication-as-a-service platform.
-
----
-
-## ✅ Core API MVP (Mostly Done)
-
-### App / Developer Side
-- [x] Developer authentication (register / login)
-- [x] App creation per developer
-- [x] App activation / disable toggle
-- [x] App edit (name, description, callback URL)
-- [x] Soft delete apps (`deletedAt`)
-- [x] Client ID generation per app
-- [x] Client Secret generation (hashed in DB)
-- [x] Client Secret rotation
-- [x] Verify client middleware (Client ID + Secret)
-- [x] Prevent inactive apps from accessing API
+A centralized authentication-as-a-service platform for developers.
 
 ---
 
-### End User Authentication API
-- [x] EndUser schema (scoped per app)
-- [x] Secure password hashing
-- [x] Register end users via API
-- [x] Login end users via API
-- [x] JWT generation for end users
-- [x] JWT verification middleware
-- [x] Protected route example (`/api/me`)
-- [x] Client-side logout (delete token)
+## ✅ MVP – COMPLETE (API-FIRST)
+
+### 🔐 Core Authentication (End Users)
+- [x] Register (email + password)
+- [x] Login
+- [x] Logout (JWT revocation via tokenVersion)
+- [x] Get current user (`/me`)
+- [x] Email verification flow
+- [x] Resend verification email (rate-limited)
+- [x] Password reset (forgot + reset)
+- [x] Password strength enforcement
+- [x] Soft delete / disable account
+- [x] Re-enable account
+- [x] Prevent login for disabled accounts
+- [x] Prevent login for unverified emails
 
 ---
 
-## ⚠️ MVP+ (Strongly Recommended Next)
+### 🧩 App / Client Authentication
+- [x] Client ID + Client Secret auth
+- [x] Secure client secret hashing
+- [x] Client secret rotation
+- [x] App enable / disable
+- [x] Callback URL allowlist validation
+- [x] Per-app usage tracking (logins, registrations)
+- [x] App soft delete support
 
-### Security & Stability
-- [x] Rate limiting on auth endpoints (login/register)
-- [x] Input validation (Joi / Zod)
-- [x] Consistent API error format
+---
+
+### 🛡 Security & Abuse Protection
+- [x] Rate limiting (API + auth routes)
 - [x] Token expiration handling
-- [x] Better logging (request + auth failures)
+- [x] Token revocation on logout / password reset
+- [x] Consistent API error format (`ApiError`)
+- [x] Centralized API error handler
+- [x] Request + auth failure logging
 
 ---
 
-### End User Account Management
-- [x] Forgot password API
-- [x] Password reset with token
-- [x] Email verification for end users
-- [x] Optional server-side logout (token versioning)
-- [x] Account disable / soft delete
-
----
-
-### App Management Improvements
-- [x] Restrict callback URLs (allowlist)
-- [x] Rotate Client ID (optional)
-- [x] View app usage stats (logins, registrations)
-- [x] Audit log per app
-
----
-
-## 🚀 Production / SaaS Features
-
-### Developer Experience
-- [x] API documentation (OpenAPI / Swagger)
+### 📄 Developer Experience
+- [x] Swagger / OpenAPI documentation
 - [x] Postman collection
-- [x] Example SDK usage (Node.js)
-- [ ] Copy-paste integration snippets
-- [ ] Dashboard usage metrics
+- [x] Example Node.js SDK
+- [x] Example API usage flows
+- [x] Clear separation of Web vs API auth logic
 
 ---
 
-### Platform & Scaling
-- [ ] Refresh tokens
-- [ ] Token revocation strategy
-- [ ] Per-app rate limits
-- [x] CORS configuration per app
-- [ ] Environment separation (dev / prod keys)
-- [ ] Monitoring & alerting
+### 🧠 Architecture Quality
+- [x] Modular middleware structure
+- [x] CatchAsync error handling
+- [x] Joi validation layer
+- [x] Clean folder separation (controllers, services, validators)
+- [x] Environment-based configuration
+- [x] Production-ready JWT handling
 
 ---
 
-## 🧪 Testing
-- [ ] Unit tests for auth logic
-- [ ] Integration tests for API routes
-- [ ] Security tests (invalid tokens, replay attacks)
-- [ ] Load testing auth endpoints
+## 🚀 V1 – NEXT MAJOR RELEASE
+
+### 🔐 Authentication & Sessions
+- [ ] Refresh token support (short-lived access tokens)
+- [ ] Refresh token rotation + reuse detection
+- [ ] Session tracking (list active sessions)
+- [ ] Revoke specific sessions
+- [ ] Account lockout after repeated failed logins
+- [ ] Optional MFA (email OTP)
 
 ---
 
-## MVP Blockers
-- [ ] Refresh tokens
-- [ ] App-level domain allowlist
-- [ ] Usage analytics UI
-
-## 📦 Deployment
-- [ ] Environment variable validation
-- [ ] Production-ready MongoDB indexes
-- [ ] Docker support
-- [ ] CI pipeline
-- [ ] Deployment checklist
+### 🌐 Social & OAuth Login
+- [ ] Login with Google
+- [ ] Login with GitHub
+- [ ] Login with Facebook
+- [ ] Login with Apple
+- [ ] OAuth account linking (password ↔ social)
+- [ ] Handle existing email collisions across providers
+- [ ] Store provider metadata (providerId, avatar, profile)
+- [ ] Per-app enable / disable social providers
 
 ---
 
-## 📝 Notes
-- JWTs are stateless and should NOT be stored in the database.
-- Client secrets are shown **once only** on creation/rotation.
-- End users are always scoped to an app.
-- App credentials must always be validated before end-user actions.
+### 🧩 OAuth Provider Configuration
+- [ ] Configure OAuth credentials per app
+  - [ ] Google Client ID & Secret
+  - [ ] GitHub Client ID & Secret
+  - [ ] Facebook App ID & Secret
+  - [ ] Apple Service ID & Private Key
+- [ ] OAuth redirect URI allowlist
+- [ ] Environment-specific OAuth configs (dev / prod)
 
 ---
 
-**Current Status:**  
-✅ Core API MVP complete  
-🚧 Moving toward production hardening
+### 📊 App Insights & Auditing
+- [ ] App usage dashboard
+- [ ] Auth metrics (daily logins, registrations)
+- [ ] Audit logs per app
+- [ ] Auth event timeline
+- [ ] Export logs (CSV / JSON)
+
+---
+
+### 🧠 Developer Experience (V1)
+- [ ] SDK refresh token helpers
+- [ ] OAuth helpers in SDK
+- [ ] More SDK examples (Next.js, Express)
+- [ ] OAuth flow diagrams
+- [ ] Improved Swagger UI polish
+- [ ] Versioned API docs (`/v1`, `/v2`)
+
+---
+
+## 🌱 V2 / FUTURE IDEAS
+
+### 🏢 Enterprise Features
+- [ ] Organizations / Teams
+- [ ] Role-based access control (RBAC)
+- [ ] SSO (SAML / OIDC)
+- [ ] IP allowlisting
+- [ ] Advanced MFA (TOTP, WebAuthn)
+
+---
+
+### 🧪 Platform Enhancements
+- [ ] Webhooks for auth events
+- [ ] Web-based admin dashboard
+- [ ] Billing & plans
+- [ ] Usage-based limits
+- [ ] Custom branding (emails, hosted pages)
+
+---
+
+## 🎯 Definition of Done
+
+- Secure, scalable auth platform
+- Password + social authentication supported
+- OAuth configurable per app
+- Clear, consistent API responses
+- Observable, auditable auth flows
+- Developer-first experience
+
+---
+
+voult.dev 🚀
