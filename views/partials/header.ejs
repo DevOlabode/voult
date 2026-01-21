@@ -1,0 +1,28 @@
+<header class="nav">
+    <div class="container nav-inner">
+  
+      <a href="/" class="logo">voult.dev</a>
+  
+      <nav class="nav-links">
+        <% if (!currentUser) { %>
+          <!-- GUEST NAV -->
+          <a href="/docs">Docs</a>
+          <a href="https://github.com/DevOlabode/auth-way" target="_blank">GitHub</a>
+          <a href="/login">Login</a>
+          <a href="/register" class="btn-primary">Get Started</a>
+  
+        <% } else { %>
+          <!-- AUTHENTICATED NAV -->
+          <a href="/dashboard">Dashboard</a>
+          <a href="/apps">Apps</a>
+          <a href="/settings">Settings</a>
+  
+          <form action="/logout" method="POST" class="inline-form">
+            <button type="submit" class="btn-ghost">Logout</button>
+          </form>
+        <% } %>
+      </nav>
+  
+    </div>
+  </header>
+  
