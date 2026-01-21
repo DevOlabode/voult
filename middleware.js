@@ -48,7 +48,7 @@ module.exports.requireAPIKey = async (req, res, next) => {
 
 // HOW FUTURE APPS WILL USE voult.dev.
 /*
-fetch('https://voult.dev.com/api/auth/login', {
+fetch('https://voult.dev/api/auth/login', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
