@@ -65,9 +65,9 @@
     <h2>Account</h2>
 
     <div class="account-card">
-      <div><strong>Email:</strong> <%= user.email %></div>
-      <div><strong>Plan:</strong> <%= user.plan %></div>
-      <div><strong>Joined:</strong> <%= user.createdAt.toDateString() %></div>
+      <div class="text-dark opacity-50"><strong>Email:</strong> <%= user.email %></div>
+      <div class="text-dark opacity-50"><strong>Plan:</strong> <%= user.plan %></div>
+      <div class="text-dark opacity-50"><strong>Joined:</strong> <%= user.createdAt.toDateString() %></div>
     </div>
   </section>
 
@@ -76,7 +76,7 @@
   </form>
 
   <form action="/delete-account" method="get">
-    <button class="btn-danger">Delete Account</button>
+    <button class="btn-danger mt-3">Delete Account</button>
   </form>
 
 </section>
