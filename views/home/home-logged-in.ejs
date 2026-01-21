@@ -1,4 +1,46 @@
 <% layout('layout/boilerplate.ejs') %>
 
-<h3>The Homepage</h3>
-<h2>Logged In</h2>
+<body data-page="auth">
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <span class="logo">voult.dev</span>
+
+      <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/apps">Apps</a>
+        <a href="/settings">Settings</a>
+        <form action="/logout" method="POST">
+          <button class="btn-ghost">Logout</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container dashboard">
+    <h1>Welcome back 👋</h1>
+    <p class="subtitle">Manage your applications and authentication settings.</p>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Your Apps</h3>
+        <p>Create and manage API credentials.</p>
+        <a href="/dashboard">View Apps →</a>
+      </div>
+
+      <div class="card">
+        <h3>API Usage</h3>
+        <p>Track logins, registrations, and traffic.</p>
+        <a href="/dashboard">View Usage →</a>
+      </div>
+
+      <div class="card">
+        <h3>Documentation</h3>
+        <p>Integration guides and references.</p>
+        <a href="/docs">Read Docs →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="/assets/home.js"></script>
+</body>

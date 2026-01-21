@@ -1,4 +1,57 @@
 <% layout('layout/boilerplate.ejs') %>
 
-<h3>The Homepage</h3>
-<h2>Not Logged IN</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>voult.dev — Auth Infrastructure for Developers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/assets/home.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body data-page="guest">
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <span class="logo">voult.dev</span>
+
+      <div class="nav-links">
+        <a href="/docs">Docs</a>
+        <a href="https://github.com/DevOlabode/auth-way" target="_blank">GitHub</a>
+        <a href="/login">Login</a>
+        <a href="/register" class="btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="hero container">
+    <h1>Authentication, done properly.</h1>
+
+    <p class="subtitle">
+      voult.dev is a developer-first authentication API providing
+      secure auth, OAuth, email flows, and account management.
+    </p>
+
+    <div class="actions">
+      <a href="/docs" class="btn-primary">Read the Docs</a>
+      <a href="/register" class="btn-secondary">Create App</a>
+    </div>
+  </main>
+
+  <section class="section container">
+    <h2>Quick Example</h2>
+
+    <pre><code>POST /api/auth/register
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123!"
+}</code></pre>
+  </section>
+
+  <footer class="footer">
+    <p>© <%= new Date().getFullYear() %> voult.dev</p>
+  </footer>
+
+  <script src="/assets/home.js"></script>
+</body>
