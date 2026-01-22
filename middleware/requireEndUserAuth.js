@@ -3,8 +3,7 @@ const EndUser = require('../models/endUser');
 const { ApiError } = require('../utils/apiError');
 
 module.exports = async function requireEndUserAuth(req, res, next) {
-  const authHeader = req.headers.x-client-token;
-  console.log(authHeader);
+  const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new ApiError(
@@ -12,9 +11,7 @@ module.exports = async function requireEndUserAuth(req, res, next) {
       'UNAUTHORIZED',
       'Authentication token is required'
     );
-  };
-
-  console.log(req.headers);
+  }
 
   const token = authHeader.split(' ')[1];
 
@@ -44,9 +41,7 @@ module.exports = async function requireEndUserAuth(req, res, next) {
 
     next();
   } catch (err) {
-    if (err instanceof ApiError) {
-      throw err;
-    }
+    if (err instanceof ApiError) throw err;
 
     throw new ApiError(
       401,
