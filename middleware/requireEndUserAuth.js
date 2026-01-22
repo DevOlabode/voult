@@ -5,13 +5,13 @@ const { ApiError } = require('../utils/apiError');
 module.exports = async function requireEndUserAuth(req, res, next) {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(
-      401,
-      'UNAUTHORIZED',
-      'Authentication token is required'
-    );
-  }
+  // if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  //   throw new ApiError(
+  //     401,
+  //     'UNAUTHORIZED',
+  //     'Authentication token is required'
+  //   );
+  // }
 
   const token = authHeader.split(' ')[1];
 
