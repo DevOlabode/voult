@@ -2,32 +2,26 @@ const express = require('express');
 const router = express.Router();
 
 //   Web Routes (sessions + EJS)
-
 const webAuthRoutes = require('./web/auth');
 const webUserRoutes = require('./web/user');
 const webAppRoutes = require('./web/app');
 
 // API Routes
-
 const apiAuthRoutes = require('./api/auth');
 
-
-//    Mount Web Routes
-
+// Mount Web Routes
 router.use('/', webAuthRoutes);
 router.use('/', webUserRoutes);
 router.use('/app', webAppRoutes);
 
-//    Mount API Routes
-
+// Mount API Routes
 router.use('/api/auth', apiAuthRoutes);
 // router.use('/api/users', apiUserRoutes);
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));
 
-//Home Page Route
-
+// Home Page Route
 router.get('/', (req, res) => {
     if (req.isAuthenticated()) {
       return res.render('home/home-logged-in', {
