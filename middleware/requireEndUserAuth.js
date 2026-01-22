@@ -11,7 +11,9 @@ module.exports = async function requireEndUserAuth(req, res, next) {
       'UNAUTHORIZED',
       'Authentication token is required'
     );
-  }
+  };
+
+  console.log(req.headers);
 
   const token = authHeader.split(' ')[1];
 
