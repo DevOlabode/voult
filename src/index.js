@@ -38,18 +38,17 @@ app.use(cors({
 }));
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('../docs/swagger');
+const YAML = require('yamljs');
+const swaggerSpec = YAML.load('./docs/openapi.yaml');
 
-swaggerUi.setup(swaggerSpec, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'voult.dev API Docs',
   customCss: `
     .swagger-ui .topbar {
       background-color: #0f172a;
     }
   `,
-});
-
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}));
 
 const ExpressError = require('../utils/ExpressError');
 

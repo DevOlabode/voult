@@ -46,12 +46,47 @@ components:
         email:
           type: string
 
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Operation successful"
+
+    VerificationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Email verified successfully"
+
+    DisableResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Account disabled successfully"
+
+    ReenableResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Account re-enabled successfully. Please log in again."
+
 paths:
 
   /api/auth/register:
     post:
       tags: [End Users]
       summary: Register an end user
+      description: Registers a new end user for the application. An email verification link will be sent to the provided email address. The user must verify their email before logging in.
       security:
         - ClientAuth: []
           ClientId: []
@@ -65,31 +100,46 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                   example: user@test.com
                 password:
                   type: string
                   example: password123
+                  description: Must meet password requirements (e.g., minimum length, special characters)
       responses:
         201:
-          description: User registered
+          description: User registered successfully. Check email for verification link.
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
+                    example: "User registered successfully"
                   token:
                     type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   user:
                     $ref: '#/components/schemas/EndUser'
         409:
-          description: User exists
+          description: User with this email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         400:
-          description: Validation error
+          description: Validation error (e.g., weak password, invalid email)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/auth/login:
     post:
       tags: [End Users]
       summary: Login an end user
+      description: Authenticates an end user with email and password. The user must have verified their email address before logging in.
       security:
         - ClientAuth: []
           ClientId: []
@@ -103,8 +153,11 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
+                  example: user@test.com
                 password:
                   type: string
+                  example: password123
       responses:
         200:
           description: Login successful
@@ -113,28 +166,74 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
+                    example: "Login successful"
                   token:
                     type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   user:
                     $ref: '#/components/schemas/EndUser'
+        403:
+          description: Email not verified. Please verify your email before logging in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         401:
           description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/auth/me:
     get:
       tags: [End Users]
       summary: Get current end user
+      description: Retrieves the details of the currently authenticated end user. The user must have a verified email.
       security:
         - EndUserAuth: []
       responses:
         200:
-          description: Current user
+          description: Current user details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EndUser'
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "60d5ecb74b24c72b8c8b4567"
+                  email:
+                    type: string
+                    format: email
+                    example: "user@test.com"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2021-06-25T12:00:00.000Z"
+                  app:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "60d5ecb74b24c72b8c8b4568"
+                      name:
+                        type: string
+                        example: "My App"
+        403:
+          description: Email not verified. Please verify your email.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         401:
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/auth/logout:
     post:
@@ -150,6 +249,7 @@ paths:
     post:
       tags: [End Users]
       summary: Request password reset
+      description: Initiates a password reset process by sending a reset link to the user's email address. The user must have a verified email.
       security:
         - ClientAuth: []
           ClientId: []
@@ -163,10 +263,11 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                   example: user@test.com
       responses:
         200:
-          description: Reset link sent
+          description: Password reset link sent successfully (if email exists and is verified)
           content:
             application/json:
               schema:
@@ -174,8 +275,13 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "If that email exists, a reset link has been sent"
         400:
-          description: Validation error
+          description: Validation error (e.g., invalid email format)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/auth/reset-password:
     post:
@@ -207,3 +313,89 @@ paths:
                     type: string
         400:
           description: Validation error
+
+  /api/auth/verify-email:
+    get:
+      tags: [End Users]
+      summary: Verify email address
+      description: Verifies the user's email using a token sent via email.
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Email verification token
+        - name: appId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Application ID
+      responses:
+        200:
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        400:
+          description: Invalid or expired verification link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/disable:
+    post:
+      tags: [End Users]
+      summary: Disable user account
+      description: Allows an authenticated user to disable their own account.
+      security:
+        - EndUserAuth: []
+      responses:
+        200:
+          description: Account disabled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisableResponse'
+        400:
+          description: Account already disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/reenable:
+    post:
+      tags: [End Users]
+      summary: Re-enable user account
+      description: Allows a user to re-enable their previously disabled account.
+      security:
+        - EndUserAuth: []
+      responses:
+        200:
+          description: Account re-enabled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReenableResponse'
+        400:
+          description: Account already active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
