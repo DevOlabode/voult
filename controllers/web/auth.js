@@ -41,9 +41,11 @@ module.exports.register =  async (req, res) => {
         verifyTokenExpires: Date.now() + 1000 * 60 * 60 * 24 // 24h
       });
 
-      const verifyUrl = `${
-        process.env.NODE_ENV === 'production' ? 'https' : 'http'
-      }://${req.headers.host}/verify/${verifyToken}`;
+      // const verifyUrl = `${
+      //   process.env.NODE_ENV === 'production' ? 'https' : 'http'
+      // }://${req.headers.host}/verify/${verifyToken}`;
+
+      const verifyUrl = `${process.env.BASE_URL}/verify/${verifyToken}`
   
       await User.register(user, password);
   
