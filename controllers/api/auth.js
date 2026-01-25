@@ -160,7 +160,7 @@ module.exports.login = async (req, res) => {
   appO.usage.totalLogins += 1;
   await appO.save();
 
-  // 🎟 Issue tokens
+  //  Issue tokens
   const accessToken = signAccessToken(user, app);
 
   const { rawToken: refreshToken } = await createRefreshToken({
@@ -182,6 +182,8 @@ module.exports.login = async (req, res) => {
 };
 
 
+// Refresh
+
 module.exports.refresh = async (req, res) => {
   const { refreshToken } = req.body;
   const app = req.appClient;
@@ -196,7 +198,7 @@ module.exports.refresh = async (req, res) => {
     tokenHash,
   }).populate('endUser');
 
-  // ❌ Token not found
+  //  Token not found
   if (!storedToken) {
     throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Invalid refresh token');
   }
@@ -220,7 +222,7 @@ module.exports.refresh = async (req, res) => {
     );
   }
 
-  // ❌ Expired
+  //  Expired
   if (storedToken.expiresAt < new Date()) {
     throw new ApiError(
       401,
@@ -229,7 +231,7 @@ module.exports.refresh = async (req, res) => {
     );
   }
 
-  // 🔄 ROTATION
+  //  ROTATION
   storedToken.revokedAt = new Date();
 
   const { rawToken: newRefreshToken } = await createRefreshToken({
@@ -241,6 +243,8 @@ module.exports.refresh = async (req, res) => {
 
   storedToken.replacedByTokenHash =
     RefreshToken.hashToken(newRefreshToken);
+
+  storedToken.lastUsedAt = new Date();  
 
   await storedToken.save();
 
@@ -515,3 +519,31 @@ module.exports.reenableAccount = async (req, res) => {
   });
 };
 
+// =======================
+// LIST SESSIONS
+// =======================
+module.exports.listSessions = async (req, res) => {
+  if (!req.endUser) {
+    throw new ApiError(401, 'UNAUTHORIZED', 'Authentication required');
+  }
+
+  const sessions = await RefreshToken.find({
+    endUser: req.endUser._id,
+    app: req.appClient._id,
+    revokedAt: null,
+    expiresAt: { $gt: new Date() },
+  })
+    .sort({ lastUsedAt: -1 })
+    .select('-tokenHash -replacedByTokenHash');
+
+  res.status(200).json({
+    sessions: sessions.map(s => ({
+      id: s._id,
+      ipAddress: s.ipAddress,
+      userAgent: s.userAgent,
+      createdAt: s.createdAt,
+      lastUsedAt: s.lastUsedAt,
+      expiresAt: s.expiresAt,
+    })),
+  });
+};

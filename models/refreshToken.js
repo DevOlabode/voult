@@ -42,6 +42,11 @@ const refreshTokenSchema = new mongoose.Schema(
 
     ipAddress: String,
     userAgent: String,
+
+    lastUsedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
