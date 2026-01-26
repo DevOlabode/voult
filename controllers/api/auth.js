@@ -18,8 +18,6 @@ const { createRefreshToken } = require('../../utils/refreshToken')
 // PASSWORDS RULES
 const { validatePassword } = require('../../validators/password');
 const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
-const endUser = require('../../models/endUser');
-
 
 // =======================
 // REGISTER

@@ -1,6 +1,9 @@
 const RefreshToken = require('../../models/refreshToken');
 const {ApiError} = require('../../utils/apiError');
 
+const { createRefreshToken } = require('../../utils/refreshToken');
+const { signAccessToken, signRefreshToken } = require('../../utils/jwt');
+
 // =======================
 // LIST SESSIONS
 // =======================
@@ -31,6 +34,9 @@ module.exports.listSessions = async (req, res) => {
   };
 
 
+
+  // Revoke Session
+
   module.exports.revokeSession = async (req, res) => {
     const { sessionId } = req.params;
   
@@ -53,4 +59,80 @@ module.exports.listSessions = async (req, res) => {
     });
   };
   
+
+// Refresh Token
+module.exports.refresh = async (req, res) => {
+  const { refreshToken } = req.body;
+  const app = req.endUser.app;
+
+  if (!refreshToken) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Refresh token required');
+  }
+
+  const tokenHash = RefreshToken.hashToken(refreshToken);
+
+  const storedToken = await RefreshToken.findOne({
+    tokenHash,
+  }).populate('endUser');
+
+  //  Token not found
+  if (!storedToken) {
+    throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Invalid refresh token');
+  }
+
+  // 🚨 REUSE DETECTION
+  if (storedToken.revokedAt) {
+    // Someone reused an already-rotated token
+    await RefreshToken.updateMany(
+      {
+        endUser: storedToken.endUser._id,
+        app: storedToken.app,
+        revokedAt: null,
+      },
+      { revokedAt: new Date() }
+    );
+
+    throw new ApiError(
+      401,
+      'REFRESH_TOKEN_REUSE_DETECTED',
+      'Session compromised. Please log in again.'
+    );
+  }
+
+  //  Expired
+  if (storedToken.expiresAt < new Date()) {
+    throw new ApiError(
+      401,
+      'REFRESH_TOKEN_EXPIRED',
+      'Refresh token expired'
+    );
+  }
+
+  //  ROTATION
+  storedToken.revokedAt = new Date();
+
+  const { rawToken: newRefreshToken } = await createRefreshToken({
+    endUser: storedToken.endUser,
+    app,
+    ipAddress: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
+
+  storedToken.replacedByTokenHash =
+    RefreshToken.hashToken(newRefreshToken);
+
+  storedToken.lastUsedAt = new Date();  
+
+  await storedToken.save();
+
+  const accessToken = signAccessToken(
+    storedToken.endUser,
+    app
+  );
+
+  res.json({
+    accessToken,
+    refreshToken: newRefreshToken,
+  });
+};
   
