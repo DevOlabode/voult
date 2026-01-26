@@ -7,7 +7,7 @@ const {ApiError} = require('../../utils/apiError');
 module.exports.listSessions = async (req, res) => {
     if (!req.endUser) {
       throw new ApiError(401, 'UNAUTHORIZED', 'Authentication required');
-    }
+    };
   
     const sessions = await RefreshToken.find({
       endUser: req.endUser._id,
