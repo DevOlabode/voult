@@ -58,7 +58,18 @@ const EndUserSchema = new Schema(
     
     lastLoginAt: Date,
 
-    deletedAt: Date
+    deletedAt: Date,
+
+    failedLoginAttempts: {
+      type: Number,
+      default: 0
+    },
+    
+    lockUntil: {
+      type: Date,
+      default: null
+    }
+
   },
   { timestamps: true }
 );
@@ -104,5 +115,10 @@ EndUserSchema.methods.generatePasswordResetToken = function () {
 
   return rawToken;
 };
+
+EndUserSchema.virtual('isLocked').get(function () {
+  return this.lockUntil && this.lockUntil > Date.now();
+});
+
 
 module.exports = mongoose.models.EndUser || mongoose.model('EndUser', EndUserSchema);

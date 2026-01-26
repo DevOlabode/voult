@@ -95,6 +95,9 @@ module.exports.register = async (req, res) => {
 };
 
 
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
+
 // =======================
 // LOGIN
 // =======================
@@ -124,14 +127,38 @@ module.exports.login = async (req, res) => {
     );
   }
 
+  //  Account lock check
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    throw new ApiError(
+      423,
+      'ACCOUNT_LOCKED',
+      'Too many failed login attempts. Try again later.'
+    );
+  }
+
   const isValid = await user.verifyPassword(password);
+
+  //  Invalid password
   if (!isValid) {
+    user.failedLoginAttempts += 1;
+
+    // Lock account if max attempts reached
+    if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+      user.lockUntil = new Date(Date.now() + LOCK_TIME);
+    }
+
+    await user.save();
+
     throw new ApiError(
       401,
       'INVALID_CREDENTIALS',
       'Invalid email or password'
     );
   }
+
+  // ✅ Successful login → reset lock state
+  user.failedLoginAttempts = 0;
+  user.lockUntil = null;
 
   if (!user.isEmailVerified) {
     throw new ApiError(
@@ -158,7 +185,7 @@ module.exports.login = async (req, res) => {
   appO.usage.totalLogins += 1;
   await appO.save();
 
-  //  Issue tokens
+  // Issue tokens
   const accessToken = signAccessToken(user, app);
 
   const { rawToken: refreshToken } = await createRefreshToken({
