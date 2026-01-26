@@ -211,3 +211,48 @@ module.exports.verifyEmail = async (req, res) => {
       message: 'Account re-enabled successfully. Please log in again.'
     });
   };
+
+  module.exports.me = async (req, res) => {
+    try {
+      const user = req.endUser; 
+  
+      if (!user) {
+        return res.status(401).json({
+          error: 'UNAUTHORIZED',
+          message: 'Authentication required'
+        });
+      }
+  
+      if (user.isDisabled) {
+        return res.status(403).json({
+          error: 'ACCOUNT_DISABLED',
+          message: 'This account has been disabled'
+        });
+      }
+  
+      return res.status(200).json({
+        id: user._id,
+        email: user.email,
+        app : user.app,
+        name: user.name,
+        isEmailVerified: user.isEmailVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+  
+        // security / status
+        failedLoginAttempts: user.failedLoginAttempts,
+        isLocked: user.lockUntil && user.lockUntil > Date.now(),
+  
+        // optional SaaS metadata
+        lastLoginAt: user.lastLoginAt
+      });
+    } catch (err) {
+      console.error('GET /me error:', err);
+  
+      return res.status(500).json({
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'Unable to fetch profile'
+      });
+    }
+  };
+  
