@@ -11,6 +11,6 @@ const catchAsync = require('../../utils/catchAsync');
 
 router.get('/', requireEndUserAuth, catchAsync(controller.listSessions));
 
-router.get('revoke/:sessionId', requireEndUserAuth, catchAsync(controller.revokeSession));
+router.get('/revoke/:sessionId', requireEndUserAuth, catchAsync(controller.revokeSession));
 
 module.exports = router;

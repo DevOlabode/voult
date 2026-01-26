@@ -37,7 +37,7 @@ module.exports.listSessions = async (req, res) => {
     const session = await RefreshToken.findOne({
       _id: sessionId,
       endUser: req.endUser._id,
-      app: req.appClient._id,
+      app: req.endUser.app,
       revokedAt: null,
     });
   
