@@ -68,7 +68,8 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Refresh token rotation + reuse detection
 - [x] Session tracking (list active sessions)
 - [x] Revoke specific sessions
-- [ ] Account lockout after repeated failed logins
+- [x] Account lockout after repeated failed logins
+- [ ] Send Email to the endUser about the lockout
 
 ---
 
