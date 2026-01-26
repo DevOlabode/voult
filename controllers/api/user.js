@@ -212,6 +212,10 @@ module.exports.verifyEmail = async (req, res) => {
     });
   };
 
+// =======================
+// ME/PROFILE PAGE
+// =======================
+
   module.exports.me = async (req, res) => {
     try {
       const user = req.endUser; 
