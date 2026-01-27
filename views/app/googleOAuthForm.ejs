@@ -3,32 +3,40 @@
 <section class="card">
   <h2 class="text-white">Google OAuth Configuration</h2>
 
-  <form action="/app/<%= app._id %>/google-oauth" method="POST">
+  <form action="/app/<%= app._id %>/google-oauth" method="POST" class="card app-form">
     
-    <label>Google Client ID</label>
+<div class="form-group">
+    <label class="text-light opacity-50">Google Client ID</label>
     <input
       type="text"
       name="clientId"
       required
       placeholder="xxxxxxxx.apps.googleusercontent.com"
     />
+</div>
 
-    <label>Google Client Secret</label>
+<div class="form-group">
+    <label class="text-light opacity-50 form-label">Google Client Secret</label>
     <input
       type="password"
       name="clientSecret"
       required
     />
+</div>
 
-    <label>Redirect URI</label>
+<div class="form-group">
+    <label class="text-light opacity-50 form-label">Redirect URI</label>
     <input
       type="url"
       name="redirectUri"
       required
       placeholder="https://yourapp.com/auth/google/callback"
     />
+</div>
 
-    <button class="btn-secondary">Save Google OAuth</button>
+   <div class="form-actions">
+    <button class="btn btn-secondary">Save Google OAuth</button>
+   </div>
   </form>
 
   <p class="hint">
