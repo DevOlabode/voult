@@ -12,10 +12,9 @@ const EndUserSchema = new Schema(
       required: true
     },
 
-    name : {
+    fullName : {
       type : String,
       required : true,
-      unique : true
     },
 
     isActive : {

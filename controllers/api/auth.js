@@ -7,7 +7,7 @@ const crypto = require('crypto');
 
 // EMAILS
 const {verifyEndUsers, sendPasswordResetEmail} = require('../../services/emailService');
-// const accountLockedEmail = require('../../services/emailOnLock');
+const { accountLockedEmail } = require('../../services/emailOnLock');
 
 // TOKENS
 const RefreshToken = require('../../models/refreshToken');
@@ -23,7 +23,12 @@ const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
 // REGISTER
 // =======================
 module.exports.register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, fullName } = req.body;
+  console.log("Full Name: ", fullName);
+  console.log("Email: ", email);
+
+  console.log("Entire Body", req.body)
+
   const app = req.appClient;
 
   if (!email || !password) {
@@ -57,6 +62,7 @@ module.exports.register = async (req, res) => {
   
 
   const user = new EndUser({
+    fullName : req.body.fullName,
     app: app._id,
     email
   });
@@ -93,9 +99,6 @@ module.exports.register = async (req, res) => {
     }
   });
 };
-
-
-const { accountLockedEmail } = require('../../services/emailOnLock');
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000;
