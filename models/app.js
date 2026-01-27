@@ -69,8 +69,14 @@ AppSchema.methods.generateClientSecret = function () {
   return secret;
 };
 
-AppSchema.methods.verifyClientSecret = function (secret) {
-  return bcrypt.compare(secret, this.clientSecretHash);
+AppSchema.methods.verifyClientSecret = async function (clientSecret) {
+  console.log('verifyClientSecret called with:', {
+    clientSecret,
+    hasHash: !!this.clientSecretHash
+  });
+
+  return bcrypt.compare(clientSecret, this.clientSecretHash);
 };
+
 
 module.exports = mongoose.models.App || mongoose.model('App', AppSchema);
