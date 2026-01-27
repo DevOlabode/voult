@@ -35,16 +35,23 @@ const AppSchema = new mongoose.Schema({
     totalLogins: { type: Number, default: 0 }
   },
 
-  googleOAuth: {
-    clientId: String,
-    clientSecret: String,
-    redirectUri: String
+googleOAuth: {
+  enabled: {
+    type: Boolean,
+    default: false,
   },
-
-  clientSecretHash: {
+  clientId: {
     type: String,
-    select: false
   },
+  clientSecret: {
+    type: String,
+    select: false,
+  },
+  redirectUri: {
+    type: String,
+  },
+},
+
 
   deletedAt: Date
 }, { timestamps: true });

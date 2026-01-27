@@ -27,6 +27,9 @@ router.get('/:id/edit', catchAsync(controller.editForm));
 router.put('/:id', validate(appSchemas.createAppSchema), catchAsync(controller.updateApp));
 
 router.post('/:id/rotate-secret',catchAsync(controller.rotateClientSecret));
-  
+
+router.get('/:id/google-oauth', controller.getGoogleOAuth);
+
+router.post('/:id/google-oauth', controller.saveGoogleOAuth);
 
 module.exports = router;

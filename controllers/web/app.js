@@ -144,3 +144,53 @@ module.exports.updateApp = async (req, res) => {
   
     res.redirect(`/app/${app._id}`);
 };
+
+module.exports.getGoogleOAuth = async (req, res) => {
+  const app = await App.findOne({
+    _id: req.params.id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  }
+
+  res.render('app/googleOAuthForm', {
+    app,
+    title: 'Configure Google OAuth',
+  });
+};
+
+
+module.exports.saveGoogleOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { clientId, clientSecret, redirectUri } = req.body;
+
+  const app = await App.findOne({
+    _id: id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  }
+
+  if (!clientId || !clientSecret || !redirectUri) {
+    req.flash('error', 'All Google OAuth fields are required');
+    return res.redirect(`/app/${id}/google-oauth`);
+  }
+
+  app.googleOAuth = {
+    enabled: true,
+    clientId,
+    clientSecret,
+    redirectUri,
+  };
+
+  await app.save();
+
+  req.flash('success', 'Google OAuth configured successfully');
+  res.redirect(`/app/${app._id}`);
+};

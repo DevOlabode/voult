@@ -1,0 +1,37 @@
+<% layout('layout/boilerplate') %>
+
+<section class="card">
+  <h2 class="text-white">Google OAuth Configuration</h2>
+
+  <form action="/app/<%= app._id %>/google-oauth" method="POST">
+    
+    <label>Google Client ID</label>
+    <input
+      type="text"
+      name="clientId"
+      required
+      placeholder="xxxxxxxx.apps.googleusercontent.com"
+    />
+
+    <label>Google Client Secret</label>
+    <input
+      type="password"
+      name="clientSecret"
+      required
+    />
+
+    <label>Redirect URI</label>
+    <input
+      type="url"
+      name="redirectUri"
+      required
+      placeholder="https://yourapp.com/auth/google/callback"
+    />
+
+    <button class="btn-secondary">Save Google OAuth</button>
+  </form>
+
+  <p class="hint">
+    This redirect URI must match what you configured in Google Cloud Console.
+  </p>
+</section>
