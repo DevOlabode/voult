@@ -21,7 +21,7 @@ router.use('/app', webAppRoutes);
 router.use('/api/auth', apiAuthRoutes);
 router.use('/api/sessions', sessionRoutes);
 router.use('/api/user', apiUserRoutes);
-router.use('./api/auth', apiGoogle)
+router.use('./api/auth/google', apiGoogle)
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));
