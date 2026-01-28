@@ -93,6 +93,8 @@ module.exports.googleRegister = async (req, res) => {
     throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code is required');
   }
 
+  console.log('Secret: ', app.googleOAuth.clientSecret);
+
   if (
     !app.googleOAuth ||
     !app.googleOAuth.clientId ||

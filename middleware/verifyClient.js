@@ -93,7 +93,9 @@ module.exports.verifyClientIdOnly = async (req, res, next) => {
     throw new ApiError(401, 'CLIENT_ID_REQUIRED', 'Client ID is required');
   }
 
-  const app = await App.findOne({ clientId });
+  const app = await App.findOne({ clientId }).select(
+    'googleOAuth clientId name usage'
+  );
 
   if (!app || !app.isActive) {
     throw new ApiError(401, 'INVALID_CLIENT', 'Invalid or inactive app');
