@@ -77,7 +77,7 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Edit Profile (extra authentication for the email)
 
 ### 🌐 Social & OAuth Login
-- [ ] Login with Google
+- [x] Login with Google
 - [ ] Login with GitHub
 - [ ] Login with Facebook
 - [ ] Login with Apple
@@ -88,7 +88,7 @@ A centralized authentication-as-a-service platform for developers.
 
 ### 🧩 OAuth Provider Configuration
 - [ ] Configure OAuth credentials per app
-  - [ ] Google Client ID & Secret
+  - [x] Google Client ID & Secret
   - [ ] GitHub Client ID & Secret
   - [ ] Facebook App ID & Secret
   - [ ] Apple Service ID & Private Key
