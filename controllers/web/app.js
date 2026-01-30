@@ -156,7 +156,7 @@ module.exports.getGoogleOAuth = async (req, res) => {
     return res.redirect('/dashboard');
   }
 
-  res.render('app/googleOAuthForm', {
+  res.render('app/google/googleOAuthForm', {
     app,
     title: 'Configure Google OAuth',
   });
@@ -206,7 +206,7 @@ module.exports.getGithubOAuth = async (req, res)=>{
     return res.redirect('/dashboard');
   }
 
-  res.render('app/githubOAuthForm', {
+  res.render('app/github/githubOAuthForm', {
     app,
     title: 'Configure Gitub OAuth',
   });
@@ -251,5 +251,79 @@ module.exports.saveGithubOAuth = async (req, res) => {
 
   /* ---------------- UX Response ---------------- */
   req.flash('success', 'GitHub OAuth settings saved successfully');
+  res.redirect(`/app/${id}/settings`);
+};
+
+/* ---------------- GOOGLE OAUTH ---------------- */
+
+module.exports.updateGoogleOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { clientId, clientSecret, redirectUri, enabled } = req.body;
+
+  const app = await App.findById(id);
+  if (!app) throw new ApiError(404, 'APP_NOT_FOUND', 'App not found');
+
+  const previousRedirectUri = app.googleOAuth?.redirectUri;
+
+  app.googleOAuth = {
+    enabled: enabled === 'true',
+    clientId,
+    redirectUri,
+    clientSecret: clientSecret
+      ? clientSecret
+      : app.googleOAuth?.clientSecret 
+  };
+
+  await app.save();
+
+  if (
+    previousRedirectUri &&
+    redirectUri &&
+    previousRedirectUri !== redirectUri
+  ) {
+    await RefreshToken.updateMany(
+      { app: app._id, provider: 'google' },
+      { revokedAt: new Date() }
+    );
+  }
+
+  req.flash('success', 'Google OAuth settings updated');
+  res.redirect(`/app/${id}/settings`);
+};
+
+/* ---------------- GITHUB OAUTH ---------------- */
+
+module.exports.updateGithubOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { clientId, clientSecret, redirectUri, enabled } = req.body;
+
+  const app = await App.findById(id);
+  if (!app) throw new ApiError(404, 'APP_NOT_FOUND', 'App not found');
+
+  const previousRedirectUri = app.githubOAuth?.redirectUri;
+
+  app.githubOAuth = {
+    enabled: enabled === 'true',
+    clientId,
+    redirectUri,
+    clientSecret: clientSecret
+      ? clientSecret
+      : app.githubOAuth?.clientSecret
+  };
+
+  await app.save();
+
+  if (
+    previousRedirectUri &&
+    redirectUri &&
+    previousRedirectUri !== redirectUri
+  ) {
+    await RefreshToken.updateMany(
+      { app: app._id, provider: 'github' },
+      { revokedAt: new Date() }
+    );
+  }
+
+  req.flash('success', 'GitHub OAuth settings updated');
   res.redirect(`/app/${id}/settings`);
 };
