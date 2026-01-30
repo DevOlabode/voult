@@ -10,7 +10,11 @@
   
     <div class="header-actions">
       <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Github OAuth Credentials</a>
-      <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Google OAuth Credentials</a>
+      <% if(!app.googleOAuth.enabled){ %>
+        <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Google OAuth Credentials</a>
+        <% }else{ %>
+          <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Edit Google OAuth Credentials</a>
+          <% } %>
       <a href="/app/<%= app._id %>/edit" class="btn-secondary btn-sm">
         Edit App
       </a>
