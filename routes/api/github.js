@@ -10,5 +10,4 @@ router.post('/github/register', verifyClientIdOnly, catchAsync(controller.github
 
 router.post('/github/login', verifyClientIdOnly, catchAsync(controller.githubLogin));
 
-
 module.exports = router;
