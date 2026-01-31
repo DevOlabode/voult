@@ -8,121 +8,157 @@ const {
 const { signAccessToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
 
-
 module.exports.githubRegister = async (req, res) => {
-    const { code } = req.body;
-    const app = req.appClient;
-  
-    if (!code) {
-      throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code required');
-    }
-  
-    if (!app.githubOAuth?.enabled) {
-      throw new ApiError(400, 'GITHUB_NOT_ENABLED', 'GitHub OAuth not enabled');
-    }
-  
-    const accessToken = await exchangeCodeForToken({
-      code,
-      clientId: app.githubOAuth.clientId,
-      clientSecret: app.githubOAuth.clientSecret
-    });
-  
-    const { githubId, email, name } = await getGitHubProfile(accessToken);
-  
-    const existingUser = await EndUser.findOne({
-      app: app._id,
-      email,
-      deletedAt: null
-    });
-  
-    if (existingUser) {
-      throw new ApiError(409, 'USER_EXISTS', 'Account already exists');
-    }
-  
-    const user = await EndUser.create({
-      app: app._id,
-      email,
-      fullName: name,
-      githubId,
-      authProvider: 'github',
-      isEmailVerified: true,
-      isActive: true,
-      lastLoginAt: new Date()
-    });
-  
-    await App.updateOne(
-      { _id: app._id },
-      { $inc: { 'usage.totalRegistrations': 1 } }
-    );
-  
-    const accessJwt = signAccessToken(user, app);
-    const { rawToken: refreshToken } = await createRefreshToken({
-      endUser: user,
-      app,
-      ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
-    });
-  
-    res.status(201).json({
-      message: 'GitHub registration successful',
-      accessToken: accessJwt,
-      refreshToken,
-      user: { id: user._id, email: user.email }
-    });
-  };
-  
+  const { code } = req.body;
+  const app = req.appClient;
 
-  module.exports.githubLogin = async (req, res) => {
-    const { code } = req.body;
-    const app = req.appClient;
-  
-    if (!code) {
-      throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code required');
+  console.log('FULL APP: ', app);
+
+  if (!code) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code required');
+  }
+
+  if (
+    !app.githubOAuth?.enabled ||
+    !app.githubOAuth.clientId ||
+    !app.githubOAuth.clientSecret
+  ) {
+    throw new ApiError(
+      400,
+      'GITHUB_NOT_CONFIGURED',
+      'GitHub OAuth is not fully configured'
+    );
+  }
+
+  const accessToken = await exchangeCodeForToken({
+    code,
+    clientId: app.githubOAuth.clientId,
+    clientSecret: app.githubOAuth.clientSecret
+  });
+
+  const { githubId, email, name } = await getGitHubProfile(accessToken);
+
+  if (!email) {
+    throw new ApiError(400, 'EMAIL_REQUIRED', 'GitHub email not available');
+  }
+
+  const existingUser = await EndUser.findOne({
+    app: app._id,
+    email,
+    deletedAt: null
+  });
+
+  if (existingUser) {
+    throw new ApiError(409, 'USER_EXISTS', 'Account already exists');
+  }
+
+  const user = await EndUser.create({
+    app: app._id,
+    email,
+    fullName: name,
+    githubId,
+    authProvider: 'github',
+    isEmailVerified: true,
+    isActive: true,
+    lastLoginAt: new Date()
+  });
+
+  await App.updateOne(
+    { _id: app._id },
+    { $inc: { 'usage.totalRegistrations': 1 } }
+  );
+
+  const accessJwt = signAccessToken(user, app);
+
+  const { rawToken: refreshToken } = await createRefreshToken({
+    endUser: user,
+    app,
+    ipAddress: req.ip,
+    userAgent: req.headers['user-agent']
+  });
+
+  res.status(201).json({
+    message: 'GitHub registration successful',
+    accessToken: accessJwt,
+    refreshToken,
+    user: {
+      id: user._id,
+      email: user.email
     }
-  
-    const accessToken = await exchangeCodeForToken({
-      code,
-      clientId: app.githubOAuth.clientId,
-      clientSecret: app.githubOAuth.clientSecret
-    });
-  
-    const { githubId, email } = await getGitHubProfile(accessToken);
-  
-    const user = await EndUser.findOne({
-      app: app._id,
-      email,
-      deletedAt: null
-    });
-  
-    if (!user) {
-      throw new ApiError(404, 'USER_NOT_FOUND', 'Account not found');
+  });
+};
+
+
+module.exports.githubLogin = async (req, res) => {
+  const { code } = req.body;
+  const app = req.appClient;
+
+  if (!code) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code required');
+  }
+
+  if (
+    !app.githubOAuth?.enabled ||
+    !app.githubOAuth.clientId ||
+    !app.githubOAuth.clientSecret
+  ) {
+    throw new ApiError(
+      400,
+      'GITHUB_NOT_CONFIGURED',
+      'GitHub OAuth is not fully configured'
+    );
+  }
+
+  const accessToken = await exchangeCodeForToken({
+    code,
+    clientId: app.githubOAuth.clientId,
+    clientSecret: app.githubOAuth.clientSecret
+  });
+
+  const { githubId, email } = await getGitHubProfile(accessToken);
+
+  if (!email) {
+    throw new ApiError(400, 'EMAIL_REQUIRED', 'GitHub email not available');
+  }
+
+  const user = await EndUser.findOne({
+    app: app._id,
+    email,
+    deletedAt: null
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'USER_NOT_FOUND', 'Account not found');
+  }
+
+  if (!user.githubId) {
+    user.githubId = githubId;
+    user.authProvider = 'github';
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(403, 'ACCOUNT_DISABLED', 'Account disabled');
+  }
+
+  user.lastLoginAt = new Date();
+  await user.save();
+
+  const accessJwt = signAccessToken(user, app);
+
+  const { rawToken: refreshToken } = await createRefreshToken({
+    endUser: user,
+    app,
+    ipAddress: req.ip,
+    userAgent: req.headers['user-agent']
+  });
+
+  res.json({
+    message: 'GitHub login successful',
+    accessToken: accessJwt,
+    refreshToken,
+    user: {
+      id: user._id,
+      email: user.email
     }
-  
-    if (!user.githubId) {
-      user.githubId = githubId;
-      user.authProvider = 'github';
-    }
-  
-    if (!user.isActive) {
-      throw new ApiError(403, 'ACCOUNT_DISABLED', 'Account disabled');
-    }
-  
-    user.lastLoginAt = new Date();
-    await user.save();
-  
-    const accessJwt = signAccessToken(user, app);
-    const { rawToken: refreshToken } = await createRefreshToken({
-      endUser: user,
-      app,
-      ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
-    });
-  
-    res.json({
-      message: 'GitHub login successful',
-      accessToken: accessJwt,
-      refreshToken,
-      user: { id: user._id, email: user.email }
-    });
-  };
-  
+  });
+};

@@ -6,8 +6,8 @@ const catchAsync = require('../../utils/catchAsync');
 
 const controller = require('../../controllers/api/github');
 
-router.post('/github/register', verifyClientIdOnly, catchAsync(controller.githubRegister));
+router.post('/register', verifyClientIdOnly, catchAsync(controller.githubRegister));
 
-router.post('/github/login', verifyClientIdOnly, catchAsync(controller.githubLogin));
+router.post('/login', verifyClientIdOnly, catchAsync(controller.githubLogin));
 
 module.exports = router;
