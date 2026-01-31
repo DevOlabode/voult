@@ -214,7 +214,7 @@ module.exports.getGithubOAuth = async (req, res)=>{
 
 module.exports.saveGithubOAuth = async (req, res) => {
   const { id } = req.params;
-  const { clientId, clientSecret, redirectUri, enabled } = req.body;
+  const { clientId, clientSecret, redirectUri } = req.body;
 
   const app = await App.findById(id);
 
@@ -237,7 +237,7 @@ module.exports.saveGithubOAuth = async (req, res) => {
   }
 
   /* ---------------- Persist Config ---------------- */
-  app.githubOAuth.enabled = enabled === 'true';
+  app.githubOAuth.enabled =  'true';
 
   app.githubOAuth.clientId = clientId.trim();
   app.githubOAuth.redirectUri = redirectUri.trim();
