@@ -8,6 +8,9 @@ const {
 const { signAccessToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
 
+// Email Services
+const {welcomeOAuthUser} = require('../../services/emailService');
+
 module.exports.githubRegister = async (req, res) => {
   const { code } = req.body;
   const app = req.appClient;
@@ -65,6 +68,16 @@ module.exports.githubRegister = async (req, res) => {
     { _id: app._id },
     { $inc: { 'usage.totalRegistrations': 1 } }
   );
+
+  // Send Welcome Email
+  await welcomeOAuthUser({
+    to: user.email,
+    name: user.fullName,
+    appName: app.name,
+    provider: 'GitHub'
+  }).catch(err => {
+    console.error('Welcome email failed', err.message);
+  });
 
   const accessJwt = signAccessToken(user, app);
 

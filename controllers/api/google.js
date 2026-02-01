@@ -4,6 +4,8 @@ const { signAccessToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
 const { OAuth2Client } = require('google-auth-library');
 
+const {welcomeOAuthUser} = require('../../services/emailService');
+
 const {verifyEndUsers} = require('../../services/emailService');
 const App = require('../../models/app');
 
@@ -77,7 +79,6 @@ module.exports.googleLogin = async (req, res) => {
   user.lastLoginAt = new Date();
   await user.save();
 
-  /* Verify End User Email */
   const appO = await App.findById(app._id);
 
   const userPerApp = await EndUser.countDocuments({app : appO._id});
@@ -87,17 +88,15 @@ module.exports.googleLogin = async (req, res) => {
 
   await user.save();
 
-  const verifyToken = await user.generateEmailVerificationToken();
-
-  const verifyUrl = `${process.env.BASE_URL}/api/auth/verify-email?token=${verifyToken}&appId=${app._id}`;
-
-  const token = signEndUserToken(user, app);
-
-  await verifyEndUsers(
-    user.email,
-    app.name,
-    verifyUrl,
-  );
+  // Send Welcome Email
+  await welcomeOAuthUser({
+    to: user.email,
+    name: user.fullName,
+    appName: app.name,
+    provider: 'Google'
+  }).catch(err => {
+    console.error('Welcome email failed', err.message);
+  });
 
   /* -------- Issue tokens -------- */
   const accessToken = signAccessToken(user, app);

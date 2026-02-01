@@ -126,3 +126,57 @@ module.exports.sendPasswordResetEmail = async (to, appName, resetUrl) => {
     `
   });
 };
+
+/**
+ * Welcome email for OAuth users (Google / GitHub)
+ */
+module.exports.welcomeOAuthUser = async ({
+  to,
+  name,
+  appName,
+  provider
+}) => {
+  return transporter.sendMail({
+    from: '"voult.dev" <solabode499@gmail.com>',
+    to,
+    subject: `Welcome to ${appName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background: #f3f4f6;">
+        <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 28px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+
+          <h1 style="color: #111827; margin-top: 0;">
+            Welcome to ${appName}, ${name || 'there'} 👋
+          </h1>
+
+          <p style="font-size: 16px; color: #374151; line-height: 1.6;">
+            Your account has been successfully created using
+            <strong>${provider}</strong>.
+          </p>
+
+          <p style="font-size: 16px; color: #374151; line-height: 1.6;">
+            Your email address is already verified, so you can start using
+            <strong>${appName}</strong> immediately.
+          </p>
+
+          <div style="margin-top: 24px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+            <ul style="font-size: 15px; color: #374151; padding-left: 18px; line-height: 1.6; margin: 0;">
+              <li>Secure authentication via OAuth</li>
+              <li>No passwords to manage</li>
+              <li>Instant access to protected APIs</li>
+              <li>Industry-standard security practices</li>
+            </ul>
+          </div>
+
+          <p style="margin-top: 26px; font-size: 14px; color: #6b7280;">
+            If you didn’t create this account, you can safely ignore this email.
+          </p>
+
+          <p style="margin-top: 10px; font-size: 14px; color: #6b7280;">
+            — The ${appName} Team
+          </p>
+
+        </div>
+      </div>
+    `
+  });
+};
