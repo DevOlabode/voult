@@ -94,7 +94,7 @@ module.exports.verifyClientIdOnly = async (req, res, next) => {
   }
 
   const app = await App.findOne({ clientId })
-    .select('+googleOAuth.clientSecret');
+  .select('+githubOAuth.clientSecret +googleOAuth.clientSecret');
 
   if (!app || !app.isActive) {
     throw new ApiError(401, 'INVALID_CLIENT', 'Invalid or inactive app');
