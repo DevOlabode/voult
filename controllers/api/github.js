@@ -12,8 +12,6 @@ module.exports.githubRegister = async (req, res) => {
   const { code } = req.body;
   const app = req.appClient;
 
-  console.log('FULL APP: ', app);
-
   if (!code) {
     throw new ApiError(400, 'VALIDATION_ERROR', 'Authorization code required');
   }
