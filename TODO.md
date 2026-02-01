@@ -97,6 +97,11 @@ A centralized authentication-as-a-service platform for developers.
 
 ---
 
+### Main App Features
+- [] Enable developer google login and register
+- [] Enable developer github login and register
+- [] Enable developer SSO register. 
+
 ### 📊 App Insights & Auditing
 - [ ] App usage dashboard
 - [ ] Auth metrics (daily logins, registrations)
