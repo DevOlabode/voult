@@ -12,11 +12,6 @@ const EndUserSchema = new Schema(
       required: true
     },
 
-    fullName : {
-      type : String,
-      required : false,
-    },
-
     isActive : {
       type : Boolean,
       default : true
@@ -28,6 +23,13 @@ const EndUserSchema = new Schema(
 
     disabledReason : {
       type : String,
+    },
+
+    fullName : {
+      type : String,
+      trim : true,
+      required : true,
+      maxlength : 100
     },
 
     email: {

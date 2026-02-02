@@ -89,7 +89,7 @@ module.exports.googleLogin = async (req, res) => {
   await user.save();
 
   // Send Welcome Email
-  await welcomeOAuthUser({
+  welcomeOAuthUser({
     to: user.email,
     name: user.fullName,
     appName: app.name,
@@ -153,7 +153,9 @@ module.exports.googleRegister = async (req, res) => {
     sub: googleId,
     email,
     email_verified,
-    name
+    name,
+    given_name,
+    family_name
   } = payload;
 
   if (!email_verified) {
@@ -175,9 +177,13 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
+  const fullName =
+  name?.trim() ||
+  given_name?.trim() + ' ' + family_name?.trim();
+
   /* -------- Create user -------- */
   const user = await EndUser.create({
-    fullName: name,
+    fullName,
     app: app._id,
     email,
     googleId,
@@ -186,6 +192,8 @@ module.exports.googleRegister = async (req, res) => {
     isActive: true,
     lastLoginAt: new Date()
   });
+
+  console.log("Full Name Saved: ", fullName);
 
   await App.updateOne(
     { _id: app._id },
