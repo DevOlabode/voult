@@ -14,7 +14,7 @@ const EndUserSchema = new Schema(
 
     fullName : {
       type : String,
-      required : true,
+      required : false,
     },
 
     isActive : {

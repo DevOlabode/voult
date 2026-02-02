@@ -9,8 +9,10 @@ const { verifyClient, verifyClientIdOnly } = require('../../middleware/verifyCli
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 const { authLimiter } = require('../../middleware/rateLimiters');
 
-router.post('/register', verifyClientIdOnly, validateCallbackUrl, authLimiter, controller.googleRegister);
+const catchAsync = require('../../utils/catchAsync');
 
-router.post('/login', verifyClientIdOnly, validateCallbackUrl, authLimiter, controller.googleLogin);
+router.post('/register', verifyClientIdOnly, validateCallbackUrl, authLimiter, catchAsync(controller.googleRegister));
+
+router.post('/login', verifyClientIdOnly, validateCallbackUrl, authLimiter, catchAsync(controller.googleLogin));
 
 module.exports = router;

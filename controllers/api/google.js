@@ -177,9 +177,9 @@ module.exports.googleRegister = async (req, res) => {
 
   /* -------- Create user -------- */
   const user = await EndUser.create({
+    fullName: name,
     app: app._id,
     email,
-    fullName: name,
     googleId,
     authProvider: 'google',
     isEmailVerified: true,
@@ -207,6 +207,7 @@ module.exports.googleRegister = async (req, res) => {
     accessToken,
     refreshToken,
     user: {
+      name : user.fullName,
       id: user._id,
       email: user.email
     }
