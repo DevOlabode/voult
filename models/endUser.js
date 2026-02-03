@@ -28,7 +28,6 @@ const EndUserSchema = new Schema(
     fullName : {
       type : String,
       trim : true,
-      required : true,
       maxlength : 100
     },
 

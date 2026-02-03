@@ -126,7 +126,7 @@ module.exports.googleRegister = async (req, res) => {
       audience: app.googleOAuth.clientId
     });
     payload = ticket.getPayload();
-  } catch (err) {
+  } catch {
     throw new ApiError(
       401,
       'INVALID_GOOGLE_TOKEN',
@@ -151,19 +151,13 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  /* ---------- Build fullName safely ---------- */
-  let fullName;
+  /* ---------- Fallback-safe fullName ---------- */
+  const fullName =
+    (given_name && family_name && `${given_name} ${family_name}`) ||
+    name ||
+    null; // IMPORTANT: do not fake names
 
-  if (given_name && family_name) {
-    fullName = `${given_name} ${family_name}`;
-  } else if (name) {
-    fullName = name;
-  } else {
-    // Guaranteed fallback
-    fullName = email.split('@')[0];
-  }
-
-  /* ---------- Prevent duplicate accounts ---------- */
+  /* ---------- Prevent duplicates ---------- */
   const existingUser = await EndUser.findOne({
     app: app._id,
     email,
@@ -182,7 +176,7 @@ module.exports.googleRegister = async (req, res) => {
   const user = await EndUser.create({
     app: app._id,
     email,
-    fullName,
+    fullName,          // may be null
     googleId,
     authProvider: 'google',
     isEmailVerified: true,
@@ -195,7 +189,7 @@ module.exports.googleRegister = async (req, res) => {
     { $inc: { 'usage.totalRegistrations': 1 } }
   );
 
-  /* ---------- Send welcome email ---------- */
+  /* ---------- Welcome email (non-blocking UX assumed) ---------- */
   await welcomeOAuthUser({
     to: email,
     name: fullName,

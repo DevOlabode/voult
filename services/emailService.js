@@ -145,7 +145,7 @@ module.exports.welcomeOAuthUser = async ({
         <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 28px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
 
           <h1 style="color: #111827; margin-top: 0;">
-            Welcome to ${appName}, ${name || 'there'} 👋
+            Welcome to ${appName}, ${name || 'there'} 
           </h1>
 
           <p style="font-size: 16px; color: #374151; line-height: 1.6;">

@@ -99,8 +99,8 @@ A centralized authentication-as-a-service platform for developers.
 
 ### Main App Features
 - [] Add resend email to forgotten password flow
-- [] Enable developer google login and register
-- [] Enable developer github login and register
+- [] Enable developer google oauth login and register
+- [] Enable developer github oauth login and register
 - [] Enable developer SSO register. 
 
 ### 📊 App Insights & Auditing
