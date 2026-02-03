@@ -123,6 +123,7 @@ module.exports.googleRegister = async (req, res) => {
   const { idToken } = req.body;
   const app = req.appClient;
 
+  /* ---------- Validation ---------- */
   if (!idToken) {
     throw new ApiError(400, 'VALIDATION_ERROR', 'idToken is required');
   }
@@ -135,7 +136,7 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  /* -------- Verify Google ID token -------- */
+  /* ---------- Verify Google ID Token ---------- */
   const client = new OAuth2Client(app.googleOAuth.clientId);
 
   let payload;
@@ -146,7 +147,11 @@ module.exports.googleRegister = async (req, res) => {
     });
     payload = ticket.getPayload();
   } catch (err) {
-    throw new ApiError(401, 'INVALID_GOOGLE_TOKEN', 'Invalid Google ID token');
+    throw new ApiError(
+      401,
+      'INVALID_GOOGLE_TOKEN',
+      'Invalid Google ID token'
+    );
   }
 
   const {
@@ -158,11 +163,27 @@ module.exports.googleRegister = async (req, res) => {
     family_name
   } = payload;
 
-  if (!email_verified) {
-    throw new ApiError(403, 'EMAIL_NOT_VERIFIED', 'Google email not verified');
+  if (!email || !email_verified) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_VERIFIED',
+      'Google email not verified'
+    );
   }
 
-  /* -------- Prevent duplicates -------- */
+  /* ---------- Build fullName safely ---------- */
+  let fullName;
+
+  if (given_name && family_name) {
+    fullName = `${given_name} ${family_name}`;
+  } else if (name) {
+    fullName = name;
+  } else {
+    // Guaranteed fallback
+    fullName = email.split('@')[0];
+  }
+
+  /* ---------- Prevent duplicate accounts ---------- */
   const existingUser = await EndUser.findOne({
     app: app._id,
     email,
@@ -177,15 +198,11 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  const fullName =
-  name?.trim() ||
-  given_name?.trim() + ' ' + family_name?.trim();
-
-  /* -------- Create user -------- */
+  /* ---------- Create user ---------- */
   const user = await EndUser.create({
-    fullName,
     app: app._id,
     email,
+    fullName,
     googleId,
     authProvider: 'google',
     isEmailVerified: true,
@@ -193,14 +210,12 @@ module.exports.googleRegister = async (req, res) => {
     lastLoginAt: new Date()
   });
 
-  console.log("Full Name Saved: ", fullName);
-
   await App.updateOne(
     { _id: app._id },
     { $inc: { 'usage.totalRegistrations': 1 } }
   );
 
-  /* -------- Issue tokens -------- */
+  /* ---------- Issue tokens ---------- */
   const accessToken = signAccessToken(user, app);
 
   const { rawToken: refreshToken } = await createRefreshToken({
@@ -210,14 +225,135 @@ module.exports.googleRegister = async (req, res) => {
     userAgent: req.headers['user-agent']
   });
 
+  /* ---------- Response ---------- */
   res.status(201).json({
     message: 'Google registration successful',
     accessToken,
     refreshToken,
     user: {
-      name : user.fullName,
       id: user._id,
-      email: user.email
+      email: user.email,
+      fullName: user.fullName
+    }
+  });
+};
+
+
+module.exports.googleRegister = async (req, res) => {
+  const { idToken } = req.body;
+  const app = req.appClient;
+
+  /* ---------- Validation ---------- */
+  if (!idToken) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'idToken is required');
+  }
+
+  if (!app.googleOAuth?.clientId) {
+    throw new ApiError(
+      400,
+      'GOOGLE_NOT_CONFIGURED',
+      'Google OAuth not enabled'
+    );
+  }
+
+  /* ---------- Verify Google ID Token ---------- */
+  const client = new OAuth2Client(app.googleOAuth.clientId);
+
+  let payload;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: app.googleOAuth.clientId
+    });
+    payload = ticket.getPayload();
+  } catch (err) {
+    throw new ApiError(
+      401,
+      'INVALID_GOOGLE_TOKEN',
+      'Invalid Google ID token'
+    );
+  }
+
+  const {
+    sub: googleId,
+    email,
+    email_verified,
+    name,
+    given_name,
+    family_name
+  } = payload;
+
+  if (!email || !email_verified) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_VERIFIED',
+      'Google email not verified'
+    );
+  }
+
+  /* ---------- Build fullName safely ---------- */
+  let fullName;
+
+  if (given_name && family_name) {
+    fullName = `${given_name} ${family_name}`;
+  } else if (name) {
+    fullName = name;
+  } else {
+    // Guaranteed fallback
+    fullName = email.split('@')[0];
+  }
+
+  /* ---------- Prevent duplicate accounts ---------- */
+  const existingUser = await EndUser.findOne({
+    app: app._id,
+    email,
+    deletedAt: null
+  });
+
+  if (existingUser) {
+    throw new ApiError(
+      409,
+      'USER_EXISTS',
+      'An account with this email already exists'
+    );
+  }
+
+  /* ---------- Create user ---------- */
+  const user = await EndUser.create({
+    app: app._id,
+    email,
+    fullName,
+    googleId,
+    authProvider: 'google',
+    isEmailVerified: true,
+    isActive: true,
+    lastLoginAt: new Date()
+  });
+
+  await App.updateOne(
+    { _id: app._id },
+    { $inc: { 'usage.totalRegistrations': 1 } }
+  );
+
+  /* ---------- Issue tokens ---------- */
+  const accessToken = signAccessToken(user, app);
+
+  const { rawToken: refreshToken } = await createRefreshToken({
+    endUser: user,
+    app,
+    ipAddress: req.ip,
+    userAgent: req.headers['user-agent']
+  });
+
+  /* ---------- Response ---------- */
+  res.status(201).json({
+    message: 'Google registration successful',
+    accessToken,
+    refreshToken,
+    user: {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName
     }
   });
 };
