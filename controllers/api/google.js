@@ -6,7 +6,6 @@ const { OAuth2Client } = require('google-auth-library');
 
 const {welcomeOAuthUser} = require('../../services/emailService');
 
-const {verifyEndUsers} = require('../../services/emailService');
 const App = require('../../models/app');
 
 module.exports.googleLogin = async (req, res) => {
@@ -78,25 +77,6 @@ module.exports.googleLogin = async (req, res) => {
 
   user.lastLoginAt = new Date();
   await user.save();
-
-  const appO = await App.findById(app._id);
-
-  const userPerApp = await EndUser.countDocuments({app : appO._id});
-  appO.usage.totalRegistrations = userPerApp;
-
-  await appO.save();
-
-  await user.save();
-
-  // Send Welcome Email
-  welcomeOAuthUser({
-    to: user.email,
-    name: user.fullName,
-    appName: app.name,
-    provider: 'Google'
-  }).catch(err => {
-    console.error('Welcome email failed', err.message);
-  });
 
   /* -------- Issue tokens -------- */
   const accessToken = signAccessToken(user, app);
@@ -214,6 +194,26 @@ module.exports.googleRegister = async (req, res) => {
     { _id: app._id },
     { $inc: { 'usage.totalRegistrations': 1 } }
   );
+
+  const appO = await App.findById(app._id);
+
+  const userPerApp = await EndUser.countDocuments({app : appO._id});
+  appO.usage.totalRegistrations = userPerApp;
+
+  await appO.save();
+
+  await user.save();
+
+  // Send Welcome Email
+  welcomeOAuthUser({
+    to: user.email,
+    name: user.fullName,
+    appName: app.name,
+    provider: 'Google'
+  }).catch(err => {
+    console.error('Welcome email failed', err.message);
+  });
+
 
   /* ---------- Issue tokens ---------- */
   const accessToken = signAccessToken(user, app);
