@@ -390,3 +390,65 @@ module.exports.saveFacebookOAuth = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.updateFacebookOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { appId, appSecret, redirectUri, enabled } = req.body;
+
+  /* ---------- Fetch app WITH secret ---------- */
+  const app = await App.findById(id).select('+facebookOAuth.appSecret');
+
+  if (!app) {
+    throw new ApiError(404, 'APP_NOT_FOUND', 'Application not found');
+  }
+
+  /* ---------- Initialize object if missing ---------- */
+  if (!app.facebookOAuth) {
+    app.facebookOAuth = {};
+  }
+
+  /* ---------- Enable / Disable ---------- */
+  app.facebookOAuth.enabled = enabled === 'true';
+
+  /* ---------- App ID ---------- */
+  if (appId) {
+    app.facebookOAuth.appId = appId.trim();
+  }
+
+  /* ---------- Redirect URI ---------- */
+  if (redirectUri) {
+    app.facebookOAuth.redirectUri = redirectUri.trim();
+  }
+
+  /* ---------- Secret rotation (ONLY if provided) ---------- */
+  if (appSecret && appSecret.trim().length > 0) {
+    app.facebookOAuth.appSecret = appSecret.trim();
+  }
+
+  /* ---------- Validation (only when enabled) ---------- */
+  if (app.facebookOAuth.enabled) {
+    if (
+      !app.facebookOAuth.appId ||
+      !app.facebookOAuth.appSecret ||
+      !app.facebookOAuth.redirectUri
+    ) {
+      throw new ApiError(
+        400,
+        'INVALID_FACEBOOK_OAUTH_CONFIG',
+        'App ID, App Secret, and Redirect URI are required when Facebook OAuth is enabled'
+      );
+    }
+  }
+
+  await app.save();
+
+  res.status(200).json({
+    message: 'Facebook OAuth configuration updated',
+    facebookOAuth: {
+      enabled: app.facebookOAuth.enabled,
+      appId: app.facebookOAuth.appId,
+      redirectUri: app.facebookOAuth.redirectUri
+      // ❌ secret intentionally omitted
+    }
+  });
+};
