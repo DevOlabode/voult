@@ -1,83 +1,164 @@
 <% layout('layout/boilerplate.ejs') %>
 
-<section class="card">
-  <h2 class="text-white">Facebook OAuth Configuration</h2>
-
-  <form
-    action="/app/<%= app._id %>/facebook-oauth"
-    method="POST"
-    class="card app-form"
-  >
-
-    <!-- Enable Facebook OAuth -->
-    <div class="form-group">
-      <label class="text-light opacity-50">
-        Enable Facebook Login
-      </label>
-
-      <select name="enabled" required>
-        <option value="true" <%= app.facebookOAuth?.enabled ? 'selected' : '' %>>
-          Enabled
-        </option>
-        <option value="false" <%= !app.facebookOAuth?.enabled ? 'selected' : '' %>>
-          Disabled
-        </option>
-      </select>
-    </div>
-
-    <!-- Facebook App ID -->
-    <div class="form-group">
-      <label class="text-light opacity-50">
-        Facebook App ID
-      </label>
-      <input
-        type="text"
-        name="appId"
-        required
-        placeholder="123456789012345"
-        value="<%= app.facebookOAuth?.appId || '' %>"
-      />
-    </div>
-
-    <!-- Facebook App Secret -->
-    <div class="form-group">
-      <label class="text-light opacity-50">
-        Facebook App Secret
-      </label>
-      <input
-        type="password"
-        name="appSecret"
-        placeholder="Leave blank to keep existing secret"
-      />
-      <small class="text-muted">
-        For security reasons, the current secret is never shown.
-      </small>
-    </div>
-
-    <!-- Redirect URI -->
-    <div class="form-group">
-      <label class="text-light opacity-50">
-        Redirect URI
-      </label>
-      <input
-        type="url"
-        name="redirectUri"
-        required
-        placeholder="https://yourapp.com/auth/facebook/callback"
-        value="<%= app.facebookOAuth?.redirectUri || '' %>"
-      />
-    </div>
-
-    <div class="form-actions">
-      <button class="btn btn-secondary">
-        Save Facebook OAuth
-      </button>
-    </div>
-
-  </form>
-
-  <p class="hint">
-    This redirect URI must exactly match the one configured in the
-    <strong>Facebook Developers Console</strong>.
-  </p>
-</section>
+<% if(!app.facebookOAuth.enabled){ %>
+    <section class="card">
+        <h2 class="text-white">Facebook OAuth Configuration</h2>
+      
+        <form
+          action="/app/<%= app._id %>/facebook-oauth"
+          method="POST"
+          class="card app-form"
+        >
+      
+          <!-- Enable Facebook OAuth -->
+          <div class="form-group">
+            <label class="text-light opacity-50">
+              Enable Facebook Login
+            </label>
+      
+            <select name="enabled" required>
+              <option value="true" <%= app.facebookOAuth?.enabled ? 'selected' : '' %>>
+                Enabled
+              </option>
+              <option value="false" <%= !app.facebookOAuth?.enabled ? 'selected' : '' %>>
+                Disabled
+              </option>
+            </select>
+          </div>
+      
+          <!-- Facebook App ID -->
+          <div class="form-group">
+            <label class="text-light opacity-50">
+              Facebook App ID
+            </label>
+            <input
+              type="text"
+              name="appId"
+              required
+              placeholder="123456789012345"
+              value="<%= app.facebookOAuth?.appId || '' %>"
+            />
+          </div>
+      
+          <!-- Facebook App Secret -->
+          <div class="form-group">
+            <label class="text-light opacity-50">
+              Facebook App Secret
+            </label>
+            <input
+              type="password"
+              name="appSecret"
+              placeholder="Leave blank to keep existing secret"
+            />
+            <small class="text-muted">
+              For security reasons, the current secret is never shown.
+            </small>
+          </div>
+      
+          <!-- Redirect URI -->
+          <div class="form-group">
+            <label class="text-light opacity-50">
+              Redirect URI
+            </label>
+            <input
+              type="url"
+              name="redirectUri"
+              required
+              placeholder="https://yourapp.com/auth/facebook/callback"
+              value="<%= app.facebookOAuth?.redirectUri || '' %>"
+            />
+          </div>
+      
+          <div class="form-actions">
+            <button class="btn btn-secondary">
+              Save Facebook OAuth
+            </button>
+          </div>
+      
+        </form>
+      
+        <p class="hint">
+          This redirect URI must exactly match the one configured in the
+          <strong>Facebook Developers Console</strong>.
+        </p>
+      </section>
+    <% }else{ %>
+        <div class="oauth-card">
+            <h2>Update Facebook OAuth</h2>
+            <p class="muted">
+              Configure Facebook Login for this application.  
+              The App Secret is never shown. Leave it blank to keep the current one.
+            </p>
+          
+            <form
+              method="POST"
+              action="/app/<%= app._id %>/update-facebook-oauth"
+              class="oauth-form"
+            >
+              <!-- Enable / Disable -->
+              <div class="form-group checkbox-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="enabled"
+                    value="true"
+                    <%= app.facebookOAuth?.enabled ? 'checked' : '' %>
+                  />
+                  Enable Facebook Login
+                </label>
+              </div>
+          
+              <!-- Facebook App ID -->
+              <div class="form-group">
+                <label for="appId">Facebook App ID</label>
+                <input
+                  type="text"
+                  id="appId"
+                  name="appId"
+                  placeholder="e.g. 123456789012345"
+                  value="<%= app.facebookOAuth?.appId || '' %>"
+                  required
+                />
+              </div>
+          
+              <!-- Facebook App Secret -->
+              <div class="form-group">
+                <label for="appSecret">
+                  Facebook App Secret
+                  <span class="hint">(leave blank to keep existing)</span>
+                </label>
+                <input
+                  type="password"
+                  id="appSecret"
+                  name="appSecret"
+                  placeholder="••••••••••••••••"
+                  autocomplete="new-password"
+                />
+              </div>
+          
+              <!-- Redirect URI -->
+              <div class="form-group">
+                <label for="redirectUri">Redirect URI</label>
+                <input
+                  type="url"
+                  id="redirectUri"
+                  name="redirectUri"
+                  placeholder="https://yourapp.com/auth/facebook/callback"
+                  value="<%= app.facebookOAuth?.redirectUri || '' %>"
+                  required
+                />
+                <small class="hint">
+                  This must exactly match the redirect URI configured in Facebook Developer Console.
+                </small>
+              </div>
+          
+              <!-- Submit -->
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  Save Facebook OAuth
+                </button>
+              </div>
+            </form>
+          </div>
+          
+        <% } %>

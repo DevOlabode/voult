@@ -347,11 +347,11 @@ module.exports.getFacebookOAuth = async (req, res) => {
 
 module.exports.saveFacebookOAuth = async (req, res, next) => {
   try {
-    const { appId } = req.params;
+    const { id } = req.params;
     const { enabled, appId: fbAppId, appSecret, redirectUri } = req.body;
 
     // Always fetch with secret explicitly selected
-    const app = await App.findById(appId).select('+facebookOAuth.appSecret');
+    const app = await App.findById(id).select('+facebookOAuth.appSecret');
 
     if (!app) {
       return res.status(404).json({ error: 'App not found' });
@@ -384,14 +384,8 @@ module.exports.saveFacebookOAuth = async (req, res, next) => {
 
     await app.save();
 
-    return res.status(200).json({
-      message: 'Facebook OAuth configuration saved',
-      facebookOAuth: {
-        enabled: app.facebookOAuth.enabled,
-        appId: app.facebookOAuth.appId,
-        redirectUri: app.facebookOAuth.redirectUri
-      }
-    });
+    req.flash('success', 'Facebook Credentials Saved')
+    return res.redirect(`/app/${id}`);
   } catch (err) {
     next(err);
   }
