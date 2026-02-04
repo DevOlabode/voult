@@ -384,7 +384,7 @@ module.exports.saveFacebookOAuth = async (req, res, next) => {
 
     await app.save();
 
-    req.flash('success', 'Facebook Credentials Saved')
+    req.flash('success', 'Facebook Credentials Added Successfully')
     return res.redirect(`/app/${id}`);
   } catch (err) {
     next(err);
@@ -441,14 +441,6 @@ module.exports.updateFacebookOAuth = async (req, res) => {
   }
 
   await app.save();
-
-  res.status(200).json({
-    message: 'Facebook OAuth configuration updated',
-    facebookOAuth: {
-      enabled: app.facebookOAuth.enabled,
-      appId: app.facebookOAuth.appId,
-      redirectUri: app.facebookOAuth.redirectUri
-      // ❌ secret intentionally omitted
-    }
-  });
+  req.flash('success', 'Facebook Credentials Uodated Successsfully')
+  return res.redirect(`/app/${id}`);
 };

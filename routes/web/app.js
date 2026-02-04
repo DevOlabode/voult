@@ -44,6 +44,6 @@ router.get('/:id/facebook-oauth', catchAsync(controller.getFacebookOAuth));
 
 router.post('/:id/facebook-oauth', catchAsync(controller.saveFacebookOAuth));
 
-router.post('/app/:id/update-facebook-oauth', catchAsync(controller.updateFacebookOAuth));
+router.post('/:id/update-facebook-oauth', catchAsync(controller.updateFacebookOAuth));
 
 module.exports = router;
