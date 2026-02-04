@@ -12,6 +12,7 @@ const sessionRoutes = require('./api/session');
 const apiUserRoutes = require('./api/user');
 const apiGoogle  = require('./api/google');
 const apiGithub = require('./api/github');
+const apiFacebook = require('./api/facebook');
 
 // Mount Web Routes
 router.use('/', webAuthRoutes);
@@ -24,6 +25,7 @@ router.use('/api/sessions', sessionRoutes);
 router.use('/api/user', apiUserRoutes);
 router.use('/api/auth/google', apiGoogle);
 router.use('/api/auth/github', apiGithub);
+router.use('/api/auth/facebook', apiFacebook);
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));

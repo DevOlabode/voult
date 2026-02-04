@@ -69,6 +69,15 @@ githubOAuth: {
     }
 },
 
+facebookOAuth: {
+  enabled: Boolean,
+  appId: String,
+  appSecret: { 
+    type: String, 
+    select: false 
+  }
+},
+
   deletedAt: Date
 }, { timestamps: true });
 
