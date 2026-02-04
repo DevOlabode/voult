@@ -40,4 +40,6 @@ router.post('/app/:id/update-google-oauth', catchAsync(controller.updateGoogleOA
 
 router.post('/app/:id/update-github-oauth', catchAsync(controller.updateGithubOAuth));
 
+router.get('/:id/facebook-oauth', catchAsync(controller.getFacebookOAuth));
+
 module.exports = router;
