@@ -345,3 +345,54 @@ module.exports.getFacebookOAuth = async (req, res) => {
   });
 };
 
+module.exports.saveFacebookOAuth = async (req, res, next) => {
+  try {
+    const { appId } = req.params;
+    const { enabled, appId: fbAppId, appSecret, redirectUri } = req.body;
+
+    // Always fetch with secret explicitly selected
+    const app = await App.findById(appId).select('+facebookOAuth.appSecret');
+
+    if (!app) {
+      return res.status(404).json({ error: 'App not found' });
+    }
+
+    // Ensure container exists
+    if (!app.facebookOAuth) {
+      app.facebookOAuth = {};
+    }
+
+    // Enable / disable
+    if (enabled !== undefined) {
+      app.facebookOAuth.enabled = enabled === 'true';
+    }
+
+    // Update App ID
+    if (fbAppId) {
+      app.facebookOAuth.appId = fbAppId.trim();
+    }
+
+    // Update redirect URI
+    if (redirectUri) {
+      app.facebookOAuth.redirectUri = redirectUri.trim();
+    }
+
+    // Update secret ONLY if explicitly provided
+    if (appSecret && appSecret.trim().length > 0) {
+      app.facebookOAuth.appSecret = appSecret.trim();
+    }
+
+    await app.save();
+
+    return res.status(200).json({
+      message: 'Facebook OAuth configuration saved',
+      facebookOAuth: {
+        enabled: app.facebookOAuth.enabled,
+        appId: app.facebookOAuth.appId,
+        redirectUri: app.facebookOAuth.redirectUri
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};

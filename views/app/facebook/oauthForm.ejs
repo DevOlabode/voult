@@ -1,4 +1,4 @@
-<% layout('layout/boilerplate') %>
+<% layout('layout/boilerplate.ejs') %>
 
 <section class="card">
   <h2 class="text-white">Facebook OAuth Configuration</h2>
@@ -9,13 +9,13 @@
     class="card app-form"
   >
 
-    <!-- Enable / Disable -->
+    <!-- Enable Facebook OAuth -->
     <div class="form-group">
-      <label class="text-light opacity-75">
+      <label class="text-light opacity-50">
         Enable Facebook Login
       </label>
 
-      <select name="enabled" class="form-select">
+      <select name="enabled" required>
         <option value="true" <%= app.facebookOAuth?.enabled ? 'selected' : '' %>>
           Enabled
         </option>
@@ -27,63 +27,57 @@
 
     <!-- Facebook App ID -->
     <div class="form-group">
-      <label class="text-light opacity-75">
+      <label class="text-light opacity-50">
         Facebook App ID
       </label>
-
       <input
         type="text"
         name="appId"
-        value="<%= app.facebookOAuth?.appId || '' %>"
         required
         placeholder="123456789012345"
+        value="<%= app.facebookOAuth?.appId || '' %>"
       />
     </div>
 
     <!-- Facebook App Secret -->
     <div class="form-group">
-      <label class="text-light opacity-75">
+      <label class="text-light opacity-50">
         Facebook App Secret
       </label>
-
       <input
         type="password"
         name="appSecret"
-        placeholder="<%= app.facebookOAuth?.appSecret ? '••••••••••••••••' : '' %>"
+        placeholder="Leave blank to keep existing secret"
       />
-
-      <small class="hint">
-        Leave blank to keep the existing secret.
+      <small class="text-muted">
+        For security reasons, the current secret is never shown.
       </small>
     </div>
 
-    <!-- Redirect URI (Read-Only) -->
+    <!-- Redirect URI -->
     <div class="form-group">
-      <label class="text-light opacity-75">
-        OAuth Redirect URI
+      <label class="text-light opacity-50">
+        Redirect URI
       </label>
-
       <input
-        type="text"
-        readonly
-        value="<%= baseUrl %>/api/auth/facebook/callback"
+        type="url"
+        name="redirectUri"
+        required
+        placeholder="https://yourapp.com/auth/facebook/callback"
+        value="<%= app.facebookOAuth?.redirectUri || '' %>"
       />
-
-      <small class="hint">
-        Copy this URL into your Facebook Developer Console.
-      </small>
     </div>
 
-    <!-- Actions -->
     <div class="form-actions">
       <button class="btn btn-secondary">
         Save Facebook OAuth
       </button>
     </div>
+
   </form>
 
-  <p class="hint mt-3">
-    Make sure your Facebook App has
-    <strong>email</strong> and <strong>public_profile</strong> permissions enabled.
+  <p class="hint">
+    This redirect URI must exactly match the one configured in the
+    <strong>Facebook Developers Console</strong>.
   </p>
 </section>
