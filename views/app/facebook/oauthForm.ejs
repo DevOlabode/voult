@@ -1,0 +1,89 @@
+<% layout('layout/boilerplate') %>
+
+<section class="card">
+  <h2 class="text-white">Facebook OAuth Configuration</h2>
+
+  <form
+    action="/app/<%= app._id %>/facebook-oauth"
+    method="POST"
+    class="card app-form"
+  >
+
+    <!-- Enable / Disable -->
+    <div class="form-group">
+      <label class="text-light opacity-75">
+        Enable Facebook Login
+      </label>
+
+      <select name="enabled" class="form-select">
+        <option value="true" <%= app.facebookOAuth?.enabled ? 'selected' : '' %>>
+          Enabled
+        </option>
+        <option value="false" <%= !app.facebookOAuth?.enabled ? 'selected' : '' %>>
+          Disabled
+        </option>
+      </select>
+    </div>
+
+    <!-- Facebook App ID -->
+    <div class="form-group">
+      <label class="text-light opacity-75">
+        Facebook App ID
+      </label>
+
+      <input
+        type="text"
+        name="appId"
+        value="<%= app.facebookOAuth?.appId || '' %>"
+        required
+        placeholder="123456789012345"
+      />
+    </div>
+
+    <!-- Facebook App Secret -->
+    <div class="form-group">
+      <label class="text-light opacity-75">
+        Facebook App Secret
+      </label>
+
+      <input
+        type="password"
+        name="appSecret"
+        placeholder="<%= app.facebookOAuth?.appSecret ? '••••••••••••••••' : '' %>"
+      />
+
+      <small class="hint">
+        Leave blank to keep the existing secret.
+      </small>
+    </div>
+
+    <!-- Redirect URI (Read-Only) -->
+    <div class="form-group">
+      <label class="text-light opacity-75">
+        OAuth Redirect URI
+      </label>
+
+      <input
+        type="text"
+        readonly
+        value="<%= baseUrl %>/api/auth/facebook/callback"
+      />
+
+      <small class="hint">
+        Copy this URL into your Facebook Developer Console.
+      </small>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button class="btn btn-secondary">
+        Save Facebook OAuth
+      </button>
+    </div>
+  </form>
+
+  <p class="hint mt-3">
+    Make sure your Facebook App has
+    <strong>email</strong> and <strong>public_profile</strong> permissions enabled.
+  </p>
+</section>

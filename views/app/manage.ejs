@@ -9,6 +9,12 @@
     </div>
   
     <div class="header-actions">
+      <% if(!app.facebookOAuth.enabled){ %>
+        <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Facebook OAuth Credentials</a>
+        <% }else{ %>
+          <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Edit Facebook OAuth Credentials</a>
+          <% } %>
+
       <% if(!app.githubOAuth.enabled){ %>
         <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Github OAuth Credentials</a>
         <% }else{ %>

@@ -72,10 +72,8 @@ githubOAuth: {
 facebookOAuth: {
   enabled: Boolean,
   appId: String,
-  appSecret: { 
-    type: String, 
-    select: false 
-  }
+  appSecret: String,
+  redirectUri: String
 },
 
   deletedAt: Date

@@ -339,7 +339,7 @@ module.exports.getFacebookOAuth = async (req, res) => {
     return res.redirect('/dashboard');
   };
 
-  res.render('app/facebook/facebookOAuthForm', {
+  res.render('app/facebook/oauthForm', {
     app,
     title: 'Configure Facebook OAuth',
   });
