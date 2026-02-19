@@ -12,7 +12,7 @@ const { accountLockedEmail } = require('../../services/emailOnLock');
 // TOKENS
 const RefreshToken = require('../../models/refreshToken');
 const { signAccessToken, signRefreshToken } = require('../../utils/jwt');
-const { createRefreshToken } = require('../../utils/refreshToken')
+const { createRefreshToken } = require('../../utils/refreshToken');
 
 
 // PASSWORDS RULES
