@@ -1,4 +1,4 @@
-const EndUser = require('../../models/EndUser');
+const EndUser = require('../../models/endUser');
 const App = require('../../models/App');
 const { ApiError } = require('../../utils/apiError');
 const {

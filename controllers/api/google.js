@@ -1,4 +1,4 @@
-const EndUser = require('../../models/EndUser');
+const EndUser = require('../../models/endUser');
 const { ApiError } = require('../../utils/apiError');
 const { signAccessToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
