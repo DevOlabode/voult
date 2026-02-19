@@ -22,6 +22,7 @@ const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
 // verify Email.
 module.exports.verifyEmail = async (req, res) => {
     const { token, appId } = req.query;
+    console.log(req.query);
   
     if (!token || !appId) {
       throw new ApiError(
@@ -62,7 +63,6 @@ module.exports.verifyEmail = async (req, res) => {
   };
   
   /* Forgotten Password */
-  
   module.exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     const app = req.appClient;

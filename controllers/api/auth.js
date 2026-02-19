@@ -229,3 +229,9 @@ module.exports.logout = async (req, res) => {
     message: 'Logged out successfully',
   })
 }  
+
+
+//verify Email
+// module.exports.verifyEmail = async (req, res)=>{
+
+// }

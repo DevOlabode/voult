@@ -34,6 +34,6 @@ router.post('/register', validate(schemas.registerSchema), verifyClientIdOnly, v
 
 router.post('/login', validate(schemas.loginSchema), verifyClientIdOnly, authLimiter, validateCallbackUrl, catchAsync(authController.login));
 
-router.get('/verify-email', catchAsync(authController.verifyEmail));
+// router.get('/verify-email', catchAsync(authController.verifyEmail));
 
 module.exports = router;

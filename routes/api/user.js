@@ -20,7 +20,7 @@ const catchAsync  = require('../../utils/catchAsync');
 
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 
-const controller = require('../../controllers/api/user')
+const controller = require('../../controllers/api/user');
 
 router.get('/me', verifyEndUserJWT, catchAsync(controller.me));
 
