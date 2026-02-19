@@ -1,5 +1,5 @@
 const EndUser = require('../../models/endUser');
-const App = require('../../models/App');
+const App = require('../../models/app');
 const { ApiError } = require('../../utils/apiError');
 const {
   exchangeCodeForToken,
