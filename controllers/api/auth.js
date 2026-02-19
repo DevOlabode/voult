@@ -76,7 +76,7 @@ module.exports.register = async (req, res) => {
 
   const verifyToken = await user.generateEmailVerificationToken();
 
-  const verifyUrl = `${process.env.BASE_URL}/api/auth/verify-email?token=${verifyToken}&appId=${app._id}`;
+  const verifyUrl = `${process.env.BASE_URL}/api/user/verify-email?token=${verifyToken}&appId=${app._id}`;
 
   const token = signEndUserToken(user, app);
 
