@@ -227,7 +227,7 @@ module.exports.verifyEmail = async (req, res) => {
         });
       }
   
-      if (user.isDisabled) {
+      if (!user.isActive) {
         return res.status(403).json({
           error: 'ACCOUNT_DISABLED',
           message: 'This account has been disabled'
