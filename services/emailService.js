@@ -58,6 +58,11 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
 };
 
 module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
+  if (isDevelopment) {
+    logEmail(to, `Welcome to ${name}`, `Welcome to ${name} 👋\nPlease verify your email address to activate your account.`, verifyUrl);
+    return Promise.resolve();
+  }
+
   return transporter.sendMail({
     from : '"voult.dev" <solabode499@gmail.com>',
     subject : `Welcome to ${name}`,
@@ -109,6 +114,11 @@ module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
 
 
 module.exports.sendPasswordResetEmail = async (to, appName, resetUrl) => {
+  if (isDevelopment) {
+    logEmail(to, `Reset your ${appName} password`, `You requested to reset your password for ${appName}.`, resetUrl);
+    return Promise.resolve();
+  }
+
   return transporter.sendMail({
     from: '"voult.dev" <solabode499@gmail.com>',
     to,
@@ -136,6 +146,11 @@ module.exports.welcomeOAuthUser = async ({
   appName,
   provider
 }) => {
+  if (isDevelopment) {
+    logEmail(to, `Welcome to ${appName}`, `Welcome to ${appName}, ${name || 'there'}! Your account has been created using ${provider}.`);
+    return Promise.resolve();
+  }
+
   return transporter.sendMail({
     from: '"voult.dev" <solabode499@gmail.com>',
     to,

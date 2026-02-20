@@ -78,13 +78,21 @@ module.exports.register = async (req, res) => {
 
   const verifyUrl = `${process.env.BASE_URL}/api/user/verify-email?token=${verifyToken}&appId=${app._id}`;
 
+  // https://www.voult.dev/api/user/verify-email?token=19be474e479cb59965ff9f0005d3a02a8a372bdba58ace7dd5609f6be1751163&appId=697c925a3471b4e1e6728c59
+
   const token = signEndUserToken(user, app);
 
-  await verifyEndUsers(
+  // Send verification email (non-blocking - don't fail registration if email fails)
+  verifyEndUsers(
     user.email,
     app.name,
     verifyUrl,
-  );
+  ).catch(err => {
+    console.error('Failed to send verification email:', err.message);
+    // Registration still succeeds even if email fails
+  });
+
+  console.log('Verification URL:', verifyUrl);
 
   res.status(201).json({
     message: 'User registered successfully',
