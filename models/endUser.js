@@ -50,7 +50,12 @@ const EndUserSchema = new Schema(
       type: String,
       index: true
     },
-    
+
+    facebookId: {
+      type: String,
+      index: true
+    },
+
     authProvider: {
       type: String,
       enum: ['local', 'google', 'github', 'facebook'],
@@ -97,8 +102,8 @@ const EndUserSchema = new Schema(
 );
 
 
-/* Ensure email is unique PER app */
-EndUserSchema.index({ app: 1, email: 1 }, { unique: true });
+/* Ensure email is unique per app when present; sparse allows multiple null (e.g. Facebook users without email) */
+EndUserSchema.index({ app: 1, email: 1 }, { unique: true, sparse: true });
 
 /* Password helpers */
 EndUserSchema.methods.setPassword = async function (password) {
