@@ -33,7 +33,7 @@ const EndUserSchema = new Schema(
 
     email: {
       type: String,
-      required: true
+      required: false
     },
 
     passwordHash: {
@@ -53,7 +53,7 @@ const EndUserSchema = new Schema(
     
     authProvider: {
       type: String,
-      enum: ['local', 'google', 'github'],
+      enum: ['local', 'google', 'github', 'facebook'],
       default: 'local',
       required : true
     }, 

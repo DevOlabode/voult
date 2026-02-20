@@ -12,7 +12,9 @@ module.exports.facebookRegister = async (req, res) => {
 
   if (!accessToken) {
     throw new ApiError(400, 'VALIDATION_ERROR', 'accessToken is required');
-  }
+  };
+
+  console.log("Facebook Access Token", accessToken);
 
   if (!app.facebookOAuth?.enabled) {
     throw new ApiError(
@@ -22,8 +24,7 @@ module.exports.facebookRegister = async (req, res) => {
     );
   }
 
-  const { facebookId, email, fullName } =
-    await getFacebookProfile(accessToken);
+  const { facebookId, email, fullName } = await getFacebookProfile(accessToken);
 
   const existingUser = await EndUser.findOne({
     app: app._id,

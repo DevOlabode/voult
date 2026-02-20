@@ -13,17 +13,16 @@ exports.getFacebookProfile = async (accessToken) => {
       }
     );
 
-    if (!data.id || !data.email) {
-      throw new ApiError(
-        403,
-        'FACEBOOK_EMAIL_REQUIRED',
-        'Facebook email permission is required'
-      );
-    }
+    // if (!data.id || !data.email) {
+    //   throw new ApiError(
+    //     403,
+    //     'FACEBOOK_EMAIL_REQUIRED',
+    //     'Facebook email permission is required'
+    //   );
+    // }
 
     return {
       facebookId: data.id,
-      email: data.email,
       fullName:
         data.first_name && data.last_name
           ? `${data.first_name} ${data.last_name}`
