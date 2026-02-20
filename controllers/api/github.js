@@ -12,7 +12,7 @@ const { createRefreshToken } = require('../../utils/refreshToken');
 const {welcomeOAuthUser} = require('../../services/emailService');
 
 module.exports.githubRegister = async (req, res) => {
-  const { code } = req.body;
+  const { code, redirect_uri: redirectUri } = req.body;
   const app = req.appClient;
 
   if (!code) {
@@ -34,7 +34,8 @@ module.exports.githubRegister = async (req, res) => {
   const accessToken = await exchangeCodeForToken({
     code,
     clientId: app.githubOAuth.clientId,
-    clientSecret: app.githubOAuth.clientSecret
+    clientSecret: app.githubOAuth.clientSecret,
+    redirectUri
   });
 
   const { githubId, email, name } = await getGitHubProfile(accessToken);
@@ -101,7 +102,7 @@ module.exports.githubRegister = async (req, res) => {
 
 
 module.exports.githubLogin = async (req, res) => {
-  const { code } = req.body;
+  const { code, redirect_uri: redirectUri } = req.body;
   const app = req.appClient;
 
   if (!code) {
@@ -123,7 +124,8 @@ module.exports.githubLogin = async (req, res) => {
   const accessToken = await exchangeCodeForToken({
     code,
     clientId: app.githubOAuth.clientId,
-    clientSecret: app.githubOAuth.clientSecret
+    clientSecret: app.githubOAuth.clientSecret,
+    redirectUri
   });
 
   const { githubId, email } = await getGitHubProfile(accessToken);
