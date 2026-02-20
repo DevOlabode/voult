@@ -177,12 +177,14 @@ module.exports.githubLogin = async (req, res) => {
 };
 
 
-module.exports.githubProfile = async(req, res)=>{
-  const accessToken = req.headers[x-access-token];
-  const profile = await getGitHubProfile(accessToken);
+module.exports.githubProfile = async (req, res) => {
+  const user = req.endUser;
+
   res.json({
-    githubId : profile.githubId,
-    name : profile.name,
-    email : profile.email
+    id: user._id,
+    githubId: user.githubId || null,
+    name: user.fullName,
+    email: user.email,
+    authProvider: user.authProvider
   });
 };
