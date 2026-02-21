@@ -80,18 +80,18 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Login with Google
 - [x] Login with GitHub
 - [x] Login with Facebook
-- [ ] Login with Apple
+<!-- - [ ] Login with Apple -->
 - [ ] OAuth account linking (password ↔ social)
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
 - [ ] Per-app enable / disable social providers
 
 ### 🧩 OAuth Provider Configuration
-- [ ] Configure OAuth credentials per app
+- [x] Configure OAuth credentials per app
   - [x] Google Client ID & Secret
   - [x] GitHub Client ID & Secret
   - [x] Facebook App ID & Secret
-  - [ ] Apple Service ID & Private Key
+  <!-- - [ ] Apple Service ID & Private Key -->
 - [ ] OAuth redirect URI allowlist
 - [ ] Environment-specific OAuth configs (dev / prod)
 
@@ -123,7 +123,7 @@ A centralized authentication-as-a-service platform for developers.
 
 ---
 
-## 🌱 V2 / FUTURE IDEAS
+## 🌱 V2
 
 ### BASIC MULTI FACTOR AUTHENTICATION
 - [ ] Optional MFA (email OTP)
