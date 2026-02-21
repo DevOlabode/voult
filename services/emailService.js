@@ -1,5 +1,11 @@
 const { transporter } = require('../config/mailer');
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+function logEmail(to, subject, body, link) {
+  console.log('[Email (dev)]', { to, subject, body, link });
+}
+
 module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
     return transporter.sendMail({
         from : '"voult.dev" <solabode499@gmail.com>',
