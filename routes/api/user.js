@@ -28,8 +28,6 @@ router.post('/forgot-password', verifyClient, catchAsync(controller.forgotPasswo
 
 router.post('/reset-password', verifyClient, catchAsync(controller.resetPassword));
 
-router.post('/logout', requireEndUserAuth, verifyClient, catchAsync(controller.logout));
-
 router.get('/verify-email', catchAsync(controller.verifyEmail));
 
 router.post('/disable', verifyEndUserJWT, requireEndUserAuth, catchAsync(controller.disableAccount));
