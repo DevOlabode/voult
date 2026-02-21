@@ -1,6 +1,8 @@
 const { transporter } = require('../config/mailer');
 
+// In development we log instead of sending, unless SEND_EMAILS=true (e.g. for testing OAuth welcome emails)
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const shouldSendEmails = process.env.SEND_EMAILS === 'true' || !isDevelopment;
 
 function logEmail(to, subject, body, link) {
   console.log('[Email (dev)]', { to, subject, body, link });
@@ -64,7 +66,7 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
 };
 
 module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
-  if (isDevelopment) {
+  if (isDevelopment && !shouldSendEmails) {
     logEmail(to, `Welcome to ${name}`, `Welcome to ${name} 👋\nPlease verify your email address to activate your account.`, verifyUrl);
     return Promise.resolve();
   }
@@ -120,7 +122,7 @@ module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
 
 
 module.exports.sendPasswordResetEmail = async (to, appName, resetUrl) => {
-  if (isDevelopment) {
+  if (isDevelopment && !shouldSendEmails) {
     logEmail(to, `Reset your ${appName} password`, `You requested to reset your password for ${appName}.`, resetUrl);
     return Promise.resolve();
   }
@@ -152,7 +154,7 @@ module.exports.welcomeOAuthUser = async ({
   appName,
   provider
 }) => {
-  if (isDevelopment) {
+  if (isDevelopment && !shouldSendEmails) {
     logEmail(to, `Welcome to ${appName}`, `Welcome to ${appName}, ${name || 'there'}! Your account has been created using ${provider}.`);
     return Promise.resolve();
   }
