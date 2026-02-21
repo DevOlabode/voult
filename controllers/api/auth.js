@@ -76,9 +76,11 @@ module.exports.register = async (req, res) => {
 
   const verifyToken = await user.generateEmailVerificationToken();
 
-  const verifyUrl = `${process.env.BASE_URL}/api/user/verify-email?token=${verifyToken}&appId=${app._id}`;
-
-  // https://www.voult.dev/api/user/verify-email?token=19be474e479cb59965ff9f0005d3a02a8a372bdba58ace7dd5609f6be1751163&appId=697c925a3471b4e1e6728c59
+  const baseUrl = (process.env.BASE_URL || '').trim();
+  if (!baseUrl) {
+    throw new ApiError(500, 'CONFIG_ERROR', 'BASE_URL is not set. Set BASE_URL in .env (e.g. BASE_URL=https://www.voult.dev) with no spaces around =.');
+  }
+  const verifyUrl = `${baseUrl}/api/user/verify-email?token=${verifyToken}&appId=${app._id}`;
 
   const token = signEndUserToken(user, app);
 
@@ -136,7 +138,7 @@ module.exports.login = async (req, res) => {
       'Too many failed login attempts. Try again later.'
     );
   }
-
+  
   const isValid = await user.verifyPassword(password);
 
   //  Wrong password

@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-['ENDUSER_JWT_SECRET'].forEach((key) => {
-  if (!process.env[key]) {
-    throw new Error(`${key} is missing`);
+['ENDUSER_JWT_SECRET', 'BASE_URL'].forEach((key) => {
+  if (!process.env[key] || !String(process.env[key]).trim()) {
+    throw new Error(`${key} is missing or empty. Set it in .env with no spaces around = (e.g. BASE_URL=https://www.voult.dev).`);
   }
 });
 
