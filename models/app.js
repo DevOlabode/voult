@@ -76,6 +76,19 @@ facebookOAuth: {
   redirectUri: String
 },
 
+linkeldnOAuth :{
+  enabled : {
+    type : Boolean,
+    default : false
+  },
+  clientId : String,
+  clientSecret : {
+    type : String,
+    select : false
+  },
+  redirectUri : String
+},
+
   deletedAt: Date
 }, { timestamps: true });
 

@@ -111,7 +111,6 @@ A centralized authentication-as-a-service platform for developers.
   - [x] GitHub Client ID & Secret
   - [x] Facebook App ID & Secret
   - [ ] Linkeldn App ID & Secret
-  <!-- - [ ] Apple Service ID & Private Key -->
 - [ ] OAuth redirect URI allowlist
 - [x] Environment-specific OAuth configs (dev / prod)
 
