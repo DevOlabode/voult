@@ -71,12 +71,13 @@ module.exports.forgotPassword = async (req, res) => {
 
 
   module.exports.resetPassword = async (req, res) => {
-    const { password,confirmPassword } = req.body;
+    const { password, confirmPassword } = req.body;
+    const { token } = req.params;
 
     if (password !== confirmPassword) {
       req.flash('error', 'Passwords do not match');
-      return res.redirect('/reset-password');
-    };
+      return res.redirect(`/reset-password/${token}`);
+    }
 
     const user = await User.findOne({
       resetPasswordToken: req.params.token,
