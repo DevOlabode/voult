@@ -80,8 +80,12 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Login with Google
 - [x] Login with GitHub
 - [x] Login with Facebook
+
+    SOCIAL - twitter, apple
+    DEVELOPMENT - gitlab, bitbucket, stack overflow
+    PROFESSIONAL - Linkeldn, Microsoft, slack, amazon
+    ENTERTAINMENT - spotify, reddit, twitch, discord, youtube
 <!-- - [ ] Login with Apple -->
-- [ ] Login with Linkeldn
 - [ ] OAuth account linking (password ↔ social)
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
