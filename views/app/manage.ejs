@@ -9,22 +9,28 @@
     </div>
   
     <div class="header-actions">
-      <% if(!app.facebookOAuth.enabled){ %>
-        <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Facebook OAuth Credentials</a>
+      <% if(!app.linkeldinOAuth.enabled){ %>
+        <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">Linkedin OAuth</a>
         <% }else{ %>
-          <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Edit Facebook OAuth Credentials</a>
+          <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">Edit Linkedin OAuth</a>
+          <% } %>
+
+      <% if(!app.facebookOAuth.enabled){ %>
+        <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Facebook OAuth</a>
+        <% }else{ %>
+          <a href="/app/<%= app._id %>/facebook-oauth" class="btn btn-secondary btn-sm">Edit Facebook OAuth</a>
           <% } %>
 
       <% if(!app.githubOAuth.enabled){ %>
-        <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Github OAuth Credentials</a>
+        <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Github OAuth</a>
         <% }else{ %>
-          <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Edit Github OAuth Credentials</a>
+          <a href="/app/<%= app._id %>/github-oauth" class="btn btn-secondary btn-sm">Edit Github OAuth</a>
           <% } %>
 
       <% if(!app.googleOAuth.enabled){ %>
-        <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Google OAuth Credentials</a>
+        <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Google OAuth</a>
         <% }else{ %>
-          <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Edit Google OAuth Credentials</a>
+          <a href="/app/<%= app._id %>/google-oauth" class="btn btn-secondary btn-sm">Edit Google OAuth</a>
           <% } %>
 
       <a href="/app/<%= app._id %>/edit" class="btn-secondary btn-sm">

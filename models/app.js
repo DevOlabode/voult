@@ -76,7 +76,7 @@ facebookOAuth: {
   redirectUri: String
 },
 
-linkeldnOAuth :{
+linkeldinOAuth :{
   enabled : {
     type : Boolean,
     default : false
