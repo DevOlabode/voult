@@ -92,6 +92,7 @@ A centralized authentication-as-a-service platform for developers.
   - [x] Google Client ID & Secret
   - [x] GitHub Client ID & Secret
   - [x] Facebook App ID & Secret
+  - [ ] Linkeldn App ID & Secret
   <!-- - [ ] Apple Service ID & Private Key -->
 - [ ] OAuth redirect URI allowlist
 - [x] Environment-specific OAuth configs (dev / prod)
@@ -99,10 +100,19 @@ A centralized authentication-as-a-service platform for developers.
 ---
 
 ### Main App Features
-- [ ] Add resend email to forgotten password flow
+
+## Backend Features.
+- [x] Add resend email to forgotten password flow
 - [ ] Enable developer google oauth login and register
 - [ ] Enable developer github oauth login and register
 - [ ] Enable developer SSO register
+
+## Frontend Features.
+- [ ] Look for a good template and good color pallete for this app.
+- [ ] Create a good/captivating landing page.
+- [ ] Restyle the entire app.
+- [ ] Add API Usage Page to the main app
+- [ ] Differentiate between the dashboard page and the apps list page
 
 ### 📊 App Insights & Auditing
 - [ ] App usage dashboard
