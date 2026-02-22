@@ -92,4 +92,54 @@ module.exports.linkedinRegister = async (req, res) => {
   });
 };
 
-
+module.exports.linkedinLogin = async (req, res) => {
+    const { code } = req.body;
+    const app = req.appClient;
+  
+    const accessToken = await exchangeCodeForToken({
+      code,
+      clientId: app.linkedinOAuth.clientId,
+      clientSecret: app.linkedinOAuth.clientSecret,
+      redirectUri: app.linkedinOAuth.redirectUri
+    });
+  
+    const { linkedinId, email } =
+      await getLinkedInProfile(accessToken);
+  
+    const user = await EndUser.findOne({
+      app: app._id,
+      email,
+      deletedAt: null
+    });
+  
+    if (!user) {
+      throw new ApiError(404, 'USER_NOT_FOUND');
+    }
+  
+    if (!user.linkedinId) {
+      user.linkedinId = linkedinId;
+      user.authProvider = 'linkedin';
+      user.isEmailVerified = true;
+    }
+  
+    if (!user.isActive) {
+      throw new ApiError(403, 'ACCOUNT_DISABLED');
+    }
+  
+    user.lastLoginAt = new Date();
+    await user.save();
+  
+    const accessJwt = signAccessToken(user, app);
+    const { rawToken: refreshToken } = await createRefreshToken({
+      endUser: user,
+      app,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent']
+    });
+  
+    res.json({
+      message: 'LinkedIn login successful',
+      accessToken: accessJwt,
+      refreshToken
+    });
+  };
