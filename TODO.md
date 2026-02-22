@@ -76,16 +76,30 @@ A centralized authentication-as-a-service platform for developers.
 ### BASIC FEATURES FOR THE API.
 - [x] Edit Profile (extra authentication for the email)
 
-### 🌐 Social & OAuth Login
+### THIRD PARTY APPS AUTHENTICATION
 - [x] Login with Google
 - [x] Login with GitHub
 - [x] Login with Facebook
+- [ ] login with the following 
+    ## SOCIAL - 
+        - [ ] twitter 
+        - [ ] apple
+    ## DEVELOPMENT - 
+        - [ ] gitlab
+        - [ ] bitbucket 
+        - [ ] stack overflow
+    ## PROFESSIONAL - 
+        - [ ] Linkeldn 
+        - [ ] Microsoft 
+        - [ ] slack 
+        - [ ] amazon
+    ## ENTERTAINMENT - 
+        - [ ] spotify
+        - [ ] reddit
+        - [ ] twitch
+        - [ ] discord 
+        - [ ] youtube
 
-    SOCIAL - twitter, apple
-    DEVELOPMENT - gitlab, bitbucket, stack overflow
-    PROFESSIONAL - Linkeldn, Microsoft, slack, amazon
-    ENTERTAINMENT - spotify, reddit, twitch, discord, youtube
-<!-- - [ ] Login with Apple -->
 - [ ] OAuth account linking (password ↔ social)
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
