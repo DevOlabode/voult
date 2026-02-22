@@ -48,7 +48,7 @@ module.exports.forgotPassword = async (req, res) => {
 
     await forgottenPasswordEmail(user.name, email, resetUrl);
   
-    req.flash('success', 'A reset link has been sent to your email.');
+    req.flash('success', `A reset link has been sent to your email. Did not see it? <a href="/resend-email">Resend email</a>`);
     res.redirect('/forgot-password');
   };
 

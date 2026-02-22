@@ -81,6 +81,7 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Login with GitHub
 - [x] Login with Facebook
 <!-- - [ ] Login with Apple -->
+- [ ] Login with Linkeldn
 - [ ] OAuth account linking (password ↔ social)
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
@@ -93,13 +94,12 @@ A centralized authentication-as-a-service platform for developers.
   - [x] Facebook App ID & Secret
   <!-- - [ ] Apple Service ID & Private Key -->
 - [ ] OAuth redirect URI allowlist
-- [ ] Environment-specific OAuth configs (dev / prod)
+- [x] Environment-specific OAuth configs (dev / prod)
 
 ---
 
 ### Main App Features
 - [ ] Add resend email to forgotten password flow
-- [ ] Edit Email profile for the end users
 - [ ] Enable developer google oauth login and register
 - [ ] Enable developer github oauth login and register
 - [ ] Enable developer SSO register
