@@ -6,7 +6,11 @@ const { verifyClient, verifyClientIdOnly } = require('../../middleware/verifyCli
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 const { authLimiter } = require('../../middleware/rateLimiters');
 
+const catchAsync = require('../../utils/catchAsync');
+
 const controller = require('../../controllers/api/linkedin');
 
+router.post('/auth/linkedin/register', verifyClient, catchAsync(controller.linkedinRegister));
+router.post('/auth/linkedin/login', verifyClient, catchAsync(controller.linkedinLogin));
 
 module.exports = router;
