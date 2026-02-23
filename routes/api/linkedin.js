@@ -10,7 +10,8 @@ const catchAsync = require('../../utils/catchAsync');
 
 const controller = require('../../controllers/api/linkedin');
 
-router.post('/auth/linkedin/register', verifyClient, catchAsync(controller.linkedinRegister));
-router.post('/auth/linkedin/login', verifyClient, catchAsync(controller.linkedinLogin));
+router.post('/register', verifyClient, catchAsync(controller.linkedinRegister));
+
+router.post('/login', verifyClient, catchAsync(controller.linkedinLogin));
 
 module.exports = router;

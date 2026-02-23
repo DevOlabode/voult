@@ -479,7 +479,7 @@ module.exports.saveLinkedinOAuth = async (req, res) => {
   if (!clientId || !clientSecret || !redirectUri) {
     req.flash('error', 'All LinkedIn OAuth fields are required');
     return res.redirect(`/app/${id}/linkedin-oauth`);
-  }
+  };
 
   app.linkedinOAuth = {
     enabled: true,
