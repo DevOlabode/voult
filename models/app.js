@@ -89,6 +89,21 @@ linkedinOAuth :{
   redirectUri : String
 },
 
+appleOAuth : {
+  enabled : {
+    type : Boolean, 
+    default: false
+  },
+  clientId : String,
+  teamId : String,
+  keyId : String,
+  privateKey : {
+    type : String,
+    select : false
+  },
+  redirectUri : String
+},
+
   deletedAt: Date
 }, { timestamps: true });
 
