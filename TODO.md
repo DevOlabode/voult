@@ -80,8 +80,8 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Login with Google
 - [x] Login with GitHub
 - [x] Login with Facebook
-- [ ] login with apple.
-- [ ] login with microsoft.
+- [x] login with apple.
+- [x] login with microsoft.
 
 - [ ] OAuth account linking (password ↔ social)
 - [ ] Role-Based Access control (RBAC)
