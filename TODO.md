@@ -80,27 +80,11 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Login with Google
 - [x] Login with GitHub
 - [x] Login with Facebook
-- [ ] login with the following 
-    ## SOCIAL - 
-        - [ ] twitter 
-        - [ ] apple
-    ## DEVELOPMENT - 
-        - [ ] gitlab
-        - [ ] bitbucket 
-        - [ ] stack overflow
-    ## PROFESSIONAL - 
-        - [x] Linkeldn 
-        - [ ] Microsoft 
-        - [ ] slack 
-        - [ ] amazon
-    ## ENTERTAINMENT - 
-        - [ ] spotify
-        - [ ] reddit
-        - [ ] twitch
-        - [ ] discord 
-        - [ ] youtube
+- [ ] login with apple.
+- [ ] login with microsoft.
 
 - [ ] OAuth account linking (password ↔ social)
+- [ ] Role-Based Access control (RBAC)
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
 - [ ] Per-app enable / disable social providers
@@ -130,6 +114,7 @@ A centralized authentication-as-a-service platform for developers.
 - [ ] Restyle the entire app.
 - [ ] Add API Usage Page to the main app
 - [ ] Differentiate between the dashboard page and the apps list page
+- [ ] Add more features to the main app.
 
 ### 📊 App Insights & Auditing
 - [ ] App usage dashboard
