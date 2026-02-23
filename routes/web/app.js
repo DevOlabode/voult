@@ -54,4 +54,8 @@ router.post('/:id/linkedin-oauth', catchAsync(controller.saveLinkedinOAuth));
 
 router.post('/:id/update-linkedin-oauth', catchAsync(controller.updateLinkedinOAuth));
 
+router.post('/:id/apple-oauth', catchAsync(controller.saveAppleOAuth));
+
+router.post('/:id/update-apple-oauth', catchAsync(controller.updateAppleOAuth));
+
 module.exports = router;

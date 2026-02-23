@@ -537,6 +537,72 @@ module.exports.getAppleOAuth = async (req, res) => {
 
   res.render('app/apple/oauthForm', {
     app,
-    title: 'Configure LinkedIn OAuth',
+    title: 'Configure Apple OAuth',
   });
+};
+
+module.exports.saveAppleOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { teamId, clientId, keyId, privateKey, redirectUri } = req.body;
+
+  const app = await App.findOne({
+    _id: id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  }
+
+  if (!teamId || !clientId || !keyId || !privateKey || !redirectUri) {
+    req.flash('error', 'All Apple OAuth fields are required');
+    return res.redirect(`/app/${id}/apple-oauth`);
+  }
+
+  app.appleOAuth = {
+    enabled: true,
+    teamId: teamId.trim(),
+    clientId: clientId.trim(),
+    keyId: keyId.trim(),
+    privateKey: privateKey.trim(),
+    redirectUri: redirectUri.trim(),
+  };
+
+  await app.save();
+
+  req.flash('success', 'Apple OAuth configured successfully');
+  res.redirect(`/app/${app._id}`);
+};
+
+module.exports.updateAppleOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { teamId, clientId, keyId, privateKey, redirectUri, enabled } = req.body;
+
+  const app = await App.findById(id).select('+appleOAuth.privateKey');
+  if (!app) throw new ApiError(404, 'APP_NOT_FOUND', 'App not found');
+
+  if (!app.owner.equals(req.user._id)) {
+    req.flash('error', 'You are not authorized to update this app');
+    return res.redirect('/dashboard');
+  }
+
+  if (!app.appleOAuth) {
+    app.appleOAuth = {};
+  }
+
+  app.appleOAuth.enabled = enabled === 'true';
+  app.appleOAuth.teamId = (teamId || '').trim();
+  app.appleOAuth.clientId = (clientId || '').trim();
+  app.appleOAuth.keyId = (keyId || '').trim();
+  app.appleOAuth.redirectUri = (redirectUri || '').trim();
+  
+  if (privateKey && privateKey.trim().length > 0) {
+    app.appleOAuth.privateKey = privateKey.trim();
+  }
+
+  await app.save();
+
+  req.flash('success', 'Apple OAuth settings updated');
+  res.redirect(`/app/${id}`);
 };
