@@ -48,6 +48,8 @@ router.post('/:id/update-facebook-oauth', catchAsync(controller.updateFacebookOA
 
 router.get('/:id/linkedin-oauth', catchAsync(controller.getLinkeldinOAuth));
 
+router.get('/:id/apple-oauth', catchAsync(controller.getAppleOAuth));
+
 router.post('/:id/linkedin-oauth', catchAsync(controller.saveLinkedinOAuth));
 
 router.post('/:id/update-linkedin-oauth', catchAsync(controller.updateLinkedinOAuth));

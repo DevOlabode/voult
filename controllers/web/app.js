@@ -522,3 +522,21 @@ module.exports.updateLinkedinOAuth = async (req, res) => {
   req.flash('success', 'LinkedIn OAuth settings updated');
   res.redirect(`/app/${id}`);
 };
+
+
+module.exports.getAppleOAuth = async (req, res) => {
+  const app = await App.findOne({
+    _id: req.params.id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  };
+
+  res.render('app/apple/oauthForm', {
+    app,
+    title: 'Configure LinkedIn OAuth',
+  });
+};
