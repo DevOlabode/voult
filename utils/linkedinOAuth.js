@@ -22,7 +22,8 @@ module.exports.exchangeCodeForToken = async ({
     );
 
     return data.access_token;
-  } catch {
+  } catch (error) {
+    console.error('LinkedIn token exchange error:', error.response?.data || error.message);
     throw new ApiError(
       401,
       'LINKEDIN_TOKEN_EXCHANGE_FAILED',
@@ -50,7 +51,8 @@ module.exports.getLinkedInProfile = async (accessToken) => {
           ? `${data.given_name} ${data.family_name}`
           : data.name || null
     };
-  } catch {
+  } catch (error) {
+    console.error('LinkedIn profile fetch error:', error.response?.data || error.message);
     throw new ApiError(
       401,
       'LINKEDIN_PROFILE_FETCH_FAILED',

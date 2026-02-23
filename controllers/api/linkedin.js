@@ -32,6 +32,8 @@ module.exports.linkedinRegister = async (req, res) => {
     redirectUri: app.linkedinOAuth.redirectUri
   });
 
+  console.log('LinkedIn OAuth successful, got access token');
+
   const { linkedinId, email, fullName } =
     await getLinkedInProfile(accessToken);
 
