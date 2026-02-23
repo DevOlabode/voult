@@ -1,3 +1,131 @@
-<% layout('layout/boilerplate.ejs') %>
+<% layout('layout/boilerplate') %>
 
-<h3>Apple Oauth Form</h3>
+<% if (!app.appleOAuth?.enabled) { %>
+  <section class="card">
+    <h2 class="text-white">Apple OAuth Configuration</h2>
+
+    <form action="/app/<%= app._id %>/apple-oauth" method="POST" class="card app-form">
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Apple Team ID</label>
+        <input
+          type="text"
+          name="teamId"
+          required
+          placeholder="e.g. ABC1234567"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Apple Services ID (Client ID)</label>
+        <input
+          type="text"
+          name="clientId"
+          required
+          placeholder="e.g. com.yourapp.services"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Apple Key ID</label>
+        <input
+          type="text"
+          name="keyId"
+          required
+          placeholder="e.g. DEF8901234"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Apple Private Key</label>
+        <textarea
+          name="privateKey"
+          rows="6"
+          required
+          placeholder="-----BEGIN PRIVATE KEY-----
+MIH...
+-----END PRIVATE KEY-----"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          required
+          placeholder="https://yourapp.com/auth/apple/callback"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary">Save Apple OAuth</button>
+      </div>
+    </form>
+
+    <p class="hint">
+      This redirect URI must match the Authorized Redirect URL in your Apple Developer Console. Use your app's callback URL (e.g. <code>https://your-frontend.com/auth/apple/callback</code>) that will receive the authorization code and send it to this API.
+    </p>
+  </section>
+<% } else { %>
+  <section class="card">
+    <h2 class="text-white">Update Apple OAuth</h2>
+
+    <form action="/app/<%= app._id %>/update-apple-oauth" method="POST" class="card app-form">
+
+      <input type="hidden" name="enabled" value="true" />
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Apple Team ID</label>
+        <input
+          type="text"
+          name="teamId"
+          value="<%= app.appleOAuth?.teamId || '' %>"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Apple Services ID (Client ID)</label>
+        <input
+          type="text"
+          name="clientId"
+          value="<%= app.appleOAuth?.clientId || '' %>"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Apple Key ID</label>
+        <input
+          type="text"
+          name="keyId"
+          value="<%= app.appleOAuth?.keyId || '' %>"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Apple Private Key</label>
+        <textarea
+          name="privateKey"
+          rows="6"
+          placeholder="Leave empty to keep existing key"
+        ></textarea>
+        <small class="text-white opacity-50">Leave empty to keep existing private key</small>
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          value="<%= app.appleOAuth?.redirectUri || '' %>"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-secondary">Save Apple OAuth</button>
+    </form>
+  </section>
+<% } %>
