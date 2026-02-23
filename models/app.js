@@ -76,7 +76,7 @@ facebookOAuth: {
   redirectUri: String
 },
 
-linkeldinOAuth :{
+linkedinOAuth :{
   enabled : {
     type : Boolean,
     default : false
