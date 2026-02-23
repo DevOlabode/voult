@@ -444,3 +444,20 @@ module.exports.updateFacebookOAuth = async (req, res) => {
   req.flash('success', 'Facebook Credentials Uodated Successsfully')
   return res.redirect(`/app/${id}`);
 };
+
+module.exports.getLinkeldinOAuth = async (req, res) => {
+  const app = await App.findOne({
+    _id: req.params.id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  };
+
+  res.render('app/likedin/oauthForm', {
+    app,
+    title: 'Configure Linkedin OAuth',
+  });
+};
