@@ -14,6 +14,7 @@ const apiGoogle  = require('./api/google');
 const apiGithub = require('./api/github');
 const apiFacebook = require('./api/facebook');
 const apiLinkedin = require('./api/linkedin');
+const apiMicorsoft  = require('./api/microsoft');
 
 // Mount Web Routes
 router.use('/', webAuthRoutes);
@@ -28,6 +29,7 @@ router.use('/api/auth/google', apiGoogle);
 router.use('/api/auth/github', apiGithub);
 router.use('/api/auth/facebook', apiFacebook);
 router.use('/api/auth/linkedin', apiLinkedin);
+router.use('/api/auth/microsoft', apiMicorsoft);
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));

@@ -104,6 +104,23 @@ appleOAuth : {
   redirectUri : String
 },
 
+microsoftOAuth : {
+  enabled : {
+    type : Boolean,
+    default: false
+  },
+  clientId : String,
+  clientSecret : {
+    type : String,
+    select : false
+  },
+  teamId : {
+    type : String,
+    default : 'common' // common | organizations | consumers | specific tenant ID
+  },
+  redirectUri : String
+},
+
   deletedAt: Date
 }, { timestamps: true });
 
