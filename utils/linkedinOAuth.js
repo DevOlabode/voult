@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { ApiError } = require('./apiError');
 
-exports.exchangeCodeForToken = async ({
+module.exports.exchangeCodeForToken = async ({
   code,
   clientId,
   clientSecret,
@@ -31,7 +31,7 @@ exports.exchangeCodeForToken = async ({
   }
 };
 
-exports.getLinkedInProfile = async (accessToken) => {
+module.exports.getLinkedInProfile = async (accessToken) => {
   try {
     const { data } = await axios.get(
       'https://api.linkedin.com/v2/userinfo',

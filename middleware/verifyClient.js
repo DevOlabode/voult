@@ -22,7 +22,9 @@ module.exports.verifyClient = async (req, res, next) => {
   // 🔑 Only require client secret for NON-OAUTH routes
   const isOAuthRoute =
     req.path.includes('/google/login') ||
-    req.path.includes('/google/register');
+    req.path.includes('/google/register') ||
+    req.path.includes('/linkedin/login') ||
+    req.path.includes('/linkedin/register');
 
   if (!isOAuthRoute) {
     if (!clientSecret) {
