@@ -89,7 +89,7 @@ A centralized authentication-as-a-service platform for developers.
         - [ ] bitbucket 
         - [ ] stack overflow
     ## PROFESSIONAL - 
-        - [ ] Linkeldn 
+        - [x] Linkeldn 
         - [ ] Microsoft 
         - [ ] slack 
         - [ ] amazon
@@ -110,7 +110,7 @@ A centralized authentication-as-a-service platform for developers.
   - [x] Google Client ID & Secret
   - [x] GitHub Client ID & Secret
   - [x] Facebook App ID & Secret
-  - [ ] Linkeldn App ID & Secret
+  - [x] Linkeldn App ID & Secret
 - [ ] OAuth redirect URI allowlist
 - [x] Environment-specific OAuth configs (dev / prod)
 
