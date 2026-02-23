@@ -9,10 +9,10 @@
     </div>
   
     <div class="header-actions">
-      <% if(!app.linkedinOAuth.enabled){ %>
-        <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">Linkedin OAuth</a>
+      <% if(!app.linkedinOAuth?.enabled){ %>
+        <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">LinkedIn OAuth</a>
         <% }else{ %>
-          <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">Edit Linkedin OAuth</a>
+          <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">Edit LinkedIn OAuth</a>
           <% } %>
 
       <% if(!app.facebookOAuth.enabled){ %>

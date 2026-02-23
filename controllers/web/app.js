@@ -456,8 +456,69 @@ module.exports.getLinkeldinOAuth = async (req, res) => {
     return res.redirect('/dashboard');
   };
 
-  res.render('app/likedin/oauthForm', {
+  res.render('app/linkedin/oauthForm', {
     app,
-    title: 'Configure Linkedin OAuth',
+    title: 'Configure LinkedIn OAuth',
   });
+};
+
+module.exports.saveLinkedinOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { clientId, clientSecret, redirectUri } = req.body;
+
+  const app = await App.findOne({
+    _id: id,
+    owner: req.user._id,
+  });
+
+  if (!app) {
+    req.flash('error', 'App not found or access denied');
+    return res.redirect('/dashboard');
+  }
+
+  if (!clientId || !clientSecret || !redirectUri) {
+    req.flash('error', 'All LinkedIn OAuth fields are required');
+    return res.redirect(`/app/${id}/linkedin-oauth`);
+  }
+
+  app.linkedinOAuth = {
+    enabled: true,
+    clientId: clientId.trim(),
+    clientSecret: clientSecret.trim(),
+    redirectUri: redirectUri.trim(),
+  };
+
+  await app.save();
+
+  req.flash('success', 'LinkedIn OAuth configured successfully');
+  res.redirect(`/app/${app._id}`);
+};
+
+module.exports.updateLinkedinOAuth = async (req, res) => {
+  const { id } = req.params;
+  const { clientId, clientSecret, redirectUri, enabled } = req.body;
+
+  const app = await App.findById(id).select('+linkedinOAuth.clientSecret');
+  if (!app) throw new ApiError(404, 'APP_NOT_FOUND', 'App not found');
+
+  if (!app.owner.equals(req.user._id)) {
+    req.flash('error', 'You are not authorized to update this app');
+    return res.redirect('/dashboard');
+  }
+
+  if (!app.linkedinOAuth) {
+    app.linkedinOAuth = {};
+  }
+
+  app.linkedinOAuth.enabled = enabled === 'true';
+  app.linkedinOAuth.clientId = (clientId || '').trim();
+  app.linkedinOAuth.redirectUri = (redirectUri || '').trim();
+  if (clientSecret && clientSecret.trim().length > 0) {
+    app.linkedinOAuth.clientSecret = clientSecret.trim();
+  }
+
+  await app.save();
+
+  req.flash('success', 'LinkedIn OAuth settings updated');
+  res.redirect(`/app/${id}`);
 };

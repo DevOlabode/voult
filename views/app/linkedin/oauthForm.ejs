@@ -1,89 +1,93 @@
 <% layout('layout/boilerplate') %>
 
-<% if(!app.linkedinOAuth.enabled){ %>
+<% if (!app.linkedinOAuth?.enabled) { %>
   <section class="card">
-    <h2 class="text-white">Linkedin OAuth Configuration</h2>
-  
+    <h2 class="text-white">LinkedIn OAuth Configuration</h2>
+
     <form action="/app/<%= app._id %>/linkedin-oauth" method="POST" class="card app-form">
-      
-  <div class="form-group">
-      <label class="text-light opacity-50">Linkedin Client ID</label>
-      <input
-        type="text"
-        name="clientId"
-        required
-        placeholder="xxxxxxxx.apps.googleusercontent.com"
-      />
-  </div>
-  
-  <div class="form-group">
-      <label class="text-light opacity-50 form-label">Google Client Secret</label>
-      <input
-        type="password"
-        name="clientSecret"
-        required
-      />
-  </div>
-  
-  <div class="form-group">
-      <label class="text-light opacity-50 form-label">Redirect URI</label>
-      <input
-        type="url"
-        name="redirectUri"
-        required
-        placeholder="https://yourapp.com/auth/google/callback"
-      />
-  </div>
-  
-     <div class="form-actions">
-      <button class="btn btn-secondary">Save Google OAuth</button>
-     </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">LinkedIn Client ID</label>
+        <input
+          type="text"
+          name="clientId"
+          required
+          placeholder="e.g. 78abc123xyz"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50 form-label">LinkedIn Client Secret</label>
+        <input
+          type="password"
+          name="clientSecret"
+          required
+          placeholder="Enter your client secret"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50 form-label">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          required
+          placeholder="https://yourapp.com/auth/linkedin/callback"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary">Save LinkedIn OAuth</button>
+      </div>
     </form>
-  
+
     <p class="hint">
-      This redirect URI must match what you configured in Google Cloud Console.
+      This redirect URI must match the Authorized Redirect URL in your LinkedIn Developer App. Use your app's callback URL (e.g. <code>https://your-frontend.com/auth/linkedin/callback</code>) that will receive the authorization code and send it to this API.
     </p>
   </section>
-  <% }else{ %>
-    <section class="card">
-      <h2 class="text-white">Update Google OAuth</h2>
-    
-      <form action="/app/<%= app._id %>/update-google-oauth" method="POST" class="card app-form">
-    
-        <input type="hidden" name="enabled" value="true" />
-    
-        <div class="form-group">
-          <label class="text-white opacity-50">Google Client ID</label>
-          <input
-            type="text"
-            name="clientId"
-            value="<%= app.googleOAuth?.clientId || '' %>"
-            required
-          />
-        </div>
-    
-        <div class="form-group">
-          <label class="text-white opacity-50">Google Client Secret</label>
-          <input
-            type="password"
-            name="clientSecret"
-            placeholder="••••••••••••"
-          />
-          <small class="text-white opacity-50">Leave empty to keep existing secret</small>
-        </div>
-    
-        <div class="form-group">
-          <label class="text-white opacity-50">Redirect URI</label>
-          <input
-            type="url"
-            name="redirectUri"
-            value="<%= app.googleOAuth?.redirectUri || '' %>"
-            required
-          />
-        </div>
-    
-        <button class="btn btn-secondary">Save Google OAuth</button>
-      </form>
-    </section>
-    
-    <% } %>
+<% } else { %>
+  <section class="card">
+    <h2 class="text-white">Update LinkedIn OAuth</h2>
+
+    <form action="/app/<%= app._id %>/update-linkedin-oauth" method="POST" class="card app-form">
+
+      <input type="hidden" name="enabled" value="true" />
+
+      <div class="form-group">
+        <label class="text-white opacity-50">LinkedIn Client ID</label>
+        <input
+          type="text"
+          name="clientId"
+          value="<%= app.linkedinOAuth?.clientId || '' %>"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">LinkedIn Client Secret</label>
+        <input
+          type="password"
+          name="clientSecret"
+          placeholder="••••••••••••"
+        />
+        <small class="text-white opacity-50">Leave empty to keep existing secret</small>
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          value="<%= app.linkedinOAuth?.redirectUri || '' %>"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-secondary">Save LinkedIn OAuth</button>
+    </form>
+  </section>
+<% } %>
+
+<p class="hint mt-3">
+  <a href="/app/<%= app._id %>" class="text-white opacity-75">← Back to app</a>
+</p>
