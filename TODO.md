@@ -95,8 +95,8 @@ A centralized authentication-as-a-service platform for developers.
   - [x] GitHub Client ID & Secret
   - [x] Facebook App ID & Secret
   - [x] Linkeldn App ID & Secret
-  - [ ] Apple App ID & Secret
-  - [ ] Microsoft App ID & Secret
+  - [x] Apple App ID & Secret
+  - [x] Microsoft App ID & Secret
 - [ ] OAuth redirect URI allowlist
 - [x] Environment-specific OAuth configs (dev / prod)
 

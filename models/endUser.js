@@ -58,7 +58,7 @@ const EndUserSchema = new Schema(
 
     authProvider: {
       type: String,
-      enum: ['local', 'google', 'github', 'facebook', 'linkedin'],
+      enum: ['local', 'google', 'github', 'facebook', 'linkedin', 'apple', 'microsoft'],
       default: 'local',
       required : true
     }, 
