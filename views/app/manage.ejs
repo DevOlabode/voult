@@ -9,11 +9,16 @@
     </div>
   
     <div class="header-actions">
+      <% if(!app.microsoftOAuth?.enabled){ %>
+        <a href="/app/<%= app._id %>/microsoft-oauth" class="btn btn-secondary btn-sm">Microsoft OAuth</a>
+        <% }else{ %>
+          <a href="/app/<%= app._id %>/microsoft-oauth" class="btn btn-secondary btn-sm">Edit Microsoft OAuth</a>
+        <% } %>
       <% if(!app.appleOAuth?.enabled){ %>
         <a href="/app/<%= app._id %>/apple-oauth" class="btn btn-secondary btn-sm">Apple OAuth</a>
         <% }else{ %>
           <a href="/app/<%= app._id %>/apple-oauth" class="btn btn-secondary btn-sm">Edit Apple OAuth</a>
-          <% } %>
+        <% } %>
       <% if(!app.linkedinOAuth?.enabled){ %>
         <a href="/app/<%= app._id %>/linkedin-oauth" class="btn btn-secondary btn-sm">LinkedIn OAuth</a>
         <% }else{ %>

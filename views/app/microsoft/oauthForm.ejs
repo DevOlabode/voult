@@ -1,0 +1,110 @@
+<% layout('layout/boilerplate') %>
+
+<% if (!app.microsoftOAuth?.enabled) { %>
+  <section class="card">
+    <h2 class="text-white">Microsoft OAuth Configuration</h2>
+
+    <form action="/app/<%= app._id %>/microsoft-oauth" method="POST" class="card app-form">
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Microsoft Client ID</label>
+        <input
+          type="text"
+          name="clientId"
+          required
+          placeholder="e.g. 12345678-1234-1234-1234-123456789abc"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Microsoft Client Secret</label>
+        <input
+          type="password"
+          name="clientSecret"
+          required
+          placeholder="Enter your client secret"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Tenant ID (optional)</label>
+        <input
+          type="text"
+          name="tenantId"
+          placeholder="e.g. common, organizations, or your tenant ID"
+        />
+        <small class="text-white opacity-50">Leave empty for multi-tenant (common)</small>
+      </div>
+
+      <div class="form-group">
+        <label class="text-light opacity-50">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          required
+          placeholder="https://yourapp.com/auth/microsoft/callback"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-secondary">Save Microsoft OAuth</button>
+      </div>
+    </form>
+
+    <p class="hint">
+      This redirect URI must match the Authorized Redirect URL in your Microsoft Azure AD App Registration. Use your app's callback URL (e.g. <code>https://your-frontend.com/auth/microsoft/callback</code>) that will receive the authorization code and send it to this API.
+    </p>
+  </section>
+<% } else { %>
+  <section class="card">
+    <h2 class="text-white">Update Microsoft OAuth</h2>
+
+    <form action="/app/<%= app._id %>/update-microsoft-oauth" method="POST" class="card app-form">
+
+      <input type="hidden" name="enabled" value="true" />
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Microsoft Client ID</label>
+        <input
+          type="text"
+          name="clientId"
+          value="<%= app.microsoftOAuth?.clientId || '' %>"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Microsoft Client Secret</label>
+        <input
+          type="password"
+          name="clientSecret"
+          placeholder="••••••••••••"
+        />
+        <small class="text-white opacity-50">Leave empty to keep existing secret</small>
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Tenant ID</label>
+        <input
+          type="text"
+          name="tenantId"
+          value="<%= app.microsoftOAuth?.tenantId || '' %>"
+          placeholder="e.g. common, organizations, or your tenant ID"
+        />
+        <small class="text-white opacity-50">Leave empty for multi-tenant (common)</small>
+      </div>
+
+      <div class="form-group">
+        <label class="text-white opacity-50">Redirect URI</label>
+        <input
+          type="url"
+          name="redirectUri"
+          value="<%= app.microsoftOAuth?.redirectUri || '' %>"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-secondary">Save Microsoft OAuth</button>
+    </form>
+  </section>
+<% } %>

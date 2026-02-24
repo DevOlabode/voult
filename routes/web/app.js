@@ -58,4 +58,10 @@ router.post('/:id/apple-oauth', catchAsync(controller.saveAppleOAuth));
 
 router.post('/:id/update-apple-oauth', catchAsync(controller.updateAppleOAuth));
 
+router.get('/:id/microsoft-oauth', catchAsync(controller.getMicrosoftOAuth));
+
+router.post('/:id/microsoft-oauth', catchAsync(controller.saveMicrosoftOAuth));
+
+router.post('/:id/update-microsoft-oauth', catchAsync(controller.updateMicrosoftOAuth));
+
 module.exports = router;
