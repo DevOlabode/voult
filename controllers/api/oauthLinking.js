@@ -1,6 +1,7 @@
 const OAuthAccount = require('../../models/OAuthAccount');
 const User = require('../../models/EndUser');
 const bcrypt = require('bcrypt');
+const generateProviderAuthUrl = require('../../services/oauth/generateProviderAuthUrl')
 
 
 // 🔹 Start Linking Flow
@@ -12,12 +13,11 @@ exports.startLinking = async (req, res) => {
     intent: 'link',
     userId: user._id.toString()
   };
-
-  const redirectUrl = generateProviderAuthUrl(provider, state);
+  const app = user.app;
+  const redirectUrl = generateProviderAuthUrl(provider, state, app);
 
   return res.json({ redirectUrl });
 };
-
 
 // 🔹 Get Linked Providers
 exports.getLinkedProviders = async (req, res) => {
