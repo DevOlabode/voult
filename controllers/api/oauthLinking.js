@@ -13,8 +13,10 @@ exports.startLinking = async (req, res) => {
     intent: 'link',
     userId: user._id.toString()
   };
-  const app = user.app;
-  const redirectUrl = generateProviderAuthUrl(provider, state, app);
+  const appId = user.app;
+  const redirectUrl = await generateProviderAuthUrl(provider, state, appId);
+
+  console.log(redirectUrl);
 
   return res.json({ redirectUrl });
 };

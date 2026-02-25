@@ -1,4 +1,5 @@
 const querystring = require('querystring');
+const App = require('../../models/app');
 
 function encodeState(stateObj) {
   return Buffer
@@ -6,16 +7,17 @@ function encodeState(stateObj) {
     .toString('base64url');
 }
 
-module.exports = function generateProviderAuthUrl(provider, state, app) {
+module.exports = async function generateProviderAuthUrl(provider, state, appId) {
 
   const encodedState = encodeState(state);
+  const app = await App.findById(appId);
 
   switch (provider) {
 
     case 'google': {
       if (app.googleOAuth?.enabled === false) {
         throw new Error('GOOGLE_NOT_ENABLED');
-      }
+      };
 
       const params = querystring.stringify({
         client_id: app.googleOAuth?.clientId,
@@ -43,14 +45,16 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
         state: encodedState
       });
 
+      console.log("PARAMS: ", params);
+
       return `https://www.facebook.com/v18.0/dialog/oauth?${params}`;
-    }
+    };
 
     case 'linkedin': {
       if (app.linkeldnOAuth?.enabled === false) {
         throw new Error('LINKEDIN_NOT_ENABLED');
       }
-
+      
       const params = querystring.stringify({
         response_type: 'code',
         client_id: app.linkedinOAuth?.clientId,
@@ -58,6 +62,8 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
         scope: 'openid profile email',
         state: encodedState
       });
+
+      console.log("PARAMS: ", params);
 
       return `https://www.linkedin.com/oauth/v2/authorization?${params}`;
     }
