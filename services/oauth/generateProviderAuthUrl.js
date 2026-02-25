@@ -15,7 +15,7 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
     case 'google': {
       if (app.googleOAuth?.enabled === false) {
         throw new Error('GOOGLE_NOT_ENABLED');
-      };
+      }
 
       const params = querystring.stringify({
         client_id: app.googleOAuth?.clientId,
@@ -31,13 +31,13 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
     }
 
     case 'facebook': {
-      if (!app.facebookOAuth?.enabled) {
+      if (app.facebookOAuth?.enabled === false) {
         throw new Error('FACEBOOK_NOT_ENABLED');
       }
 
       const params = querystring.stringify({
-        client_id: app.facebookOAuth.clientId,
-        redirect_uri: app.facebookOAuth.redirectUri,
+        client_id: app.facebookOAuth?.clientId,
+        redirect_uri: app.facebookOAuth?.redirectUri,
         response_type: 'code',
         scope: 'email,public_profile',
         state: encodedState
@@ -47,14 +47,14 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
     }
 
     case 'linkedin': {
-      if (!app.linkedinOAuth?.enabled) {
+      if (app.linkeldnOAuth?.enabled === false) {
         throw new Error('LINKEDIN_NOT_ENABLED');
       }
 
       const params = querystring.stringify({
         response_type: 'code',
-        client_id: app.linkedinOAuth.clientId,
-        redirect_uri: app.linkedinOAuth.redirectUri,
+        client_id: app.linkedinOAuth?.clientId,
+        redirect_uri: app.linkedinOAuth?.redirectUri,
         scope: 'openid profile email',
         state: encodedState
       });
@@ -63,16 +63,16 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
     }
 
     case 'microsoft': {
-      if (!app.microsoftOAuth?.enabled) {
+      if (app.microsoftOAuth?.enabled === false) {
         throw new Error('MICROSOFT_NOT_ENABLED');
       }
 
       const tenant = app.microsoftOAuth.tenantId || 'common';
 
       const params = querystring.stringify({
-        client_id: app.microsoftOAuth.clientId,
+        client_id: app.microsoftOAuth?.clientId,
         response_type: 'code',
-        redirect_uri: app.microsoftOAuth.redirectUri,
+        redirect_uri: app.microsoftOAuth?.redirectUri,
         response_mode: 'query',
         scope: 'openid profile email',
         state: encodedState
@@ -82,13 +82,13 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
     }
 
     case 'apple': {
-      if (!app.appleOAuth?.enabled) {
+      if (app.appleOAuth?.enabled === false) {
         throw new Error('APPLE_NOT_ENABLED');
       }
 
       const params = querystring.stringify({
-        client_id: app.appleOAuth.clientId,
-        redirect_uri: app.appleOAuth.redirectUri,
+        client_id: app.appleOAuth?.clientId,
+        redirect_uri: app.appleOAuth?.redirectUri,
         response_type: 'code id_token',
         response_mode: 'form_post',
         scope: 'name email',
@@ -96,6 +96,22 @@ module.exports = function generateProviderAuthUrl(provider, state, app) {
       });
 
       return `https://appleid.apple.com/auth/authorize?${params}`;
+    }
+
+    case 'github': {
+      if (app.googleOAuth?.enabled === false) {
+        throw new Error('GITHUB_NOT_ENABLED');
+      }
+
+      const params = querystring.stringify({
+        client_id: app.githubOAuth?.clientId,
+        redirect_uri: app.githubOAuth?.redirectUri,
+        scope: 'read:user user:email',
+        allow_signup: 'true',
+        state: encodedState
+      });
+
+      return `https://github.com/login/oauth/authorize?${params}`;
     }
 
     default:
