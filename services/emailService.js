@@ -4,9 +4,9 @@ const { transporter } = require('../config/mailer');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const shouldSendEmails = process.env.SEND_EMAILS === 'true' || !isDevelopment;
 
-function logEmail(to, subject, body, link) {
-  console.log('[Email (dev)]', { to, subject, body, link });
-}
+// function logEmail(to, subject, body, link) {
+//   console.log('[Email (dev)]', { to, subject, body, link });
+// }
 
 module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
     return transporter.sendMail({
@@ -66,10 +66,10 @@ module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
 };
 
 module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
-  if (isDevelopment && !shouldSendEmails) {
-    logEmail(to, `Welcome to ${name}`, `Welcome to ${name} 👋\nPlease verify your email address to activate your account.`, verifyUrl);
-    return Promise.resolve();
-  }
+  // if (isDevelopment && !shouldSendEmails) {
+  //   logEmail(to, `Welcome to ${name}`, `Welcome to ${name} 👋\nPlease verify your email address to activate your account.`, verifyUrl);
+  //   return Promise.resolve();
+  // }
 
   return transporter.sendMail({
     from : '"voult.dev" <solabode499@gmail.com>',

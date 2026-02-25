@@ -94,7 +94,7 @@ module.exports.register = async (req, res) => {
     // Registration still succeeds even if email fails
   });
 
-  console.log('Verification URL:', verifyUrl);
+  // console.log('Verification URL:', verifyUrl);
 
   res.status(201).json({
     message: 'User registered successfully',

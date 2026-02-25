@@ -30,6 +30,11 @@ const AppSchema = new mongoose.Schema({
     index: true
   },
 
+  clientSecretHash: {
+    type: String,
+    select: false
+  },
+
   usage: {
     totalRegistrations: { type: Number, default: 0 },
     totalLogins: { type: Number, default: 0 }
@@ -143,7 +148,24 @@ AppSchema.methods.verifyClientSecret = async function (clientSecret) {
     hasHash: !!this.clientSecretHash
   });
 
-  return bcrypt.compare(clientSecret, this.clientSecretHash);
+  // Check if clientSecretHash exists
+  if (!this.clientSecretHash) {
+    console.error('Client secret hash not found for app:', this.clientId);
+    return false;
+  }
+
+  // Check if clientSecret is provided
+  if (!clientSecret) {
+    console.error('Client secret not provided');
+    return false;
+  }
+
+  try {
+    return await bcrypt.compare(clientSecret, this.clientSecretHash);
+  } catch (error) {
+    console.error('Error comparing client secret:', error.message);
+    return false;
+  }
 };
 
 
