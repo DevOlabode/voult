@@ -1,4 +1,4 @@
-const User = require('../../models/User');
+const User = require('../../models/endUser');
 const OAuthAccount = require('../../models/OAuthAccount');
 const { createTokens } = require('../auth/createTokens');
 
@@ -37,6 +37,15 @@ async function handleOAuthCallback({
       refreshToken
     });
 
+    // Update linkedProviders field
+    if (!user.linkedProviders) {
+      user.linkedProviders = [];
+    }
+    if (!user.linkedProviders.includes(provider)) {
+      user.linkedProviders.push(provider);
+      await user.save();
+    }
+
     return { linked: true };
   }
 
@@ -52,6 +61,15 @@ async function handleOAuthCallback({
         accessToken,
         refreshToken
       });
+
+      // Update linkedProviders field
+      if (!userByEmail.linkedProviders) {
+        userByEmail.linkedProviders = [];
+      }
+      if (!userByEmail.linkedProviders.includes(provider)) {
+        userByEmail.linkedProviders.push(provider);
+        await userByEmail.save();
+      }
 
       return createTokens(userByEmail);
     }
@@ -70,6 +88,15 @@ async function handleOAuthCallback({
     accessToken,
     refreshToken
   });
+
+  // Update linkedProviders field for new user
+  if (!newUser.linkedProviders) {
+    newUser.linkedProviders = [];
+  }
+  if (!newUser.linkedProviders.includes(provider)) {
+    newUser.linkedProviders.push(provider);
+    await newUser.save();
+  }
 
   return createTokens(newUser);
 }

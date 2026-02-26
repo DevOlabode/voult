@@ -1,5 +1,5 @@
 const OAuthAccount = require('../../models/OAuthAccount');
-const User = require('../../models/EndUser');
+const User = require('../../models/endUser');
 const bcrypt = require('bcrypt');
 const generateProviderAuthUrl = require('../../services/oauth/generateProviderAuthUrl')
 
@@ -50,10 +50,17 @@ exports.unlinkProvider = async (req, res) => {
     });
   }
 
+  // Delete the OAuth account
   await OAuthAccount.deleteOne({
     userId: user._id,
     provider
   });
+
+  // Remove provider from linkedProviders array
+  if (user.linkedProviders && user.linkedProviders.includes(provider)) {
+    user.linkedProviders = user.linkedProviders.filter(p => p !== provider);
+    await user.save();
+  }
 
   return res.json({ success: true });
 };

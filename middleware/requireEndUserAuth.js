@@ -18,7 +18,7 @@ module.exports = async function requireEndUserAuth(req, res, next) {
   try {
     const payload = jwt.verify(token, process.env.ENDUSER_JWT_SECRET);
 
-    const user = await EndUser.findById(payload.sub);
+    const user = await EndUser.findById(payload.sub).select('+linkedProviders');
 
     if (!user) {
       throw new ApiError(

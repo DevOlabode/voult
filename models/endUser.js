@@ -62,9 +62,16 @@ const EndUserSchema = new Schema(
       default: 'local',
       required : true
     }, 
+
     isEmailVerified: {
       type: Boolean,
       default: false
+    },
+
+    linkedProviders : {
+      type : [String],
+      enum : ['google', 'github', 'facebook', 'linkedin', 'apple', 'microsoft'],
+      default : [],
     },
 
     emailVerificationToken: String,
@@ -146,6 +153,21 @@ EndUserSchema.methods.generatePasswordResetToken = function () {
 EndUserSchema.virtual('isLocked').get(function () {
   return this.lockUntil && this.lockUntil > Date.now();
 });
+
+// Helper method to check if a specific provider is linked
+EndUserSchema.methods.hasLinkedProvider = function(provider) {
+  return this.linkedProviders && this.linkedProviders.includes(provider);
+};
+
+// Helper method to get all linked providers
+EndUserSchema.methods.getLinkedProviders = function() {
+  return this.linkedProviders || [];
+};
+
+// Helper method to check if user has any linked providers
+EndUserSchema.methods.hasAnyLinkedProviders = function() {
+  return this.linkedProviders && this.linkedProviders.length > 0;
+};
 
 
 module.exports = mongoose.models.EndUser || mongoose.model('EndUser', EndUserSchema);

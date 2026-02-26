@@ -87,7 +87,6 @@ A centralized authentication-as-a-service platform for developers.
 - [ ] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
 - [ ] Per-app enable / disable social providers
-- [ ] Role-Based Access control (RBAC)
 
 ### 🧩 OAuth Provider Configuration
 - [x] Configure OAuth credentials per app

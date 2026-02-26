@@ -20,7 +20,7 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
 
-    const endUser = await EndUser.findById(payload.sub);
+    const endUser = await EndUser.findById(payload.sub).select('+linkedProviders');
 
     if (!endUser) {
       throw new ApiError(
