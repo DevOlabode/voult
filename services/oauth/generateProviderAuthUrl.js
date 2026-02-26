@@ -45,8 +45,6 @@ module.exports = async function generateProviderAuthUrl(provider, state, appId) 
         state: encodedState
       });
 
-      console.log("PARAMS: ", params);
-
       return `https://www.facebook.com/v18.0/dialog/oauth?${params}`;
     };
 
@@ -62,8 +60,6 @@ module.exports = async function generateProviderAuthUrl(provider, state, appId) 
         scope: 'openid profile email',
         state: encodedState
       });
-
-      console.log("PARAMS: ", params);
 
       return `https://www.linkedin.com/oauth/v2/authorization?${params}`;
     }
