@@ -1,3 +1,4 @@
 ## FUTURE TODO
 - [ ] test microsoft oauth
 - [ ] test apple oauth
+- [ ] OAuth Linking for the endusers (Tracking in and storing links in the database)

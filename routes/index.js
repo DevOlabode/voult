@@ -16,6 +16,7 @@ const apiFacebook = require('./api/facebook');
 const apiLinkedin = require('./api/linkedin');
 const apiMicorsoft  = require('./api/microsoft');
 const oauthLinking = require('./api/oauthLinking');
+const oauth = require('./api/oauth');
 
 // Mount Web Routes
 router.use('/', webAuthRoutes);
@@ -32,6 +33,7 @@ router.use('/api/auth/facebook', apiFacebook);
 router.use('/api/auth/linkedin', apiLinkedin);
 router.use('/api/auth/microsoft', apiMicorsoft);
 router.use('/api', oauthLinking);
+router.use('/api', oauth);
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));
