@@ -1,4 +1,6 @@
 const App = require('../../models/app');
+const OAuthAccount = require('../../models/OAuthAccount');
+const User = require('../../models/endUser');
 
 module.exports.newForm = (req, res)=>{
     res.render('app/new', {title : 'New App'});
@@ -182,6 +184,17 @@ module.exports.saveGoogleOAuth = async (req, res) => {
     return res.redirect(`/app/${id}/google-oauth`);
   }
 
+  // Check if any users are already linked to Google OAuth
+  const linkedUsers = await OAuthAccount.countDocuments({
+    provider: 'google',
+    user: { $in: await User.find({ app: id }).select('_id') }
+  });
+
+  if (linkedUsers > 0) {
+    req.flash('error', 'Cannot disable Google OAuth while users have linked accounts. Unlink accounts first.');
+    return res.redirect(`/app/${id}`);
+  }
+
   app.googleOAuth = {
     enabled: true,
     clientId,
@@ -263,6 +276,19 @@ module.exports.updateGoogleOAuth = async (req, res) => {
   const app = await App.findById(id);
   if (!app) throw new ApiError(404, 'APP_NOT_FOUND', 'App not found');
 
+  // Check if disabling Google OAuth while users have linked accounts
+  if (enabled === 'false' && app.googleOAuth?.enabled) {
+    const linkedUsers = await OAuthAccount.countDocuments({
+      provider: 'google',
+      user: { $in: await User.find({ app: id }).select('_id') }
+    });
+
+    if (linkedUsers > 0) {
+      req.flash('error', 'Cannot disable Google OAuth while users have linked accounts. Unlink accounts first.');
+      return res.redirect(`/app/${id}`);
+    }
+  }
+
   const previousRedirectUri = app.googleOAuth?.redirectUri;
 
   app.googleOAuth = {
@@ -288,7 +314,7 @@ module.exports.updateGoogleOAuth = async (req, res) => {
   }
 
   req.flash('success', 'Google OAuth settings updated');
-  res.redirect(`/app/${id}/settings`);
+  res.redirect(`/app/${id}`);
 };
 
 /* ---------------- GITHUB OAUTH ---------------- */

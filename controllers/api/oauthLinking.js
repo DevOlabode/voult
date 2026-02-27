@@ -3,20 +3,33 @@ const User = require('../../models/endUser');
 const bcrypt = require('bcrypt');
 const generateProviderAuthUrl = require('../../services/oauth/generateProviderAuthUrl')
 
+const App = require('../../models/App');
 
-// 🔹 Start Linking Flow
 exports.startLinking = async (req, res) => {
   const { provider } = req.params;
   const user = req.endUser;
 
+  const app = await App.findById(user.app);
+
+  if (!app || !app.isActive) {
+    return res.status(404).json({ error: 'APP_NOT_ACTIVE' });
+  }
+
+  const providerConfig = app[`${provider}OAuth`];
+
+  if (!providerConfig || !providerConfig.enabled) {
+    return res.status(403).json({
+      error: 'PROVIDER_DISABLED_FOR_THIS_APP'
+    });
+  }
+
   const state = {
     intent: 'link',
-    userId: user._id.toString()
+    userId: user._id.toString(),
+    appId: app._id.toString()
   };
-  const appId = user.app;
-  const redirectUrl = await generateProviderAuthUrl(provider, state, appId);
 
-  console.log(redirectUrl);
+  const redirectUrl = generateProviderAuthUrl(provider, state, app);
 
   return res.json({ redirectUrl });
 };

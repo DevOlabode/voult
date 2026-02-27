@@ -84,7 +84,7 @@ A centralized authentication-as-a-service platform for developers.
 - [x] login with microsoft.
 
 - [ ] OAuth account linking (password ↔ social) *
-- [ ] Handle existing email collisions across providers
+- [x] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
 - [ ] Per-app enable / disable social providers
 

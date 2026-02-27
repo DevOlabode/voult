@@ -49,7 +49,7 @@ module.exports = async function generateProviderAuthUrl(provider, state, appId) 
     };
 
     case 'linkedin': {
-      if (app.linkeldnOAuth?.enabled === false) {
+      if (app.linkedinOAuth?.enabled === false) {
         throw new Error('LINKEDIN_NOT_ENABLED');
       }
       
@@ -101,7 +101,7 @@ module.exports = async function generateProviderAuthUrl(provider, state, appId) 
     }
 
     case 'github': {
-      if (app.googleOAuth?.enabled === false) {
+      if (app.githubOAuth?.enabled === false) {
         throw new Error('GITHUB_NOT_ENABLED');
       }
 

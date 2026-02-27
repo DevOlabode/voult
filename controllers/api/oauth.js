@@ -2,6 +2,7 @@
 
 const OAuthAccount = require('../../models/OAuthAccount');
 const User = require('../../models/endUser');
+const App = require('../../models/App');
 const {createToken} = require('../../utils/createTokens');
 const exchangeCodeForToken = require('../../utils/exchangeCodeForToken');
 const getProviderProfile = require('../../utils/getProviderProfile');
@@ -22,12 +23,24 @@ exports.handleCallback = async (req, res) => {
     }
 
     const decodedState = decodeState(state);
-    const { intent, userId } = decodedState;
+    const { intent, userId, appId } = decodedState;
 
-    // 1️⃣ Exchange code for tokens
-    const tokenResponse = await exchangeCodeForToken(provider, code);
+    // 1️⃣ Fetch app with secrets and check provider enablement
+    const app = await App.findById(appId).select('+googleOAuth.clientSecret +githubOAuth.clientSecret +facebookOAuth.appSecret +linkedinOAuth.clientSecret +appleOAuth.privateKey +microsoftOAuth.clientSecret');
+    
+    if (!app || !app.isActive) {
+      return res.status(404).json({ error: 'APP_NOT_ACTIVE' });
+    }
 
-    // 2️⃣ Fetch provider profile
+    const providerConfig = app[`${provider}OAuth`];
+    if (!providerConfig || !providerConfig.enabled) {
+      return res.status(403).json({ error: 'PROVIDER_DISABLED_FOR_THIS_APP' });
+    }
+
+    // 2️⃣ Exchange code for tokens using app credentials
+    const tokenResponse = await exchangeCodeForToken(provider, code, app);
+
+    // 3️⃣ Fetch provider profile
     const profile = await getProviderProfile(provider, tokenResponse);
 
     const providerUserId = profile.id;
