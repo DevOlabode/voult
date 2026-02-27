@@ -122,10 +122,10 @@ module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
 
 
 module.exports.sendPasswordResetEmail = async (to, appName, resetUrl) => {
-  if (isDevelopment && !shouldSendEmails) {
-    logEmail(to, `Reset your ${appName} password`, `You requested to reset your password for ${appName}.`, resetUrl);
-    return Promise.resolve();
-  }
+//   if (isDevelopment && !shouldSendEmails) {
+//     logEmail(to, `Reset your ${appName} password`, `You requested to reset your password for ${appName}.`, resetUrl);
+//     return Promise.resolve();
+//   }
 
   return transporter.sendMail({
     from: '"voult.dev" <solabode499@gmail.com>',
@@ -154,10 +154,10 @@ module.exports.welcomeOAuthUser = async ({
   appName,
   provider
 }) => {
-  if (isDevelopment && !shouldSendEmails) {
-    logEmail(to, `Welcome to ${appName}`, `Welcome to ${appName}, ${name || 'there'}! Your account has been created using ${provider}.`);
-    return Promise.resolve();
-  }
+  // if (isDevelopment && !shouldSendEmails) {
+  //   logEmail(to, `Welcome to ${appName}`, `Welcome to ${appName}, ${name || 'there'}! Your account has been created using ${provider}.`);
+  //   return Promise.resolve();
+  // }
 
   return transporter.sendMail({
     from: '"voult.dev" <solabode499@gmail.com>',

@@ -130,7 +130,7 @@ exports.handleCallback = async (req, res) => {
     }
 
     return res.status(400).json({ error: 'INVALID_INTENT' });
-
+    
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'OAUTH_CALLBACK_FAILED' });
