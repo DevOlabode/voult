@@ -7,6 +7,12 @@ const {Schema} = mongoose;
 
 const developerSchema = new Schema(
   {
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    avatar: String,
     email: {
       type: String,
       required: true,

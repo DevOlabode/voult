@@ -24,6 +24,21 @@ router.get('/register',redirectIfLoggedIn, controller.registerForm);
 
 router.post('/register', webAuthLimiter, catchAsync(controller.register));
 
+router.get('/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/login'
+  }),
+  (req, res) => {
+    res.redirect('/dashboard');
+  }
+);
+
 router.post('/logout', controller.logout);
 
 router.get('/verify/:token', catchAsync(controller.verifyAccount));
