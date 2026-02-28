@@ -2,7 +2,7 @@
 
 const OAuthAccount = require('../../models/OAuthAccount');
 const User = require('../../models/endUser');
-const App = require('../../models/App');
+const App = require('../../models/app');
 const {createToken} = require('../../utils/createTokens');
 const exchangeCodeForToken = require('../../utils/exchangeCodeForToken');
 const getProviderProfile = require('../../utils/getProviderProfile');
