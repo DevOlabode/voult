@@ -86,7 +86,7 @@ A centralized authentication-as-a-service platform for developers.
 - [ ] OAuth account linking (password ↔ social) *
 - [x] Handle existing email collisions across providers
 - [ ] Store provider metadata (providerId, avatar, profile)
-- [ ] Per-app enable / disable social providers
+- [x] Per-app enable / disable social providers
 
 ### 🧩 OAuth Provider Configuration
 - [x] Configure OAuth credentials per app
@@ -105,6 +105,7 @@ A centralized authentication-as-a-service platform for developers.
 
 ## Backend Features.
 - [x] Add resend email to forgotten password flow
+- [ ] Add settings page to the frontend of the app.
 - [ ] Enable developer google oauth login and register
 - [ ] Enable developer github oauth login and register
 - [ ] Enable developer SSO registration

@@ -1,29 +1,42 @@
 const App = require('../../models/App');
+const {ApiError} = require('../../utils/apiError')
 
-exports.getProviderVisibility = async (req, res) => {
+module.exports.getProviderVisibility = async (req, res) => {
   try {
-    const { appId } = req.params;
+    const { clientId } = req.params;
     
-    const app = await App.findById(appId);
+    const app = await App.findOne({clientId});
     
-    if (!app || !app.isActive) {
-      return res.status(404).json({ error: 'APP_NOT_FOUND' });
-    }
+    if (!app & !app.isActive) {
+      throw new ApiError(
+        404,
+        'APP_NOT_FOUND',
+        'Could not found app in the database'
+      );
+    };
+
+    // console.log(app);
 
     // Return visibility status for all providers
     const visibility = {
-      google: app.googleOAuth?.enabled || false,
-      github: app.githubOAuth?.enabled || false,
-      facebook: app.facebookOAuth?.enabled || false,
-      linkedin: app.linkedinOAuth?.enabled || false,
-      apple: app.appleOAuth?.enabled || false,
-      microsoft: app.microsoftOAuth?.enabled || false
+      google: app.googleOAuth?.enabled,
+      github: app.githubOAuth?.enabled,
+      facebook: app.facebookOAuth?.enabled,
+      linkedin: app.linkedinOAuth?.enabled,
+      apple: app.appleOAuth?.enabled,
+      microsoft: app.microsoftOAuth?.enabled
     };
+
+    // console.log(visibility)
 
     return res.json({ providers: visibility });
     
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'FETCH_PROVIDER_VISIBILITY_FAILED' });
+    // console.error(err);
+    throw new ApiError(
+      500,
+      'FETCH_PROVIDER_VISIBILITY_FAILED',
+      'Provider Visibility Failed'
+    )
   }
 };
