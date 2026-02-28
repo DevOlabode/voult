@@ -14,9 +14,7 @@ module.exports.getProviderVisibility = async (req, res) => {
         'Could not found app in the database'
       );
     };
-
-    // console.log(app);
-
+    
     // Return visibility status for all providers
     const visibility = {
       google: app.googleOAuth?.enabled,
@@ -27,12 +25,9 @@ module.exports.getProviderVisibility = async (req, res) => {
       microsoft: app.microsoftOAuth?.enabled
     };
 
-    // console.log(visibility)
-
     return res.json({ providers: visibility });
     
   } catch (err) {
-    // console.error(err);
     throw new ApiError(
       500,
       'FETCH_PROVIDER_VISIBILITY_FAILED',
