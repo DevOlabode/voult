@@ -3,7 +3,7 @@ const User = require('../../models/endUser');
 const bcrypt = require('bcrypt');
 const generateProviderAuthUrl = require('../../services/oauth/generateProviderAuthUrl')
 
-const App = require('../../models/App');
+const App = require('../../models/app');
 
 exports.startLinking = async (req, res) => {
   const { provider } = req.params;
