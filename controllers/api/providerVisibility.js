@@ -1,4 +1,4 @@
-const App = require('../../models/App');
+const App = require('../../models/app');
 const {ApiError} = require('../../utils/apiError')
 
 module.exports.getProviderVisibility = async (req, res) => {
