@@ -103,7 +103,7 @@ module.exports = async function generateProviderAuthUrl(provider, state, appId) 
     case 'github': {
       if (app.githubOAuth?.enabled === false) {
         throw new Error('GITHUB_NOT_ENABLED');
-      }
+      };
 
       const params = querystring.stringify({
         client_id: app.githubOAuth?.clientId,

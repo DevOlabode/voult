@@ -13,7 +13,7 @@ exports.startLinking = async (req, res) => {
 
   if (!app || !app.isActive) {
     return res.status(404).json({ error: 'APP_NOT_ACTIVE' });
-  }
+  };
 
   const providerConfig = app[`${provider}OAuth`];
 
@@ -21,7 +21,7 @@ exports.startLinking = async (req, res) => {
     return res.status(403).json({
       error: 'PROVIDER_DISABLED_FOR_THIS_APP'
     });
-  }
+  };
 
   const state = {
     intent: 'link',
@@ -29,7 +29,7 @@ exports.startLinking = async (req, res) => {
     appId: app._id.toString()
   };
 
-  const redirectUrl = generateProviderAuthUrl(provider, state, app);
+  const redirectUrl = await generateProviderAuthUrl(provider, state, user.app);
 
   return res.json({ redirectUrl });
 };

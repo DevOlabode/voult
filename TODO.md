@@ -85,7 +85,7 @@ A centralized authentication-as-a-service platform for developers.
 
 - [ ] OAuth account linking (password ↔ social) *
 - [x] Handle existing email collisions across providers
-- [ ] Store provider metadata (providerId, avatar, profile)
+- [ ] Store provider metadata (providerId, avatar, profile) *
 - [x] Per-app enable / disable social providers
 
 ### 🧩 OAuth Provider Configuration

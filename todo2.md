@@ -2,3 +2,4 @@
 - [ ] test microsoft oauth
 - [ ] test apple oauth
 - [ ] OAuth Linking for the endusers (Tracking in and storing links in the database) *
+- [ ] Linking and meta data profile Not working perfecly. *

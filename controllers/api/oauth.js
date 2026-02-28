@@ -72,9 +72,15 @@ exports.handleCallback = async (req, res) => {
       }
 
       await OAuthAccount.findOneAndUpdate(
-        { user: userId, provider },
+        { user: userId, provider, app: app._id },
         {
           providerUserId,
+          profile: {
+            email: profile.email,
+            name: profile.name,
+            avatar: profile.avatar,
+            raw: profile.raw
+          },
           accessToken: tokenResponse.access_token,
           refreshToken: tokenResponse.refresh_token,
           tokenExpiresAt: tokenResponse.expires_in
@@ -131,8 +137,15 @@ exports.handleCallback = async (req, res) => {
 
       await OAuthAccount.create({
         user: user._id,
+        app: app._id,
         provider,
         providerUserId,
+        profile: {
+          email: profile.email,
+          name: profile.name,
+          avatar: profile.avatar,
+          raw: profile.raw
+        },
         accessToken: tokenResponse.access_token,
         refreshToken: tokenResponse.refresh_token
       });
