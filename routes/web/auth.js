@@ -24,13 +24,13 @@ router.get('/register',redirectIfLoggedIn, controller.registerForm);
 
 router.post('/register', webAuthLimiter, catchAsync(controller.register));
 
-router.get('/google',
+router.get('/auth/google',
   passport.authenticate('google', {
     scope: ['profile', 'email']
   })
 );
 
-router.get('/google/callback',
+router.get('/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/login'
   }),
