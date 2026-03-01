@@ -106,7 +106,7 @@ A centralized authentication-as-a-service platform for developers.
 ## Backend Features.
 - [x] Add resend email to forgotten password flow
 - [ ] Add settings page to the frontend of the app.
-- [ ] Enable developer google oauth login and register
+- [x] Enable developer google oauth login and register
 - [ ] Enable developer github oauth login and register
 - [ ] Enable developer SSO registration
 
