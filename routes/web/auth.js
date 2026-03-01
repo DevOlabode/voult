@@ -39,6 +39,21 @@ router.get('/auth/google/callback',
   }
 );
 
+router.get('/auth/github',
+  passport.authenticate('github', {
+    scope: ['user:email']
+  })
+);
+
+router.get('/auth/github/callback',
+  passport.authenticate('github', {
+    failureRedirect: '/login'
+  }),
+  (req, res) => {
+    res.redirect('/dashboard');
+  }
+);
+
 router.post('/logout', controller.logout);
 
 router.get('/verify/:token', catchAsync(controller.verifyAccount));

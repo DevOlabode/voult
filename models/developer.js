@@ -12,6 +12,11 @@ const developerSchema = new Schema(
       unique: true,
       sparse: true
     },
+    githubId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
     avatar: String,
     email: {
       type: String,
