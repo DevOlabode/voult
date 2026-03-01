@@ -9,17 +9,17 @@ This implementation adds comprehensive provider metadata storage and management 
 ### **Key Improvements**
 
 1. **Rich Provider Profiles**: Each linked OAuth account now stores:
-   - Provider user ID (stable identity)
-   - Email (provider-verified)
-   - Display name
-   - Profile avatar
-   - Raw provider response (for debugging)
-
+  - Provider user ID (stable identity)
+  - Email (provider-verified)
+  - Display name
+  - Profile avatar
+  - Raw provider response (for debugging)
 2. **App Isolation**: Each app maintains independent OAuth accounts
 3. **Professional UX**: Users see avatars and proper names in account dashboards
 4. **Identity Security**: Identity is `(provider + providerUserId + app)` - never just email
 
 ### **New Data Structure**
+
 ```javascript
 {
   user: ObjectId,           // User who owns this account
@@ -52,6 +52,7 @@ This implementation adds comprehensive provider metadata storage and management 
 **Purpose**: Test the new endpoint that shows which providers are enabled for an app.
 
 **Steps**:
+
 1. Create or identify an app ID from your dashboard
 2. Make a GET request to the provider visibility endpoint:
 
@@ -60,6 +61,7 @@ curl -X GET "http://localhost:3000/api/{appId}"
 ```
 
 **Expected Response**:
+
 ```json
 {
   "providers": {
@@ -74,6 +76,7 @@ curl -X GET "http://localhost:3000/api/{appId}"
 ```
 
 **Test Cases**:
+
 - ✅ Test with valid app ID
 - ✅ Test with non-existent app ID (should return 404)
 - ✅ Test with inactive app (should return 404)
@@ -83,11 +86,13 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Verify that OAuth callbacks are blocked when a provider is disabled.
 
 **Steps**:
+
 1. In your app settings, disable a provider (e.g., Google OAuth)
 2. Try to initiate OAuth flow for that provider
 3. Check the callback response
 
 **Expected Behavior**:
+
 - Should receive `403 Forbidden` with error: `"PROVIDER_DISABLED_FOR_THIS_APP"`
 - OAuth flow should be blocked before any token exchange
 
@@ -96,14 +101,16 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Verify that OAuth callbacks work normally when a provider is enabled.
 
 **Steps**:
+
 1. Enable a provider in your app settings
 2. Complete the full OAuth flow:
-   - Initiate OAuth (redirect to provider)
-   - Authenticate with provider
-   - Return to callback URL
+  - Initiate OAuth (redirect to provider)
+  - Authenticate with provider
+  - Return to callback URL
 3. Verify successful authentication
 
 **Expected Behavior**:
+
 - Should complete successfully
 - Should receive proper authentication token or redirect
 
@@ -112,11 +119,13 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Verify that token exchange uses app-specific credentials instead of environment variables.
 
 **Steps**:
+
 1. Configure different OAuth credentials for two different apps
 2. Test OAuth flow for both apps
 3. Monitor network requests or logs to verify correct credentials are used
 
 **Expected Behavior**:
+
 - Each app should use its own configured credentials
 - No fallback to environment variables
 
@@ -125,12 +134,14 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Test the validation that prevents disabling providers with linked users.
 
 **Steps**:
+
 1. Enable Google OAuth for an app
 2. Have a user link their Google account to that app
 3. Try to disable Google OAuth in app settings
 4. Attempt to save the changes
 
 **Expected Behavior**:
+
 - Should receive error: `"Cannot disable Google OAuth while users have linked accounts. Unlink accounts first."`
 - Provider should remain enabled
 
@@ -139,12 +150,14 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Test that different apps can have different provider configurations.
 
 **Steps**:
+
 1. Create two apps
 2. Enable Google OAuth for App A, disable for App B
 3. Enable GitHub OAuth for App B, disable for App A
 4. Test OAuth flows for both apps
 
 **Expected Behavior**:
+
 - App A should allow Google OAuth but block GitHub
 - App B should allow GitHub OAuth but block Google
 - Each app maintains independent provider settings
@@ -156,15 +169,17 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Verify that OAuth accounts store rich profile metadata.
 
 **Steps**:
+
 1. Link a Google account to your app
 2. Check the OAuthAccount document in your database
 3. Verify the profile object contains:
-   - `email`: Provider-verified email
-   - `name`: Display name
-   - `avatar`: Profile image URL
-   - `raw`: Full provider response
+  - `email`: Provider-verified email
+  - `name`: Display name
+  - `avatar`: Profile image URL
+  - `raw`: Full provider response
 
 **Expected Behavior**:
+
 - OAuthAccount should have complete profile object
 - Metadata should be provider-specific (Google vs GitHub vs Facebook)
 
@@ -173,6 +188,7 @@ curl -X GET "http://localhost:3000/api/{appId}"
 **Purpose**: Test the new endpoint that retrieves all linked providers with metadata.
 
 **Steps**:
+
 1. Link multiple providers (Google, GitHub, Facebook) to your account
 2. Make a GET request to the user OAuth endpoint:
 
@@ -182,6 +198,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "success": true,
@@ -205,6 +222,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ```
 
 **Test Cases**:
+
 - ✅ Test with no linked providers (should return empty array)
 - ✅ Test with multiple providers
 - ✅ Test with invalid/expired JWT token (should return 401)
@@ -214,6 +232,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 **Purpose**: Test unlinking providers while preserving metadata history.
 
 **Steps**:
+
 1. Link a provider and verify metadata is stored
 2. Unlink the provider using the DELETE endpoint:
 
@@ -223,6 +242,7 @@ curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
 ```
 
 **Expected Behavior**:
+
 - Should return success message
 - OAuthAccount should be soft-deleted (deletedAt field set)
 - Original metadata remains in database for audit purposes
@@ -232,16 +252,18 @@ curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
 **Purpose**: Verify each provider returns correct metadata format.
 
 **Steps**:
+
 1. Link accounts from different providers
 2. Check the metadata for each:
-   - **Google**: Should have picture URL, email, name
-   - **GitHub**: Should have avatar_url, email, name
-   - **Facebook**: Should have picture data.url, email, name
-   - **LinkedIn**: Should have picture, email, name
-   - **Microsoft**: Should have displayName, email
-   - **Apple**: Minimal data (handled during sign-in)
+  - **Google**: Should have picture URL, email, name
+  - **GitHub**: Should have avatar_url, email, name
+  - **Facebook**: Should have picture data.url, email, name
+  - **LinkedIn**: Should have picture, email, name
+  - **Microsoft**: Should have displayName, email
+  - **Apple**: Minimal data (handled during sign-in)
 
 **Expected Behavior**:
+
 - Each provider should return appropriate metadata
 - Avatar URLs should be valid and accessible
 - Email should be provider-verified
@@ -251,6 +273,7 @@ curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
 ### **Step 1: Application Setup**
 
 **1.1 Start Your Application**
+
 ```bash
 # Navigate to your project directory
 cd /Users/samuelolabode/Documents/dev/voult
@@ -264,11 +287,13 @@ node src/index.js
 ```
 
 **1.2 Access Developer Dashboard**
+
 - Open your browser and go to `http://localhost:3000/dashboard`
 - Log in with your developer account
 - You should see your existing apps or option to create new ones
 
 **1.3 Create Test App (if needed)**
+
 - Click "Create New App" or similar
 - Fill in app name: "Test OAuth App"
 - Set callback URL: `http://localhost:3000/api/google/callback` (for testing)
@@ -277,23 +302,26 @@ node src/index.js
 ### **Step 2: Configure OAuth Providers**
 
 **2.1 Google OAuth Setup**
+
 1. Go to your app settings in the dashboard
 2. Navigate to "Google OAuth" configuration
 3. Enter your Google OAuth credentials:
-   - Client ID: Your Google OAuth client ID
-   - Client Secret: Your Google OAuth client secret
-   - Redirect URI: `http://localhost:3000/api/google/callback`
+  - Client ID: Your Google OAuth client ID
+  - Client Secret: Your Google OAuth client secret
+  - Redirect URI: `http://localhost:3000/api/google/callback`
 4. Enable Google OAuth and save
 
 **2.2 GitHub OAuth Setup**
+
 1. Navigate to "GitHub OAuth" configuration
 2. Enter your GitHub OAuth credentials:
-   - Client ID: Your GitHub OAuth client ID
-   - Client Secret: Your GitHub OAuth client secret
-   - Redirect URI: `http://localhost:3000/api/github/callback`
+  - Client ID: Your GitHub OAuth client ID
+  - Client Secret: Your GitHub OAuth client secret
+  - Redirect URI: `http://localhost:3000/api/github/callback`
 3. Enable GitHub OAuth and save
 
 **2.3 Verify Provider Status**
+
 ```bash
 # Test the provider visibility endpoint
 curl -X GET "http://localhost:3000/api/YOUR_APP_ID"
@@ -314,6 +342,7 @@ curl -X GET "http://localhost:3000/api/YOUR_APP_ID"
 ### **Step 3: Test OAuth Flow with Metadata**
 
 **3.1 Link Google Account**
+
 1. Navigate to your app's OAuth linking page (typically `/app/{id}/link/google`)
 2. Click "Link Google Account"
 3. You'll be redirected to Google's OAuth consent screen
@@ -321,6 +350,7 @@ curl -X GET "http://localhost:3000/api/YOUR_APP_ID"
 5. You should be redirected back to your app with success message
 
 **3.2 Verify Metadata Storage in Database**
+
 ```bash
 # Connect to MongoDB (adjust connection string as needed)
 mongo "mongodb://localhost:27017/your_database_name"
@@ -358,10 +388,12 @@ db.OAuthAccounts.find({
 ```
 
 **3.3 Link GitHub Account**
+
 1. Navigate to your app's GitHub OAuth linking page
 2. Click "Link GitHub Account"
 3. Sign in to GitHub and authorize your app
 4. Verify success and check database:
+
 ```bash
 # Check GitHub OAuth account
 db.OAuthAccounts.find({
@@ -388,9 +420,11 @@ db.OAuthAccounts.find({
 ### **Step 4: Test User OAuth Management API**
 
 **4.1 Get JWT Token**
+
 1. Log in to your app as an end user (not developer)
 2. Complete login flow to get JWT token
 3. Or use the authentication endpoint:
+
 ```bash
 # Login to get JWT token
 curl -X POST "http://localhost:3000/api/auth/login" \
@@ -404,6 +438,7 @@ curl -X POST "http://localhost:3000/api/auth/login" \
 ```
 
 **4.2 Test User OAuth Management Endpoint**
+
 ```bash
 # Replace YOUR_JWT_TOKEN with actual token
 curl -X GET "http://localhost:3000/api/me/oauth" \
@@ -433,6 +468,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ```
 
 **4.3 Test with No Linked Providers**
+
 ```bash
 # Create a new user account with no linked providers
 curl -X GET "http://localhost:3000/api/me/oauth" \
@@ -448,6 +484,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ### **Step 5: Test Provider Unlinking**
 
 **5.1 Unlink Google Account**
+
 ```bash
 # Unlink Google provider
 curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
@@ -462,6 +499,7 @@ curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
 ```
 
 **5.2 Verify Soft Delete in Database**
+
 ```bash
 # Check that the account was soft-deleted
 db.OAuthAccounts.find({
@@ -477,6 +515,7 @@ db.OAuthAccounts.find({
 ```
 
 **5.3 Test Safety Validation**
+
 ```bash
 # Try to unlink the last provider when user has no password
 # Should return error:
@@ -488,11 +527,13 @@ db.OAuthAccounts.find({
 ### **Step 6: Test App Isolation**
 
 **6.1 Create Second App**
+
 1. In developer dashboard, create "Test App 2"
 2. Configure only GitHub OAuth for this app
 3. Note the new App ID
 
 **6.2 Test Different Provider Configurations**
+
 ```bash
 # Check App 1 providers (should have Google enabled)
 curl -X GET "http://localhost:3000/api/APP1_ID/providers"
@@ -502,9 +543,11 @@ curl -X GET "http://localhost:3000/api/APP2_ID/providers"
 ```
 
 **6.3 Test Cross-App Isolation**
+
 1. Link Google to App 1
 2. Link GitHub to App 2
 3. Verify each app only sees its own linked providers:
+
 ```bash
 # User linked to App 1 should only see Google
 # User linked to App 2 should only see GitHub
@@ -515,26 +558,31 @@ curl -X GET "http://localhost:3000/api/APP2_ID/providers"
 **7.1 Test Each Provider Type**
 
 **Google Metadata:**
+
 - Should include `picture` URL
 - Should have `verified_email: true`
 - Should have `sub` as stable user ID
 
 **GitHub Metadata:**
+
 - Should include `avatar_url`
 - Should have `login` username
 - May have public email or null
 
 **Facebook Metadata:**
+
 - Should include nested `picture.data.url`
 - Should have `name` field
 - May have email if permissions granted
 
 **LinkedIn Metadata:**
+
 - Should include `picture` URL
 - Should have `given_name` and `family_name`
 - Should have verified email
 
 **7.2 Verify Metadata Quality**
+
 ```bash
 # Check that avatar URLs are accessible
 curl -I "https://lh3.googleusercontent.com/..."
@@ -549,11 +597,13 @@ curl -I "https://lh3.googleusercontent.com/..."
 ### **Step 8: Test Error Scenarios**
 
 **8.1 Test Disabled Provider**
+
 1. Disable Google OAuth in app settings
 2. Try to link Google account
 3. Should receive `403 Forbidden` with `"PROVIDER_DISABLED_FOR_THIS_APP"`
 
 **8.2 Test Invalid JWT Token**
+
 ```bash
 # Use expired or invalid token
 curl -X GET "http://localhost:3000/api/me/oauth" \
@@ -563,6 +613,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ```
 
 **8.3 Test Non-existent App**
+
 ```bash
 # Use invalid app ID
 curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
@@ -573,14 +624,16 @@ curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
 ### **Step 9: Test Frontend Integration**
 
 **9.1 Account Dashboard Display**
+
 1. Navigate to user account dashboard
 2. Verify linked providers show:
-   - Provider icons/logos
-   - User avatars
-   - Display names
-   - "Unlink" buttons
+  - Provider icons/logos
+  - User avatars
+  - Display names
+  - "Unlink" buttons
 
 **9.2 Link/Unlink UI**
+
 1. Test "Link Google Account" button
 2. Test "Unlink" buttons for each provider
 3. Verify success/error messages display properly
@@ -588,6 +641,7 @@ curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
 ### **Step 10: Production Readiness Checks**
 
 **10.1 Performance Testing**
+
 ```bash
 # Test with multiple linked providers
 # Verify API response times are acceptable (< 500ms)
@@ -597,6 +651,7 @@ curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
 ```
 
 **10.2 Security Testing**
+
 ```bash
 # Verify JWT tokens are properly validated
 # Verify app isolation prevents cross-app access
@@ -604,6 +659,7 @@ curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
 ```
 
 **10.3 Data Integrity**
+
 ```bash
 # Verify metadata updates on relink
 # Verify soft deletes preserve audit trail
@@ -613,6 +669,7 @@ curl -X GET "http://localhost:3000/api/INVALID_APP_ID/providers"
 ## Manual Testing Commands
 
 ### Test Provider Visibility
+
 ```bash
 # Replace {appId} with your actual app ID
 curl -X GET "http://localhost:3000/api/{appId}/providers" \
@@ -620,6 +677,7 @@ curl -X GET "http://localhost:3000/api/{appId}/providers" \
 ```
 
 ### Test User OAuth Management
+
 ```bash
 # Replace YOUR_JWT_TOKEN with actual token
 curl -X GET "http://localhost:3000/api/me/oauth" \
@@ -628,6 +686,7 @@ curl -X GET "http://localhost:3000/api/me/oauth" \
 ```
 
 ### Test Provider Unlinking
+
 ```bash
 # Replace YOUR_JWT_TOKEN and provider name
 curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
@@ -636,6 +695,7 @@ curl -X DELETE "http://localhost:3000/api/me/oauth/google" \
 ```
 
 ### Test OAuth Callback (should fail if disabled)
+
 ```bash
 # This simulates an OAuth callback - replace values as needed
 curl -X GET "http://localhost:3000/api/google/callback?code=test_code&state=test_state" \
@@ -649,9 +709,9 @@ curl -X GET "http://localhost:3000/api/google/callback?code=test_code&state=test
 3. **Database Verification**: Check the `apps` and `OAuthAccounts` collections to verify configurations
 4. **State Parameter**: Ensure the OAuth state parameter includes the correct app ID
 5. **Metadata Inspection**: Use MongoDB queries to inspect OAuthAccount documents:
-   ```javascript
+  ```javascript
    db.OAuthAccounts.find({ user: ObjectId("...") }).pretty()
-   ```
+  ```
 
 ## Expected Error Responses
 
@@ -674,3 +734,4 @@ curl -X GET "http://localhost:3000/api/google/callback?code=test_code&state=test
 - ✅ Provider unlinking works with safety checks
 - ✅ Each provider returns appropriate metadata format
 - ✅ App isolation prevents provider conflicts between apps
+
