@@ -144,4 +144,6 @@ module.exports.forgotPassword = async (req, res) => {
     }
   };
   
-  
+  module.exports.settingsPage = (req, res) =>{
+    res.render('user/settings', {title : 'Settings'})
+  };

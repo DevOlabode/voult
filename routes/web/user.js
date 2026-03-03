@@ -22,4 +22,6 @@ router.get('/delete-account', isLoggedIn, catchAsync(controller.deleteAccountFor
 
 router.post('/delete-account', isLoggedIn, catchAsync(controller.deleteAccount));
 
+router.get('/settings', isLoggedIn, catchAsync(controller.settingsPage));
+
 module.exports = router;

@@ -7,4 +7,7 @@
 
 
 TOMORROW TODO
-- [ ] Test github login and register using passport.
+- [x] Study Chemistry and Physics
+- [x] Figure out how to integrate healcode axe-core into healcode
+- [ ] Write the tests scripts for the landing page for healcode
+- [ ] Start working on the settings page.

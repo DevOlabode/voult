@@ -107,7 +107,7 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Add resend email to forgotten password flow
 - [ ] Add settings page to the frontend of the app.
 - [x] Enable developer google oauth login and register
-- [ ] Enable developer github oauth login and register
+- [x] Enable developer github oauth login and register
 - [ ] Enable developer SSO registration
 
 ## Frontend Features.
@@ -138,6 +138,10 @@ A centralized authentication-as-a-service platform for developers.
 ---
 
 ## 🌱 V2
+
+### Publish Method
+- [ ] Create an SDK for this API.
+- [ ] Make it have two ways of integration, the NPM, yarn, pnpm, bun etc and the other axios/fetch method from voult.dev directly.
 
 ### BASIC MULTI FACTOR AUTHENTICATION
 - [ ] Optional MFA (email OTP)
