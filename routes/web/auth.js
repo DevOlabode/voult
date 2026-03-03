@@ -35,7 +35,7 @@ router.get('/auth/google/callback',
     failureRedirect: '/login'
   }),
   (req, res) => {
-    res.redirect('/dashboard');
+    res.redirect('/');
   }
 );
 
@@ -50,7 +50,7 @@ router.get('/auth/github/callback',
     failureRedirect: '/login'
   }),
   (req, res) => {
-    res.redirect('/dashboard');
+    res.redirect('/');
   }
 );
 
