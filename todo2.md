@@ -15,3 +15,10 @@ TOMORROW TODO
 
 OTHER TODO
 - [ ] Write the developer setting frontend and backend.
+- [ ] Complete the landingPage test script for healcode.
+
+
+EXTRA AUTH FOR MAIN APP 
+- GOOGLE AUTHENTICATOR OR SIMILAR
+- SECURITY KEY
+- NOTIFICATION VIA ...
