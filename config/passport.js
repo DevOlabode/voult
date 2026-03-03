@@ -18,14 +18,12 @@ passport.use(new GoogleStrategy({
     const email = profile.emails?.[0]?.value;
     const avatar = profile.photos?.[0]?.value;
 
-    // 1️⃣ Check if already linked
     let developer = await Developer.findOne({ googleId });
 
     if (developer) {
       return done(null, developer);
     }
 
-    // 2️⃣ Check if email exists (link account)
     developer = await Developer.findOne({ email });
 
     if (developer) {
@@ -36,7 +34,6 @@ passport.use(new GoogleStrategy({
       return done(null, developer);
     }
 
-    // 3️⃣ Otherwise create new account
     developer = await Developer.create({
       email,
       googleId,
@@ -59,14 +56,12 @@ passport.use(new GitHubStrategy({
   try {
 
     const githubId = profile.id;
-    const email = profile.emails?.[0]?.value; // may be undefined
+    const email = profile.emails?.[0]?.value; 
     const avatar = profile.photos?.[0]?.value;
 
-    // 1️⃣ Already linked?
     let developer = await Developer.findOne({ githubId });
     if (developer) return done(null, developer);
-    
-    // 2️⃣ If email exists, link account
+
     if (email) {
       developer = await Developer.findOne({ email });
       if (developer) {
@@ -77,7 +72,6 @@ passport.use(new GitHubStrategy({
       }
     }
 
-    // 3️⃣ Create new account
     developer = await Developer.create({
       email,
       githubId,
