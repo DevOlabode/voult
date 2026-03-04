@@ -2,8 +2,22 @@
 
 <h2>Settings</h2>
 
-<p>Name: <%= user.name %></p>
-<p>Email: <%= user.email %></p>
-<p>Auth Provider: <%= user.authProvider %></p>
-<p>Created At: <%= user.createdAt %></p>
-<p>Updated At: <%= user.updatedAt %></p>
+<form action="/settings" method="post">
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" value="<%= user.name %>">
+
+    <br>
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" value="<%= user.email %>">
+
+    <br>
+    <label for="plan">Plan</label>
+    <select name="plan" id="plan">
+        <option value="free">Free</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise</option>
+    </select>
+    <br>
+
+    <button type="submit">Save</button>
+</form>

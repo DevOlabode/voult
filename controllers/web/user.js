@@ -150,3 +150,20 @@ module.exports.forgotPassword = async (req, res) => {
     const user = req.user;
     res.render('user/settings', {title : 'Settings', user})
   };
+
+  module.exports.updateSettingss = async(req, res) =>{
+    const {name, email, plan, avatar} = req.body;
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if(!user){
+      req.flash('error', 'User not found');
+      return res.redirect('/settings');
+    }
+    user.name = name;
+    user.email = email;
+    user.plan = plan;
+    user.avatar = avatar;
+    await user.save();
+    req.flash('success', 'Settings updated successfully');
+    res.redirect('/settings');
+  };
