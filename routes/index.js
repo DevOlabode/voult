@@ -5,6 +5,7 @@ const router = express.Router();
 const webAuthRoutes = require('./web/auth');
 const webUserRoutes = require('./web/user');
 const webAppRoutes = require('./web/app');
+const developerSettingsRoutes = require('./web/settings')
 
 // API Routes
 const apiAuthRoutes = require('./api/auth');
@@ -24,6 +25,7 @@ const userOAuthAccounts = require('./api/userOAuthAccounts');
 router.use('/', webAuthRoutes);
 router.use('/', webUserRoutes);
 router.use('/app', webAppRoutes);
+router.use('/', developerSettingsRoutes);
 
 // Mount API Routes
 router.use('/api/auth', apiAuthRoutes);

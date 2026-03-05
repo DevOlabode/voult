@@ -18,12 +18,4 @@ router.get('/reset-password/:token', catchAsync(controller.resetPasswordForm));
 
 router.post('/reset-password/:token', webAuthLimiter, catchAsync(controller.resetPassword));
 
-router.get('/delete-account', isLoggedIn, catchAsync(controller.deleteAccountForm));
-
-router.post('/delete-account', isLoggedIn, catchAsync(controller.deleteAccount));
-
-router.get('/settings', isLoggedIn, catchAsync(controller.settingsPage));
-
-router.post('/settings', isLoggedIn, catchAsync(controller.updateSettingss));
-
 module.exports = router;
