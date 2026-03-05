@@ -4,17 +4,29 @@
 
 <form action="/settings" method="post" class="auth-form">
     <h3>Profile</h3>
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" value="<%= user.username %>">    
+    </div>
 
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username" value="<%= user.username %>">
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name" value="<%= user.name %>">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" value="<%= user.name %>">
+    </div>
     
-    <label for="password">password</label>
-    <small class="opacity-50">Edit Your Password</small>
+    <div class="form-group">
+        <label for="password">password</label>
+        <small class="opacity-50">Edit Your Password</small>
 
-    <input type="password" name="currentPassword" id="currentPassword" placeholder="..........." class="mb-3">
-    <input type="password" name="newPassword" id="newPassword" placeholder="...........">
+        <input type="password" name="currentPassword" id="currentPassword" placeholder="..........." class="mb-3">
+        <input type="password" name="newPassword" id="newPassword" placeholder="...........">
+    </div>
 
     <button type="submit">Save</button>
+
+    <br>
+    <form action="/settings/deleteAccount" class="form-group">
+        <button class="btn btn-danger">Delete Account</button>
+    </form>
+    
 </form>
