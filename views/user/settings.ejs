@@ -1,23 +1,20 @@
 <% layout('layout/boilerplate.ejs') %>
 
-<h2>Settings</h2>
+<h1 class="text-center">Settings</h1>
 
-<form action="/settings" method="post">
+<form action="/settings" method="post" class="auth-form">
+    <h3>Profile</h3>
+
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" value="<%= user.username %>">
     <label for="name">Name</label>
     <input type="text" name="name" id="name" value="<%= user.name %>">
+    
+    <label for="password">password</label>
+    <small class="opacity-50">Edit Your Password</small>
 
-    <br>
-    <label for="email">Email</label>
-    <input type="email" name="email" id="email" value="<%= user.email %>">
-
-    <br>
-    <label for="plan">Plan</label>
-    <select name="plan" id="plan">
-        <option value="free">Free</option>
-        <option value="pro">Pro</option>
-        <option value="enterprise">Enterprise</option>
-    </select>
-    <br>
+    <input type="password" name="currentPassword" id="currentPassword" placeholder="..........." class="mb-3">
+    <input type="password" name="newPassword" id="newPassword" placeholder="...........">
 
     <button type="submit">Save</button>
 </form>

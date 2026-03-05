@@ -25,7 +25,7 @@ module.exports.registerForm = (req, res)=>{
 
 module.exports.register =  async (req, res) => {
     try {
-      const { email, name, password } = req.body;
+      const { email, name, password, username } = req.body;
   
       if (!email || !name || !password) {
         req.flash('error', 'All fields are required');
@@ -37,6 +37,7 @@ module.exports.register =  async (req, res) => {
       const user = new User({
         name,
         email,
+        username,
         verifyToken,
         verifyTokenExpires: Date.now() + 1000 * 60 * 60 * 24 // 24h
       });

@@ -7,6 +7,11 @@ const {Schema} = mongoose;
 
 const developerSchema = new Schema(
   {
+    username : {
+      type : String,
+      unique : true,
+      required : false
+    },
     googleId: {
       type: String,
       unique: true,
