@@ -52,22 +52,22 @@ module.exports.forgotPassword = async (req, res) => {
     res.redirect('/login');
   };
 
-  module.exports.resetPasswordForm = async (req, res) => {
-    const user = await User.findOne({
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
+  // module.exports.resetPasswordForm = async (req, res) => {
+  //   const user = await User.findOne({
+  //     resetPasswordToken: req.params.token,
+  //     resetPasswordExpires: { $gt: Date.now() },
+  //   });
   
-    if (!user) {
-      req.flash('error', 'Password reset token is invalid or expired');
-      return res.redirect('/forgot-password');
-    }
+  //   if (!user) {
+  //     req.flash('error', 'Password reset token is invalid or expired');
+  //     return res.redirect('/forgot-password');
+  //   }
   
-    res.render('forgottenPassword/reset-password', {
-      title : 'Reset Password',
-      token: req.params.token,
-    });
-  };
+  //   res.render('forgottenPassword/reset-password', {
+  //     title : 'Reset Password',
+  //     token: req.params.token,
+  //   });
+  // };
 
 
   module.exports.resetPassword = async (req, res) => {
