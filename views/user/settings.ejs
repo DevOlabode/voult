@@ -18,13 +18,15 @@
 
 <div class="form-group">
     <h3>Password</h3>
-    <label for="password">password</label>
-    <small class="opacity-50">Edit Your Password</small>
-
-    <input type="password" name="currentPassword" id="currentPassword" placeholder="..........." class="mb-3">
-    <input type="password" name="newPassword" id="newPassword" placeholder="...........">
-
-    <button type="submit">Save</button>
+    <form action="/reset-password" method="post">
+        <label for="password">password</label>
+        <small class="opacity-50">Edit Your Password</small>
+    
+        <input type="password" name="password" id="currentPassword" placeholder="..........." class="mb-3">
+        <input type="password" name="confirmPassword" id="newPassword" placeholder="...........">
+    
+        <button type="submit">Save</button>
+    </form>
 </div>
 
 <form action="/delete-account" class="auth-form">
