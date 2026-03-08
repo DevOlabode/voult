@@ -90,6 +90,12 @@ exports.handleCallback = async (req, res) => {
         { upsert: true, new: true }
       );
 
+      // Track linked provider on the end user document as well
+      await User.findByIdAndUpdate(
+        userId,
+        { $addToSet: { linkedProviders: provider } }
+      );
+
       return res.json({ message: 'ACCOUNT_LINKED_SUCCESSFULLY' });
     }
 

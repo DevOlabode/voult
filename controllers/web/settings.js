@@ -53,30 +53,27 @@ const App = require('../../models/app');
 
 module.exports.resetPassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
-  const { token } = req.params;
+
+  if (!password || !confirmPassword) {
+    req.flash('error', 'Please fill in all password fields');
+    return res.redirect('/settings');
+  };
 
   if (password !== confirmPassword) {
     req.flash('error', 'Passwords do not match');
-    return res.redirect(`/reset-password/${token}`);
+    return res.redirect('/settings');
   };
 
-  const user = await User.findOne({
-    resetPasswordToken: req.params.token,
-    resetPasswordExpires: { $gt: Date.now() },
-  });
+  const user = await User.findById(req.user._id);
 
   if (!user) {
-    req.flash('error', 'Password reset token is invalid or expired');
-    return res.redirect('/forgot-password');
+    req.flash('error', 'User not found');
+    return res.redirect('/login');
   };
 
   await user.setPassword(password);
-
-  // Cleanup
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
   await user.save();
 
-  req.flash('success', 'Password updated. You can now log in.');
-  res.redirect('/login');
+  req.flash('success', 'Password updated successfully');
+  res.redirect('/settings');
 };

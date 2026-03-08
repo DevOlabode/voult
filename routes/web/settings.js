@@ -16,6 +16,6 @@ router.get('/delete-account', isLoggedIn, catchAsync(controller.deleteAccountFor
 
 router.post('/delete-account', isLoggedIn, catchAsync(controller.deleteAccount));
 
-router.post('/reset-password', webAuthLimiter, catchAsync(controller.resetPassword));
+router.post('/reset-password', isLoggedIn, webAuthLimiter, catchAsync(controller.resetPassword));
 
 module.exports = router;
