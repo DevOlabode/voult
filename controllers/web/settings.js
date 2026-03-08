@@ -4,7 +4,7 @@ const App = require('../../models/app');
   // Developer Settings Page.
   module.exports.settingsPage = (req, res) =>{
     const user = req.user;
-    res.render('user/settings', {title : 'Settings', user})
+    res.render('user/settings', {title : 'Settings | voult.dev', user});
   };
 
   module.exports.deleteAccountForm = async(req, res)=>{

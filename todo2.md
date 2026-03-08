@@ -22,3 +22,12 @@ OTHER TODO
 - GOOGLE AUTHENTICATOR OR SIMILAR
 - SECURITY KEY
 - NOTIFICATION VIA ...
+
+
+
+### SETTINGS FUNCTIONALITIES.
+- [ ] Edit Email functionalities
+- [ ] if user register with oauth(google/ github), allow them set password in the settings. Then after that they can input current password before they can change the password again.
+- [ ] Add multi-factor authentication using passport.
+- [ ] Close/delete account
+- [ ] Profile
