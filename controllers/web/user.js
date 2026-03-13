@@ -17,6 +17,13 @@ module.exports.dashboard = async (req, res) => {
   });
 };
 
+module.exports.profilePage = async (req, res) => {
+  res.render('user/profile', {
+    title: 'Profile | voult.dev',
+    user: req.user,
+  });
+};
+
 function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 };

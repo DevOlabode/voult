@@ -8,7 +8,9 @@ const { isLoggedIn } = require('../../middleware');
 
 const { webAuthLimiter } = require('../../middleware/rateLimiters')
 
-router.get('/dashboard',isLoggedIn, catchAsync(controller.dashboard));
+router.get('/dashboard', isLoggedIn, catchAsync(controller.dashboard));
+
+router.get('/profile', isLoggedIn, catchAsync(controller.profilePage));
 
 router.get('/forgot-password', controller.forgotPasswordForm);
 
