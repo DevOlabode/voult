@@ -9,65 +9,27 @@
     </p>
   </header>
 
-  <!-- Apps -->
-  <section class="dashboard-section" id="apps">
-    <div class="section-header">
-      <h2>Your Apps</h2>
-      <a href="/app/new" class="btn-secondary btn-sm">New App</a>
-    </div>
-
-    <% if (apps.length === 0) { %>
-      <div class="empty-state">
-        <p>You haven’t created any apps yet.</p>
-        <a href="/app/new" class="btn-primary">Create App</a>
-      </div>
-    <% } else { %>
-      <div class="apps-grid">
-        <% apps.forEach(app => { %>
-          <div class="app-card">
-            <h3 class="text-dark opacity-75"><%= app.name %></h3>
-
-            <% if (app.description) { %>
-              <p class="muted"><%= app.description %></p>
-            <% } %>
-
-            <div class="app-meta">
-              <span class="status <%= app.isActive ? 'active' : 'disabled' %>">
-                <%= app.isActive ? 'Active' : 'Disabled' %>
-              </span>
-              <span class="date text-dark opacity-25">
-                <%= app.createdAt.toDateString() %>
-              </span>
-            </div>
-
-            <p class="muted">
-              <%= app.usage.totalRegistrations %> users.
-              <%= app.usage.totalLogins %> logins
-            </p>
-
-            <div class="app-actions">
-              <a href="/app/<%= app._id %>" class="link">
-                Manage →
-              </a>
-            
-              <a href="/app/<%= app._id %>/edit" class="btn-link">
-                Edit
-              </a>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    <% } %>
-  </section>
-
-  <!-- Account -->
   <section class="dashboard-section">
-    <h2>Account</h2>
+    <h2>Overview</h2>
+    <div class="dashboard-grid">
+      <div class="card">
+        <h2>Your apps</h2>
+        <p class="muted mb-2">
+          You currently have <strong><%= appsCount %></strong> app<%= appsCount === 1 ? '' : 's' %>.
+        </p>
+        <a href="/apps" class="btn-primary btn-sm">View apps</a>
+      </div>
 
-    <div class="account-card text-dark">
-      <div><strong>Email:</strong> <span class="opacity-75"><%= user.email %></span> </div>
-      <div><strong>Plan:</strong> <span class="opacity-75"><%= user.plan %></span></div>
-      <div><strong>Joined:</strong> <span class="opacity-75"> <%= user.createdAt.toDateString() %> </span> </div>
+      <div class="card">
+        <h2>Account</h2>
+        <div class="account-card text-dark">
+          <div><strong>Email:</strong> <span class="opacity-75"><%= user.email %></span> </div>
+          <div><strong>Plan:</strong> <span class="opacity-75"><%= user.plan %></span></div>
+          <div><strong>Joined:</strong> <span class="opacity-75"> <%= user.createdAt.toDateString() %> </span> </div>
+        </div>
+        <a href="/settings" class="btn-link mt-2">Manage settings →</a>
+      </div>
     </div>
   </section>
+
 </section>

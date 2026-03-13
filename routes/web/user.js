@@ -10,6 +10,8 @@ const { webAuthLimiter } = require('../../middleware/rateLimiters')
 
 router.get('/dashboard', isLoggedIn, catchAsync(controller.dashboard));
 
+router.get('/apps', isLoggedIn, catchAsync(controller.appsPage));
+
 router.get('/profile', isLoggedIn, catchAsync(controller.profilePage));
 
 router.get('/forgot-password', controller.forgotPasswordForm);

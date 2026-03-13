@@ -5,15 +5,29 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 
 module.exports.dashboard = async (req, res) => {
-  const apps = await App.find({
+  // Simple overview; detailed app management lives on /apps
+  const appsCount = await App.countDocuments({
     owner: req.user._id,
-    deletedAt: { $exists: false } 
-  }).sort({ createdAt: -1 });
+    deletedAt: { $exists: false },
+  });
 
   res.render('user/dashboard', {
     title: 'Dashboard',
     user: req.user,
-    apps
+    appsCount,
+  });
+};
+
+module.exports.appsPage = async (req, res) => {
+  const apps = await App.find({
+    owner: req.user._id,
+    deletedAt: { $exists: false },
+  }).sort({ createdAt: -1 });
+
+  res.render('user/apps', {
+    title: 'Apps | voult.dev',
+    user: req.user,
+    apps,
   });
 };
 
