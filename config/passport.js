@@ -38,7 +38,8 @@ passport.use(new GoogleStrategy({
       email,
       googleId,
       avatar,
-      name: profile.displayName
+      name: profile.displayName,
+      hasPassword: false,
     });
 
     return done(null, developer);
@@ -76,7 +77,8 @@ passport.use(new GitHubStrategy({
       email,
       githubId,
       avatar,
-      name: profile.displayName || profile.username
+      name: profile.displayName || profile.username,
+      hasPassword: false,
     });
 
     return done(null, developer);

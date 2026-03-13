@@ -62,6 +62,17 @@ const developerSchema = new Schema(
 
 
     lastLoginAt: Date,
+
+    // True when user has set a password (false for OAuth-only until they set one in settings)
+    hasPassword: {
+      type: Boolean,
+      default: true,
+    },
+
+    // When changing email we store pending email and send verification
+    pendingEmail: String,
+    pendingEmailToken: String,
+    pendingEmailTokenExpires: Date,
   },
   {
     timestamps: true,
