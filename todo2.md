@@ -13,20 +13,7 @@ TOMORROW TODO
 - [x] Start working on the tests scripts for the landing page for healcode
 - [x] Start working on the settings page.
 
-OTHER TODO
-- [ ] Write the developer setting frontend and backend.
-- [ ] Complete the landingPage test script for healcode.
-
-
 2FACTOR AUTHENTICATION FOR MAIN APP 
 - GOOGLE AUTHENTICATOR OR SIMILAR
 - SECURITY KEY
 - NOTIFICATION VIA ...
-
-
-
-### SETTINGS FUNCTIONALITIES.
-- [ ] Edit Email functionalities
-- [ ] if user register with oauth(google/ github), allow them set password in the settings. Then after that they can input current password before they can change the password again.
-- [ ] Close/delete account
-- [ ] Profile
