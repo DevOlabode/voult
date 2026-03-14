@@ -108,7 +108,6 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Add settings page to the frontend of the app.
 - [x] Enable developer google oauth login and register
 - [x] Enable developer github oauth login and register
-- [ ] Enable developer SSO registration *
 
 ## Frontend Features.
 - [ ] Look for a good template and good color pallete for this app.

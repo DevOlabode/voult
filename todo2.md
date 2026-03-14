@@ -7,7 +7,7 @@
 - [ ] Change the redirect URI from localhost to voult.dev.
 
 
-TOMORROW TODO
+## TOMORROW TODO
 - [x] Study Chemistry and Physics
 - [x] Figure out how to integrate healcode axe-core into healcode
 - [x] Start working on the tests scripts for the landing page for healcode
@@ -17,3 +17,5 @@ TOMORROW TODO
 - GOOGLE AUTHENTICATOR OR SIMILAR
 - SECURITY KEY
 - NOTIFICATION VIA ...
+
+- TEST THE LINK GOOGLE AND GITHUB FEATURE IN THE SETTINGS PAGE AFTER UNSUSPENDING THE MAIN SITE.
