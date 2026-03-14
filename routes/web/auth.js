@@ -7,20 +7,20 @@ const controller = require('../../controllers/web/auth');
 
 const catchAsync = require('../../utils/catchAsync');
 
-const {redirectIfLoggedIn, storeReturnTo} = require('../../middleware');
+const { redirectIfLoggedIn, storeReturnTo, isLoggedIn } = require('../../middleware');
 
-const { webAuthLimiter } = require('../../middleware/rateLimiters')
+const { webAuthLimiter } = require('../../middleware/rateLimiters');
 
 router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
 router.post('/login', storeReturnTo, passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true,
-  }), 
+  }),
   webAuthLimiter,
   controller.login);
 
-router.get('/register',redirectIfLoggedIn, controller.registerForm);
+router.get('/register', redirectIfLoggedIn, controller.registerForm);
 
 router.post('/register', webAuthLimiter, catchAsync(controller.register));
 
@@ -39,6 +39,9 @@ router.get('/auth/google/callback',
   }
 );
 
+router.get('/auth/google/link', isLoggedIn, controller.startLinkGoogle);
+router.get('/auth/google/link/callback', controller.googleLinkCallback);
+
 router.get('/auth/github',
   passport.authenticate('github', {
     scope: ['user:email']
@@ -53,6 +56,9 @@ router.get('/auth/github/callback',
     res.redirect('/');
   }
 );
+
+router.get('/auth/github/link', isLoggedIn, controller.startLinkGithub);
+router.get('/auth/github/link/callback', controller.githubLinkCallback);
 
 router.post('/logout', controller.logout);
 

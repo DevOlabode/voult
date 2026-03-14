@@ -144,6 +144,47 @@ module.exports.changePassword = async (req, res) => {
   res.redirect('/settings');
 };
 
+// Unlink OAuth provider (must keep at least one sign-in method).
+module.exports.unlinkProvider = async (req, res) => {
+  const { provider } = req.params;
+  if (provider !== 'google' && provider !== 'github') {
+    req.flash('error', 'Invalid provider');
+    return res.redirect('/settings');
+  }
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    req.flash('error', 'User not found');
+    return res.redirect('/settings');
+  }
+
+  const hasPassword = user.hasPassword !== false;
+  const hasGoogle = !!user.googleId;
+  const hasGithub = !!user.githubId;
+
+  if (provider === 'google' && !user.googleId) {
+    req.flash('error', 'Google is not linked to your account.');
+    return res.redirect('/settings');
+  }
+  if (provider === 'github' && !user.githubId) {
+    req.flash('error', 'GitHub is not linked to your account.');
+    return res.redirect('/settings');
+  }
+
+  const otherMethods = hasPassword + (provider === 'google' ? hasGithub : hasGoogle);
+  if (otherMethods < 1) {
+    req.flash('error', 'You must keep at least one sign-in method. Set a password or link another provider first.');
+    return res.redirect('/settings');
+  }
+
+  if (provider === 'google') user.googleId = undefined;
+  else user.githubId = undefined;
+  await user.save();
+
+  req.flash('success', provider === 'google' ? 'Google unlinked.' : 'GitHub unlinked.');
+  res.redirect('/settings');
+};
+
 module.exports.deleteAccountForm = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) {

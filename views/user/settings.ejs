@@ -40,6 +40,36 @@
       </form>
     </section>
 
+    <!-- Linked accounts -->
+    <section class="settings-section card">
+      <h2 class="section-title">Linked accounts</h2>
+      <p class="muted mb-3">Link Google or GitHub to sign in with them, or unlink if you no longer want to use them.</p>
+      <div class="linked-providers">
+        <div class="provider-row">
+          <span class="provider-name">Google</span>
+          <% if (user.googleId) { %>
+            <span class="provider-badge linked">Linked</span>
+            <form action="/settings/unlink/google" method="post" class="inline-form" onsubmit="return confirm('Unlink Google from this account?');">
+              <button type="submit" class="btn-link danger">Unlink</button>
+            </form>
+          <% } else { %>
+            <a href="/auth/google/link" class="btn-primary btn-sm">Link Google</a>
+          <% } %>
+        </div>
+        <div class="provider-row">
+          <span class="provider-name">GitHub</span>
+          <% if (user.githubId) { %>
+            <span class="provider-badge linked">Linked</span>
+            <form action="/settings/unlink/github" method="post" class="inline-form" onsubmit="return confirm('Unlink GitHub from this account?');">
+              <button type="submit" class="btn-link danger">Unlink</button>
+            </form>
+          <% } else { %>
+            <a href="/auth/github/link" class="btn-primary btn-sm">Link GitHub</a>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
     <!-- Password: OAuth users without a password see "Set password"; others see "Change password" -->
     <section class="settings-section card">
       <h2 class="section-title">Password</h2>
@@ -105,4 +135,11 @@
 .mb-3 { margin-bottom: 12px; }
 .settings-danger .btn-danger { display: inline-block; padding: 10px 18px; border-radius: 6px; background: #dc2626; color: #fff; text-decoration: none; font-weight: 500; border: none; cursor: pointer; }
 .settings-danger .btn-danger:hover { background: #b91c1c; color: #fff; }
+.linked-providers { display: flex; flex-direction: column; gap: 12px; }
+.provider-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.provider-name { font-weight: 500; min-width: 80px; }
+.provider-badge.linked { font-size: 12px; color: #16a34a; }
+.inline-form { display: inline; margin: 0; }
+.btn-link.danger { color: #dc2626; background: none; border: none; cursor: pointer; font-size: 14px; padding: 0; text-decoration: underline; }
+.btn-link.danger:hover { color: #b91c1c; }
 </style>

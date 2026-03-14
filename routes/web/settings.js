@@ -14,6 +14,8 @@ router.get('/settings/verify-email/:token', catchAsync(controller.verifyNewEmail
 router.post('/settings/password/set', isLoggedIn, webAuthLimiter, catchAsync(controller.setPassword));
 router.post('/settings/password/change', isLoggedIn, webAuthLimiter, catchAsync(controller.changePassword));
 
+router.post('/settings/unlink/:provider', isLoggedIn, catchAsync(controller.unlinkProvider));
+
 router.get('/delete-account', isLoggedIn, catchAsync(controller.deleteAccountForm));
 router.post('/delete-account', isLoggedIn, catchAsync(controller.deleteAccount));
 

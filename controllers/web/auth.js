@@ -1,10 +1,9 @@
 const User = require('../../models/developer');
-
 const passport = require('passport');
-
-const {welcomeEmail} = require('../../services/emailService');
-
+const { welcomeEmail } = require('../../services/emailService');
 const crypto = require('crypto');
+
+const baseUrl = () => (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 module.exports.loginForm = (req, res)=>{
     res.render('auth/login', {title : "Login Page"})
@@ -93,4 +92,112 @@ module.exports.verifyAccount = async (req, res) => {
 
   req.flash('success', 'Your account has been verified. You can now log in.');
   res.redirect('/login');
+};
+
+// ---- Link OAuth providers to developer account (must be logged in) ----
+
+module.exports.startLinkGoogle = (req, res, next) => {
+  req.session.linkingUserId = req.user._id.toString();
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    callbackURL: baseUrl() + '/auth/google/link/callback',
+  })(req, res, next);
+};
+
+module.exports.googleLinkCallback = (req, res, next) => {
+  const targetId = req.session.linkingUserId;
+  if (targetId) delete req.session.linkingUserId;
+
+  passport.authenticate('google', {
+    callbackURL: baseUrl() + '/auth/google/link/callback',
+    failureRedirect: '/settings',
+  }, async (err, user, info) => {
+    if (err) {
+      req.flash('error', 'Could not link Google account.');
+      return res.redirect('/settings');
+    }
+    if (!user) {
+      req.flash('error', 'Google sign-in was cancelled or failed.');
+      return res.redirect('/settings');
+    }
+    if (!targetId) {
+      req.flash('error', 'Link session expired. Please try again.');
+      return res.redirect('/settings');
+    }
+
+    const target = await User.findById(targetId);
+    if (!target) {
+      req.flash('error', 'Account not found.');
+      return res.redirect('/settings');
+    }
+
+    target.googleId = user.googleId;
+    if (!target.avatar && user.avatar) target.avatar = user.avatar;
+    await target.save();
+
+    if (user._id.toString() !== targetId) {
+      await User.findByIdAndUpdate(user._id, { $unset: { googleId: 1 } });
+      req.login(target, (loginErr) => {
+        if (loginErr) return next(loginErr);
+        req.flash('success', 'Google account linked.');
+        res.redirect('/settings');
+      });
+    } else {
+      req.flash('success', 'Google account linked.');
+      res.redirect('/settings');
+    }
+  })(req, res, next);
+};
+
+module.exports.startLinkGithub = (req, res, next) => {
+  req.session.linkingUserId = req.user._id.toString();
+  passport.authenticate('github', {
+    scope: ['user:email'],
+    callbackURL: baseUrl() + '/auth/github/link/callback',
+  })(req, res, next);
+};
+
+module.exports.githubLinkCallback = (req, res, next) => {
+  const targetId = req.session.linkingUserId;
+  if (targetId) delete req.session.linkingUserId;
+
+  passport.authenticate('github', {
+    callbackURL: baseUrl() + '/auth/github/link/callback',
+    failureRedirect: '/settings',
+  }, async (err, user, info) => {
+    if (err) {
+      req.flash('error', 'Could not link GitHub account.');
+      return res.redirect('/settings');
+    }
+    if (!user) {
+      req.flash('error', 'GitHub sign-in was cancelled or failed.');
+      return res.redirect('/settings');
+    }
+    if (!targetId) {
+      req.flash('error', 'Link session expired. Please try again.');
+      return res.redirect('/settings');
+    }
+
+    const target = await User.findById(targetId);
+    if (!target) {
+      req.flash('error', 'Account not found.');
+      return res.redirect('/settings');
+    }
+
+    target.githubId = user.githubId;
+    if (!target.avatar && user.avatar) target.avatar = user.avatar;
+    await target.save();
+
+    if (user._id.toString() !== targetId) {
+      await User.findByIdAndUpdate(user._id, { $unset: { githubId: 1 } });
+      req.login(target, (loginErr) => {
+        if (loginErr) return next(loginErr);
+        req.flash('success', 'GitHub account linked.');
+        res.redirect('/settings');
+      });
+    } else {
+      req.flash('success', 'GitHub account linked.');
+      res.redirect('/settings');
+    }
+  })(req, res, next);
 };
