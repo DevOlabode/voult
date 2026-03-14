@@ -8,9 +8,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_SMTP_KEY
   },
-  tls: {
-    rejectUnauthorized: false
-  }
+  ...(process.env.NODE_ENV === 'production' && {
+    tls: { rejectUnauthorized: true }
+  })
 });
 
 module.exports = {transporter};

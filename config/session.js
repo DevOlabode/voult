@@ -1,11 +1,13 @@
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sessionConfig = {
-    secret : process.env.SECRET,
-    resave : false,
-    saveUninitialized : true,
-    cookie : {
-        secure : false, 
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: isProduction,
         httpOnly: true,
-        expires : new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
 };

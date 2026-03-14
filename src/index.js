@@ -6,6 +6,10 @@ require('dotenv').config();
   }
 });
 
+if (process.env.NODE_ENV === 'production' && (!process.env.SECRET || !String(process.env.SECRET).trim())) {
+  throw new Error('SECRET is required in production for session cookies. Set it in .env.');
+}
+
 
 const express = require('express');
 const app = express();
@@ -128,7 +132,7 @@ app.use((err, req, res, next) => {
 });
   
 
-const PORT = process.env.PORT;
-app.listen(PORT, ()=>{
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
     console.log(`App is listening on PORT ${PORT}`)
 });
