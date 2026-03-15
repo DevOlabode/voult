@@ -1,6 +1,6 @@
 # 🔐 Voult — Authentication as a Service for Developers
 
-Voult is a **developer-first authentication platform** that provides secure, scalable, and easy-to-integrate authentication APIs for modern web applications.
+Voult.dev is a **developer-first authentication platform** that provides secure, scalable, and easy-to-integrate authentication APIs for modern web applications.
 
 It handles the hard parts of auth — user management, email verification, password resets, JWT handling, and account security — so developers can focus on building products, not auth systems.
 
