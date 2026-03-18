@@ -96,7 +96,7 @@ A centralized authentication-as-a-service platform for developers.
   - [x] Linkeldn App ID & Secret
   - [x] Apple App ID & Secret
   - [x] Microsoft App ID & Secret
-- [ ] OAuth redirect URI allowlist
+- [ ] OAuth redirect URI allowlist *
 - [x] Environment-specific OAuth configs (dev / prod)
 
 ---
@@ -175,4 +175,4 @@ A centralized authentication-as-a-service platform for developers.
 
 ---
 
-voult.dev 🚀 -->
+voult.dev  -->
