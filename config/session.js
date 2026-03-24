@@ -6,7 +6,7 @@ const sessionConfig = {
     saveUninitialized: true,
     cookie: {
         secure: isProduction,
-        httpOnly: true,
+        httpOnly: false,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
