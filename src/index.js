@@ -34,19 +34,38 @@ const methodOverride = require('method-override');
 
 const cors = require('cors');
 
-app.use(cors({
-  origin: [
-    'https://www.voult.dev',
-    'https://voult.onrender.com/'
-  ],
+// CORS configuration - allow multiple origins for flexibility
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://www.voult.dev',
+      'https://voult.dev',
+      'https://voult.onrender.com',
+      'https://voult.onrender.com/',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type',
     'x-client-secret',
-    'X-Client-Id'
+    'X-Client-Id',
+    'Authorization'
   ]
-}));
+};
+
+app.use(cors(corsOptions));
 
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
