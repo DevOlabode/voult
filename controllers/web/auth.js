@@ -14,7 +14,7 @@ module.exports.login = async (req, res) => {
     await req.user.save();
 
     req.flash('success', 'Welcome back');
-    const returnUrl = res.locals.returnTo || '/';
+    const returnUrl = res.locals.returnTo || '/login';
     res.redirect(returnUrl);
 };
 
