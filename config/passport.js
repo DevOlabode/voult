@@ -55,7 +55,8 @@ passport.use(new GoogleStrategy({
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: 'https://voult.dev/auth/github/callback'
+  // callbackURL: 'https://voult.dev/auth/github/callback',
+  callbackURL : "https://www.voult.dev/auth/github/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
 
