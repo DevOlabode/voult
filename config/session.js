@@ -7,7 +7,7 @@ const sessionConfig = {
     cookie: {
        secure : false,
         httpOnly: true,
-        sameSite: 'lax', // Add CSRF protection
+        sameSite: 'lax',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         maxAge: 1000 * 60 * 60 * 24 * 7,
     }
