@@ -13,12 +13,29 @@ const { webAuthLimiter } = require('../../middleware/rateLimiters');
 
 router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
-router.post('/login', storeReturnTo, passport.authenticate('local', {
-    failureRedirect: '/login',
-    failureFlash: true,
-  }),
-  webAuthLimiter,
-  controller.login);
+router.post('/login', storeReturnTo, webAuthLimiter, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Use custom authentication to handle both user not found and wrong password consistently
+    const user = await controller.customAuthenticate(email, password);
+    
+    // Authentication successful - log in the user
+    req.login(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      
+      // Call the original login controller to set lastLoginAt and redirect
+      controller.login(req, res, next);
+    });
+    
+  } catch (err) {
+    // Set consistent error message for both scenarios
+    req.flash('error', 'Invalid credentials. Please try again.');
+    res.redirect('/login');
+  }
+});
 
 router.get('/register', redirectIfLoggedIn, controller.registerForm);
 

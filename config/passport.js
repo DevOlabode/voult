@@ -3,9 +3,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Developer = require('../models/developer');
 const GitHubStrategy = require('passport-github').Strategy;
 
-passport.use(Developer.createStrategy({
-  failureMessage : "Invalid credentials. Please try again."
-}));
+passport.use(Developer.createStrategy());
 
 passport.serializeUser(Developer.serializeUser());
 passport.deserializeUser(Developer.deserializeUser());

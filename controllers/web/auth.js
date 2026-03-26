@@ -3,6 +3,30 @@ const passport = require('passport');
 const { welcomeEmail } = require('../../services/emailService');
 const crypto = require('crypto');
 
+// Custom authentication function to handle both user not found and wrong password consistently
+const customAuthenticate = async (email, password) => {
+  const user = await User.findOne({ email: email.toLowerCase() });
+  
+  if (!user) {
+    // User doesn't exist - return consistent error message
+    throw new Error('Invalid credentials. Please try again.');
+  }
+  
+  // User exists, verify password
+  return new Promise((resolve, reject) => {
+    user.authenticate(password, (err, authenticatedUser, failureDetails) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!authenticatedUser) {
+        // Password is incorrect - return consistent error message
+        return reject(new Error('Invalid credentials. Please try again.'));
+      }
+      resolve(authenticatedUser);
+    });
+  });
+};
+
 const baseUrl = () => (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 module.exports.loginForm = (req, res)=>{
