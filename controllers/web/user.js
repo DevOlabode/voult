@@ -95,5 +95,30 @@ module.exports.forgotPassword = async (req, res) => {
 
   module.exports.resetPassword = async(req, res)=>{
     const { password, confirmPassword } = req.body;
-    res.send(req.body);
-  }
+
+    if(password !== confirmPassword){
+      req.flash('error', 'New Password and confirm password should be the same');
+      res.redirect(`/reset-password/${req.params.token}`)
+    };
+
+    const user = await User.findOne({
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      req.flash('error', 'Password reset token is invalid or expired');
+      return res.redirect('/forgot-password');
+    };
+
+    user.setPassword(confirmPassword, async (err) => {
+      if (err) {
+          return res.status(500).json({ message: 'Error setting new password.' });
+      };
+
+      // Save updated user
+      await user.save();
+      req.flash('success', 'Changed Password Successfully');
+      res.redirect('/login')
+  });
+}
