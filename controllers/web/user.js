@@ -42,10 +42,12 @@ function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 };
 
+// Enter Email Form.
 module.exports.forgotPasswordForm = async(req, res)=>{
     res.render('forgottenPassword/forgot-password', {title : 'Forgot Password'})
 };
 
+// Send Email to user email
 module.exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
   
@@ -73,19 +75,25 @@ module.exports.forgotPassword = async (req, res) => {
     res.redirect('/login');
   };
 
-  // module.exports.resetPasswordForm = async (req, res) => {
-  //   const user = await User.findOne({
-  //     resetPasswordToken: req.params.token,
-  //     resetPasswordExpires: { $gt: Date.now() },
-  //   });
   
-  //   if (!user) {
-  //     req.flash('error', 'Password reset token is invalid or expired');
-  //     return res.redirect('/forgot-password');
-  //   }
+  module.exports.resetPasswordForm = async (req, res) => {
+    const user = await User.findOne({
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
   
-  //   res.render('forgottenPassword/reset-password', {
-  //     title : 'Reset Password',
-  //     token: req.params.token,
-  //   });
-  // };
+    if (!user) {
+      req.flash('error', 'Password reset token is invalid or expired');
+      return res.redirect('/forgot-password');
+    }
+  
+    res.render('forgottenPassword/reset-password', {
+      title : 'Reset Password',
+      token: req.params.token,
+    });
+  };
+
+  module.exports.resetPassword = async(req, res)=>{
+    const { password, confirmPassword } = req.body;
+    res.send(req.body);
+  }

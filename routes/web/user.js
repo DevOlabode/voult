@@ -18,8 +18,8 @@ router.get('/forgot-password', controller.forgotPasswordForm);
 
 router.post('/forgot-password', webAuthLimiter, catchAsync(controller.forgotPassword));
 
-// router.get('/reset-password/:token', catchAsync(controller.resetPasswordForm));
+router.get('/reset-password/:token', catchAsync(controller.resetPasswordForm));
 
-// router.post('/reset-password/:token', webAuthLimiter, catchAsync(controller.resetPassword));
+router.post('/reset-password/:token', webAuthLimiter, catchAsync(controller.resetPassword));
 
 module.exports = router;
