@@ -4,6 +4,7 @@ const App = require('../../models/app');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { promisify } = require('util');
+const { validatePassword } = require('../../validators/password');
 
 module.exports.dashboard = async (req, res) => {
   // Simple overview; detailed app management lives on /apps
@@ -39,9 +40,18 @@ module.exports.profilePage = async (req, res) => {
   });
 };
 
+// Generate a raw token and return it (will be hashed before storing)
 function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
-};
+}
+
+// Hash a token for storage in the database
+function hashToken(token) {
+  return crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+}
 
 // Enter Email Form.
 module.exports.forgotPasswordForm = async(req, res)=>{
@@ -60,13 +70,18 @@ module.exports.forgotPassword = async (req, res) => {
       return res.redirect('/forgot-password');
     }
   
-    const token = generateResetToken();
+    // Generate raw token for the email link
+    const rawToken = generateResetToken();
+    
+    // Hash the token before storing in database
+    const hashedToken = hashToken(rawToken);
   
-    user.resetPasswordToken = token;
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 1000 * 60 * 30; // 30 minutes
     await user.save();
   
-    const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
+    // Send raw token in the email link
+    const resetUrl = `${process.env.BASE_URL}/reset-password/${rawToken}`;
 
     const {forgottenPasswordEmail} = require('../../services/passwordResetEmail');
 
@@ -78,8 +93,11 @@ module.exports.forgotPassword = async (req, res) => {
 
   
   module.exports.resetPasswordForm = async (req, res) => {
+    // Hash the incoming token to compare with stored hashed token
+    const hashedToken = hashToken(req.params.token);
+    
     const user = await User.findOne({
-      resetPasswordToken: req.params.token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
   
@@ -104,9 +122,18 @@ module.exports.forgotPassword = async (req, res) => {
         return res.redirect(`/reset-password/${req.params.token}`);
       }
 
+      // Validate password strength
+      if (!validatePassword(password)) {
+        req.flash('error', 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+        return res.redirect(`/reset-password/${req.params.token}`);
+      }
+
+      // Hash the incoming token to compare with stored hashed token
+      const hashedToken = hashToken(req.params.token);
+
       // Find user with valid token
       const user = await User.findOne({
-        resetPasswordToken: req.params.token,
+        resetPasswordToken: hashedToken,
         resetPasswordExpires: { $gt: Date.now() },
       });
 
