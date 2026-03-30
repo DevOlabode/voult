@@ -3,6 +3,7 @@ const App = require('../../models/app');
 
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const { promisify } = require('util');
 
 module.exports.dashboard = async (req, res) => {
   // Simple overview; detailed app management lives on /apps
@@ -114,8 +115,7 @@ module.exports.forgotPassword = async (req, res) => {
         return res.redirect('/forgot-password');
       }
 
-      //Set Password
-      await user.setPassword(confirmPassword);
+      await user.setPassword(password);
 
       // Clear reset token fields (security)
       user.resetPasswordToken = undefined;
