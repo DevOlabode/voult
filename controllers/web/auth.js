@@ -2,6 +2,7 @@ const User = require('../../models/developer');
 const passport = require('passport');
 const { welcomeEmail } = require('../../services/emailService');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 // Custom authentication function to handle both user not found and wrong password consistently
 // const customAuthenticate = async (email, password) => {
@@ -26,8 +27,7 @@ const crypto = require('crypto');
 //     });
 //   });
 // };
-
-module.exports.customAuthenticate = async (email, password) => {
+const customAuthenticate = async (email, password) => {
   const user = await User.findOne({ email });
 
   if (!user) {
