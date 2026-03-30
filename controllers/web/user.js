@@ -94,31 +94,42 @@ module.exports.forgotPassword = async (req, res) => {
   };
 
   module.exports.resetPassword = async(req, res)=>{
-    const { password, confirmPassword } = req.body;
+    try {
+      const { password, confirmPassword } = req.body;
 
-    if(password !== confirmPassword){
-      req.flash('error', 'New Password and confirm password should be the same');
-      res.redirect(`/reset-password/${req.params.token}`)
-    };
+      // Check if passwords match
+      if(password !== confirmPassword){
+        req.flash('error', 'New Password and confirm password should be the same');
+        return res.redirect(`/reset-password/${req.params.token}`);
+      }
 
-    const user = await User.findOne({
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
+      // Find user with valid token
+      const user = await User.findOne({
+        resetPasswordToken: req.params.token,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
 
-    if (!user) {
-      req.flash('error', 'Password reset token is invalid or expired');
-      return res.redirect('/forgot-password');
-    };
+      if (!user) {
+        req.flash('error', 'Password reset token is invalid or expired');
+        return res.redirect('/forgot-password');
+      }
 
-    user.setPassword(confirmPassword, async (err) => {
-      if (err) {
-          return res.status(500).json({ message: 'Error setting new password.' });
-      };
+      //Set Password
+      await user.setPassword(confirmPassword);
 
+      // Clear reset token fields (security)
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      
       // Save updated user
       await user.save();
-      req.flash('success', 'Changed Password Successfully');
-      res.redirect('/login')
-  });
-}
+      
+      req.flash('success', 'Password changed successfully. You can login with your new passwords');
+      res.redirect('/login');
+      
+    } catch (error) {
+      console.error('Password reset error:', error);
+      req.flash('error', 'An error occurred while resetting your password. Please try again.');
+      res.redirect(`/reset-password/${req.params.token}`);
+    }
+  };
