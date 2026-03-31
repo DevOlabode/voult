@@ -28,10 +28,6 @@ const sessionConfig = require('../config/session');
 
 const methodOverride = require('method-override');
 
-// const cors  = require('cors');
-// const corsOptions = require('../middleware/corsOptions');
-// app.use(cors(corsOptions));
-
 const cors = require('cors');
 
 // CORS configuration - allow multiple origins for flexibility
