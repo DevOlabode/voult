@@ -5,8 +5,7 @@ const sessionConfig = {
     resave: false,
     saveUninitialized: true,
     cookie: {
-    //    secure : true,
-        secure: isProduction && (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+       secure : false,
         httpOnly: true,
         sameSite: 'lax',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
