@@ -9,15 +9,11 @@ const customAuthenticate = async (email, password) => {
   const user = await User.findOne({ email: email.toLowerCase() });
   
   if (!user) {
-    // User doesn't exist - return consistent error message
     throw new Error('Invalid credentials. Please try again.');
   }
   
-  // User exists, verify password using the instance method correctly
-  // passport-local-mongoose's authenticate method returns an object with 'error' property if failed
   const { error } = await user.authenticate(password);
   if (error) {
-    // Password is incorrect - return consistent error message
     throw new Error('Invalid credentials. Please try again.');
   }
   

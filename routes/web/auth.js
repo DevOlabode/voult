@@ -17,16 +17,13 @@ router.post('/login', storeReturnTo, webAuthLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     
-    // Use custom authentication to handle both user not found and wrong password consistently
     const user = await controller.customAuthenticate(email, password);
     
-    // Authentication successful - log in the user
     req.login(user, (err) => {
       if (err) {
         return next(err);
       }
       
-      // Call the original login controller to set lastLoginAt and redirect
       controller.login(req, res, next);
     });
     
