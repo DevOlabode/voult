@@ -1,7 +1,31 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const Developer = require('../models/developer');
 const GitHubStrategy = require('passport-github').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
+const Developer = require('../models/developer');
+
+// Local strategy for email/password authentication
+passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+  try {
+    const developer = await Developer.findOne({ email: email.toLowerCase() });
+    
+    if (!developer) {
+      return done(null, false, { message: 'Invalid credentials. Please try again.' });
+    }
+    
+    developer.authenticate(password, (err, user, error) => {
+      if (err) {
+        return done(err);
+      }
+      if (error) {
+        return done(null, false, { message: 'Invalid credentials. Please try again.' });
+      }
+      return done(null, user);
+    });
+  } catch (err) {
+    return done(err);
+  }
+}));
 
 passport.use(Developer.createStrategy());
 

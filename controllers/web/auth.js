@@ -2,39 +2,6 @@ const User = require('../../models/developer');
 const passport = require('passport');
 const { welcomeEmail } = require('../../services/emailService');
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
-
-// Custom authentication function to handle both user not found and wrong password consistently
-const customAuthenticate = async (email, password) => {
-  const user = await User.findOne({ email: email.toLowerCase() });
-  
-  if (!user) {
-    throw new Error('Invalid credentials. Please try again.');
-  }
-  
-  const { error } = await user.authenticate(password);
-  if (error) {
-    throw new Error('Invalid credentials. Please try again.');
-  }
-  
-  return user;
-};
-
-// const customAuthenticate = async (email, password) => {
-//   const user = await User.findOne({ email });
-
-//   if (!user) {
-//     throw new Error('Invalid credentials');
-//   }
-
-//   const isMatch = await bcrypt.compare(password, user.password);
-
-//   if (!isMatch) {
-//     throw new Error('Invalid credentials');
-//   }
-
-//   return user;
-// };
 
 const baseUrl = () => (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 

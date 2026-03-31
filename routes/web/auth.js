@@ -13,26 +13,15 @@ const { webAuthLimiter } = require('../../middleware/rateLimiters');
 
 router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
-router.post('/login', storeReturnTo, webAuthLimiter, async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    
-    const user = await controller.customAuthenticate(email, password);
-    
-    req.login(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      
-      controller.login(req, res, next);
-    });
-    
-  } catch (err) {
-    // Set consistent error message for both scenarios
-    req.flash('error', 'Invalid credentials. Please try again.');
-    res.redirect('/login');
-  }
-});
+router.post('/login', 
+  storeReturnTo, 
+  webAuthLimiter,
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    failureFlash: 'Invalid credentials. Please try again.'
+  }),
+  controller.login
+);
 
 router.get('/register', redirectIfLoggedIn, controller.registerForm);
 
