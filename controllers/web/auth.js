@@ -13,19 +13,15 @@ const customAuthenticate = async (email, password) => {
     throw new Error('Invalid credentials. Please try again.');
   }
   
-  // User exists, verify password
-  return new Promise((resolve, reject) => {
-    user.authenticate(password, (err, authenticatedUser, failureDetails) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!authenticatedUser) {
-        // Password is incorrect - return consistent error message
-        return reject(new Error('Invalid credentials. Please try again.'));
-      }
-      resolve(authenticatedUser);
-    });
-  });
+  // User exists, verify password using the instance method correctly
+  // passport-local-mongoose's authenticate method returns an object with 'error' property if failed
+  const { error } = await user.authenticate(password);
+  if (error) {
+    // Password is incorrect - return consistent error message
+    throw new Error('Invalid credentials. Please try again.');
+  }
+  
+  return user;
 };
 
 // const customAuthenticate = async (email, password) => {
