@@ -1,17 +1,17 @@
-# 🔐 Voult — Authentication as a Service for Developers
+# Voult — Authentication as a Service for Developers
 
 Voult.dev is a **developer-first authentication platform** that provides secure, scalable, and easy-to-integrate authentication APIs for modern web applications.
 
 It handles the hard parts of auth — user management, email verification, password resets, JWT handling, and account security — so developers can focus on building products, not auth systems.
 
-🌐 Live: https://www.voult.dev  
-📦 Repo: https://github.com/DevOlabode/voult
+Live: https://www.voult.dev  
+Repo: https://github.com/DevOlabode/voult
 
 **Deploying?** See [DEPLOY.md](./DEPLOY.md) for production readiness and env setup.
 
 ---
 
-## ✨ Features
+##  Features
 
 ### Core Authentication
 - User registration (email + password)
@@ -39,7 +39,7 @@ It handles the hard parts of auth — user management, email verification, passw
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 - **Backend**: Node.js, Express
 - **Auth**: JWT, Passport.js
