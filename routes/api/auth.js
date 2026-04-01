@@ -30,9 +30,9 @@ router.use(apiLimiter);
   Authorization: Bearer client_secret
 */
 
-router.post('/register', validate(schemas.registerSchema), verifyClientIdOnly, validateCallbackUrl, authLimiter, catchAsync(authController.register));
+router.post('/register', verifyClientIdOnly, validateCallbackUrl, authLimiter, catchAsync(authController.register)); // Add Validation
 
-router.post('/login', validate(schemas.loginSchema), verifyClientIdOnly, authLimiter, validateCallbackUrl, catchAsync(authController.login));
+router.post('/login', verifyClientIdOnly, authLimiter, validateCallbackUrl, catchAsync(authController.login));  //Add Validation
 
 router.post('/logout', verifyClientIdOnly, requireEndUserAuth, authLimiter, validateCallbackUrl, catchAsync(authController.logout));
 
