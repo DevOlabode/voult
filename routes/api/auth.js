@@ -34,6 +34,6 @@ router.post('/register', validate(schemas.registerSchema), verifyClientIdOnly, v
 
 router.post('/login', validate(schemas.loginSchema), verifyClientIdOnly, authLimiter, validateCallbackUrl, catchAsync(authController.login));
 
-router.post('/logout', verifyClientIdOnly,requireEndUserAuth, authLimiter, validateCallbackUrl, catchAsync(authController.logout));
+router.post('/logout', verifyClientIdOnly, requireEndUserAuth, authLimiter, validateCallbackUrl, catchAsync(authController.logout));
 
 module.exports = router;

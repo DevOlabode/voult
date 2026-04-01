@@ -18,7 +18,7 @@ module.exports.verifyClient = async (req, res, next) => {
   if (!app || !app.isActive) {
     throw new ApiError(401, 'INVALID_CLIENT', 'Invalid or inactive app');
   }
-
+  
   // 🔑 Only require client secret for NON-OAUTH routes
   const isOAuthRoute =
     req.path.includes('/google/login') ||
