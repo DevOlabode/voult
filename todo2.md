@@ -6,13 +6,6 @@
 - [ ] After logging in with google or github let it redirect you to where you where before
 - [ ] Change the redirect URI from localhost to voult.dev.
 
-
-## TOMORROW TODO
-- [x] Study Chemistry and Physics
-- [x] Figure out how to integrate healcode axe-core into healcode
-- [x] Start working on the tests scripts for the landing page for healcode
-- [x] Start working on the settings page.
-
 2FACTOR AUTHENTICATION FOR MAIN APP 
 - GOOGLE AUTHENTICATOR OR SIMILAR
 - SECURITY KEY
