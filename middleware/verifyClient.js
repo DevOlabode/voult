@@ -13,7 +13,7 @@ module.exports.verifyClient = async (req, res, next) => {
   const app = await App.findOne({
     clientId,
     deletedAt: { $exists: false }
-  });
+  }).select('+clientSecretHash');
 
   if (!app || !app.isActive) {
     throw new ApiError(401, 'INVALID_CLIENT', 'Invalid or inactive app');

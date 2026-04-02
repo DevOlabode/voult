@@ -11,15 +11,15 @@
 
 ### Authentication
 1. **Register** - `POST /api/auth/register`
-   - Headers: `X-Client-Id`, `Content-Type: application/json`
+   - Headers: `X-Client-Id`, `X-Client-Secret`, `Content-Type: application/json`
    - Body: `{ email, password, fullName }`
 
 2. **Login** - `POST /api/auth/login`
-   - Headers: `X-Client-Id`, `Content-Type: application/json`
+   - Headers: `X-Client-Id`, `X-Client-Secret`, `Content-Type: application/json`
    - Body: `{ email, password }`
 
 3. **Logout** - `POST /api/auth/logout`
-   - Headers: `X-Client-Id`, `X-Client-Token: Bearer <token>`
+   - Headers: `X-Client-Id`, `X-Client-Secret`, `X-Client-Token: Bearer <token>`
 
 ### User Profile
 4. **Get Profile** - `GET /api/user/me`
@@ -31,11 +31,11 @@
 
 ### Password Management
 6. **Forgot Password** - `POST /api/user/forgot-password`
-   - Headers: `X-Client-Id`, `Content-Type: application/json`
+   - Headers: `X-Client-Id`, `X-Client-Secret`, `Content-Type: application/json`
    - Body: `{ email }`
 
 7. **Reset Password** - `POST /api/user/reset-password?token=<token>&appId=<appId>`
-   - Headers: `X-Client-Id`, `Content-Type: application/json`
+   - Headers: `X-Client-Id`, `X-Client-Secret`, `Content-Type: application/json`
    - Body: `{ password }`
 
 ### Account Management
@@ -90,5 +90,5 @@
 ## Important Notes
 1. Use `X-Client-Token` header (not `Authorization`) for end-user authentication
 2. Include `Bearer ` prefix before the token value
-3. `X-Client-Id` is required for registration, login, and password operations
+3. `X-Client-Id` AND `X-Client-Secret` are required for registration, login, logout, and password operations
 4. Access tokens expire - use refresh endpoint to get new tokens
