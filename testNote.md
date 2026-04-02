@@ -8,4 +8,5 @@ Testing Questions:
 - for google, github, and other oauth authentication, users should no thave to input their clientID and secret into the app, they should have in their .env.
 
 ## TODO
-- Research how tokens (both access tokens and refresh token work) in other auth tools
+- Research how tokens (both access tokens and refresh token work) in other auth tools.
+- Fix the total registrations and login count (EndUser count for the developer)
