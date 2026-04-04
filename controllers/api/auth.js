@@ -130,7 +130,7 @@ module.exports.login = async (req, res) => {
 
   if (!user) {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid email or password');
-  }
+  };
 
   // 🔒 Account locked
   if (user.lockUntil && user.lockUntil > Date.now()) {
