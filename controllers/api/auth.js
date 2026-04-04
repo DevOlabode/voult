@@ -164,9 +164,7 @@ module.exports.login = async (req, res) => {
       console.error('Account Lock Email Failed: ', err.message);
     }
     }
-
-    await user.save();
-
+    
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid email or password');
   }
 
@@ -241,7 +239,7 @@ module.exports.logout = async (req, res) => {
 
   req.endUser.token.accessToken = null
   req.endUser.token.refreshToken = null
-  
+
   await req.endUser.save();
 
   res.status(200).json({
