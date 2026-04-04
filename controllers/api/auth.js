@@ -183,7 +183,6 @@ module.exports.login = async (req, res) => {
   }
 
   user.lastLoginAt = new Date();
-  await user.save();
 
   const appO = await App.findById(app._id);
   appO.usage.totalLogins += 1;
@@ -197,6 +196,11 @@ module.exports.login = async (req, res) => {
     userAgent: req.headers['user-agent']
   });
 
+  user.token.accessToken = accessToken;
+  user.token.refreshToken = refreshToken;
+
+  await user.save();
+
   res.status(200).json({
     message: 'Login successful',
     accessToken,
@@ -207,7 +211,6 @@ module.exports.login = async (req, res) => {
     }
   });
 };
-
 
 // =======================
 // LOGOUT
@@ -235,6 +238,10 @@ module.exports.logout = async (req, res) => {
 
   // Optional hard logout (kills any still-valid access tokens)
   req.endUser.tokenVersion += 1;
+
+  req.endUser.token.accessToken = null
+  req.endUser.token.refreshToken = null
+  
   await req.endUser.save();
 
   res.status(200).json({
