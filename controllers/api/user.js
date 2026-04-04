@@ -86,7 +86,7 @@ module.exports.verifyEmail = async (req, res) => {
         message: 'Email Not Found'
       });
     }
-  
+    
     const resetToken = user.generatePasswordResetToken();
     await user.save();
   
