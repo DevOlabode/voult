@@ -25,7 +25,7 @@ const EndUserSchema = new Schema(
       type : String,
     },
 
-    tokens :{
+    token :{
       accessToken : {
         type : String,
         required : true
