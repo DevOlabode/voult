@@ -10,3 +10,4 @@ Testing Questions:
 ## TODO
 - Research how tokens (both access tokens and refresh token work) in other auth tools.
 - Fix the total registrations and login count (EndUser count for the developer)
+- Store access and refresh token in a database field and make it work exactly as it works right now.
