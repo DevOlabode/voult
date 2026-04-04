@@ -7,8 +7,6 @@ It handles the hard parts of auth — user management, email verification, passw
 Live: https://www.voult.dev  
 Repo: https://github.com/DevOlabode/voult
 
-**Deploying?** See [DEPLOY.md](./DEPLOY.md) for production readiness and env setup.
-
 ---
 
 ##  Features
