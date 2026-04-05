@@ -25,15 +25,6 @@ const EndUserSchema = new Schema(
       type : String,
     },
 
-    token :{
-      accessToken : {
-        type : String,
-      },
-      refreshToken : {
-        type : String
-      }
-    },
-
     fullName : {
       type : String,
       trim : true,

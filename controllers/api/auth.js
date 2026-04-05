@@ -82,7 +82,6 @@ module.exports.register = async (req, res) => {
 
   const token = signEndUserToken(user, app);
 
-  user.token.accessToken = token;
   await user.save();
 
 
@@ -193,10 +192,7 @@ module.exports.login = async (req, res) => {
     ipAddress: req.ip,
     userAgent: req.headers['user-agent']
   });
-
-  user.token.accessToken = accessToken;
-  user.token.refreshToken = refreshToken;
-
+  
   await user.save();
 
   res.status(200).json({
