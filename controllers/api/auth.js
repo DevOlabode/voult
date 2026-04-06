@@ -233,9 +233,6 @@ module.exports.logout = async (req, res) => {
   // Optional hard logout (kills any still-valid access tokens)
   req.endUser.tokenVersion += 1;
 
-  req.endUser.token.accessToken = null
-  req.endUser.token.refreshToken = null
-
   await req.endUser.save();
 
   res.status(200).json({

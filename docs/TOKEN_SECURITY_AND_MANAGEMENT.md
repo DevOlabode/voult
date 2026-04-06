@@ -299,9 +299,16 @@ module.exports.logout = async (req, res) => {
     // Even if logout fails, clear local tokens
     tokenManager.clearTokens();
     
-    res.status(error.response?.status || 500).json({
+    // Handle different error types safely
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message 
+                 || error.response?.data?.error 
+                 || error.message 
+                 || "Logout failed";
+    
+    res.status(status).json({
       success: false,
-      message: error.response?.data?.message || "Logout failed"
+      message
     });
   }
 };
