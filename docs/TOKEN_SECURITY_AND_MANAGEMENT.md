@@ -91,17 +91,28 @@ Your authentication system already has a proper token refresh mechanism:
 
 ## Implementation Examples
 
-### Option 1: Automatic Refresh in Your Application
+### Option 1: Complete TokenManager for Your Application
+
+This is a comprehensive TokenManager implementation for your consuming application:
 
 ```javascript
-// tokenManager.js
+// utils/tokenManager.js
+require('dotenv').config();
+const axios = require('axios');
+const fs = require('fs');
+
 class TokenManager {
   constructor() {
     this.accessToken = null;
     this.refreshToken = process.env.REFRESH_TOKEN;
     this.tokenExpiry = null;
+    this.apiUrl = process.env.API_URL || 'https://voult.dev/api';
   }
 
+  /**
+   * Get a valid access token, refreshing if necessary
+   * Use this for most API calls
+   */
   async getValidAccessToken() {
     // Return cached token if still valid (with 1-minute buffer)
     if (this.accessToken && this.tokenExpiry > Date.now() + 60000) {
@@ -109,33 +120,61 @@ class TokenManager {
     }
 
     // Refresh token
-    const response = await fetch('/api/session/refresh', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: this.refreshToken })
-    });
+    const response = await axios.post(
+      `${this.apiUrl}/session/refresh`,
+      { refreshToken: this.refreshToken }
+    );
 
-    if (!response.ok) {
-      throw new Error('Token refresh failed');
-    }
-
-    const { accessToken, refreshToken } = await response.json();
+    const { accessToken, refreshToken } = response.data;
     
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
-    
-    // Decode JWT to get expiry (or estimate 15 minutes)
-    this.tokenExpiry = Date.now() + 15 * 60 * 1000;
-    
-    // Update .env file with new refresh token
-    this.updateEnvFile('REFRESH_TOKEN', refreshToken);
+    this.setTokens(accessToken, refreshToken);
     
     return accessToken;
   }
 
+  /**
+   * Get current token WITHOUT auto-refreshing
+   * Use this for logout (even if expired, we want to revoke the session)
+   */
+  getCurrentToken() {
+    return this.accessToken;
+  }
+
+  /**
+   * Store tokens after login
+   */
+  setTokens(accessToken, refreshToken) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.tokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
+    
+    // Update .env with refresh token
+    this.updateEnvFile('REFRESH_TOKEN', refreshToken);
+  }
+
+  /**
+   * Clear all tokens (for logout)
+   */
+  clearTokens() {
+    this.accessToken = null;
+    this.refreshToken = null;
+    this.tokenExpiry = null;
+    
+    // Clear from .env file
+    this.updateEnvFile('REFRESH_TOKEN', '');
+  }
+
+  /**
+   * Update .env file
+   */
   updateEnvFile(key, value) {
-    const fs = require('fs');
     const envPath = '.env';
+    
+    if (!fs.existsSync(envPath)) {
+      console.warn('.env file not found');
+      return;
+    }
+    
     let content = fs.readFileSync(envPath, 'utf8');
     content = content.replace(
       new RegExp(`^${key}=.*`, 'm'),
@@ -145,10 +184,135 @@ class TokenManager {
   }
 }
 
-// Usage
-const tokenManager = new TokenManager();
-const token = await tokenManager.getValidAccessToken();
+module.exports = TokenManager;
 ```
+
+#### Usage Examples:
+
+**1. Initialize in your main app file:**
+```javascript
+// index.js or app.js
+const TokenManager = require('./utils/tokenManager');
+const tokenManager = new TokenManager();
+
+// Make it available throughout your app
+module.exports = { tokenManager };
+```
+
+**2. Store tokens after login:**
+```javascript
+// In your login controller/route
+const { tokenManager } = require('./index');
+
+module.exports.login = async (req, res) => {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/auth/login`,
+      req.body,
+      {
+        headers: {
+          'x-client-id': process.env.CLIENT_ID,
+          'x-client-secret': process.env.CLIENT_SECRET
+        }
+      }
+    );
+
+    // Store tokens in TokenManager
+    tokenManager.setTokens(
+      response.data.accessToken,
+      response.data.refreshToken
+    );
+
+    res.json({ success: true, data: response.data });
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || "Something went wrong"
+    });
+  }
+};
+```
+
+**3. Use for authenticated API calls:**
+```javascript
+// In any controller that needs authentication
+const { tokenManager } = require('./index');
+
+module.exports.getUserProfile = async (req, res) => {
+  try {
+    const token = await tokenManager.getValidAccessToken();
+    
+    const response = await axios.get(
+      `${process.env.API_URL}/user/profile`,
+      {
+        headers: {
+          'x-client-token': `Bearer ${token}`
+        }
+      }
+    );
+
+    res.json({ success: true, data: response.data });
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || "Something went wrong"
+    });
+  }
+};
+```
+
+**4. Proper logout implementation:**
+```javascript
+// In your logout controller
+const { tokenManager } = require('./index');
+
+module.exports.logout = async (req, res) => {
+  try {
+    // Get current token WITHOUT auto-refreshing
+    const currentToken = tokenManager.getCurrentToken();
+    
+    if (!currentToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'No active session to logout'
+      });
+    }
+
+    // Call logout endpoint with current token (even if expired)
+    await axios.post(
+      `${process.env.API_URL}/auth/logout`,
+      {},
+      {
+        headers: {
+          'x-client-token': `Bearer ${currentToken}`,
+          'x-client-id': process.env.CLIENT_ID,
+          'x-client-secret': process.env.CLIENT_SECRET
+        }
+      }
+    );
+
+    // Clear tokens after successful logout
+    tokenManager.clearTokens();
+
+    res.json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    // Even if logout fails, clear local tokens
+    tokenManager.clearTokens();
+    
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || "Logout failed"
+    });
+  }
+};
+```
+
+**Important Notes:**
+- Use `getValidAccessToken()` for most API calls (auto-refreshes if expired)
+- Use `getCurrentToken()` for logout (don't refresh, just use what you have)
+- Always call `setTokens()` after successful login
+- Always call `clearTokens()` after logout
+- The TokenManager automatically updates your `.env` file with new refresh tokens
 
 ### Option 2: Development Script for Token Refresh
 
