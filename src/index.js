@@ -102,7 +102,7 @@ app.use((req, res, next) => {
     res.locals.info = req.flash('info');
     res.locals.currentUser = req.user;
     next();
-  });
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ 
