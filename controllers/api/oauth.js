@@ -6,12 +6,107 @@ const App = require('../../models/app');
 const {createToken} = require('../../utils/createTokens');
 const exchangeCodeForToken = require('../../utils/exchangeCodeForToken');
 const getProviderProfile = require('../../utils/getProviderProfile');
+const generateProviderAuthUrl = require('../../services/oauth/generateProviderAuthUrl');
 
 function decodeState(state) {
   return JSON.parse(
     Buffer.from(state, 'base64url').toString()
   );
 }
+
+function encodeState(stateObj) {
+  return Buffer
+    .from(JSON.stringify(stateObj))
+    .toString('base64url');
+}
+
+// Generate OAuth authorization URL
+exports.generateAuthUrl = async (req, res) => {
+  try {
+    const { provider } = req.params;
+    const { intent, redirectUri } = req.body;
+    
+    // Validate required parameters
+    if (!intent || !redirectUri) {
+      return res.status(400).json({ 
+        error: 'MISSING_PARAMETERS',
+        message: 'intent and redirectUri are required' 
+      });
+    }
+
+    // Validate intent
+    const validIntents = ['register', 'login', 'link'];
+    if (!validIntents.includes(intent)) {
+      return res.status(400).json({ 
+        error: 'INVALID_INTENT',
+        message: 'intent must be one of: register, login, link' 
+      });
+    }
+
+    // Get app ID from request (could be from header, query, or body)
+    const appId = req.headers['x-app-id'] || req.query.appId || req.body.appId;
+    
+    if (!appId) {
+      return res.status(400).json({ 
+        error: 'MISSING_APP_ID',
+        message: 'App ID is required. Provide via X-App-ID header, query param, or body.' 
+      });
+    }
+
+    // For link intent, userId is required
+    if (intent === 'link' && !req.body.userId) {
+      return res.status(400).json({ 
+        error: 'MISSING_USER_ID',
+        message: 'userId is required for link intent' 
+      });
+    }
+
+    // Build state object
+    const stateObj = {
+      intent,
+      appId,
+      redirectUri,
+      ...(intent === 'link' && { userId: req.body.userId })
+    };
+
+    // Generate the authorization URL
+    const authUrl = await generateProviderAuthUrl(provider, stateObj, appId);
+
+    return res.json({ 
+      authUrl,
+      provider,
+      intent,
+      expiresInSeconds: 600 // Auth URLs typically expire in 10 minutes
+    });
+
+  } catch (error) {
+    console.error('Error generating auth URL:', error);
+    
+    if (error.message === 'INVALID_PROVIDER') {
+      return res.status(400).json({ 
+        error: 'INVALID_PROVIDER',
+        message: 'Unsupported OAuth provider' 
+      });
+    }
+    
+    if (error.message === 'GOOGLE_NOT_ENABLED' || 
+        error.message === 'FACEBOOK_NOT_ENABLED' ||
+        error.message === 'LINKEDIN_NOT_ENABLED' ||
+        error.message === 'MICROSOFT_NOT_ENABLED' ||
+        error.message === 'APPLE_NOT_ENABLED' ||
+        error.message === 'GITHUB_NOT_ENABLED') {
+      return res.status(403).json({ 
+        error: 'PROVIDER_NOT_ENABLED',
+        message: 'OAuth provider is not enabled for this app' 
+      });
+    }
+
+    return res.status(500).json({ 
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to generate authorization URL' 
+    });
+  }
+};
 
 exports.handleCallback = async (req, res) => {
   try {
