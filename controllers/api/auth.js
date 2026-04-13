@@ -24,10 +24,11 @@ const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
 // =======================
 module.exports.register = async (req, res) => {
   const { email, password, fullName } = req.body;
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
   const app = req.appClient;
 
-  if (!email || !password) {
+  if (!normalizedEmail || !password) {
     throw new ApiError(
       400,
       'VALIDATION_ERROR',
@@ -37,7 +38,7 @@ module.exports.register = async (req, res) => {
 
   const existingUser = await EndUser.findOne({
     app: app._id,
-    email
+    email: normalizedEmail
   });
 
   if (existingUser) {
@@ -60,7 +61,7 @@ module.exports.register = async (req, res) => {
   const user = new EndUser({
     fullName,
     app: app._id,
-    email
+    email: normalizedEmail
   });
 
   await user.setPassword(password);
@@ -114,15 +115,16 @@ const LOCK_TIME = 15 * 60 * 1000;
 // =======================
 module.exports.login = async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   const app = req.appClient;
 
-  if (!email || !password) {
+  if (!normalizedEmail || !password) {
     throw new ApiError(400, 'VALIDATION_ERROR', 'Email and password are required');
   }
 
   const user = await EndUser.findOne({
     app: app._id,
-    email,
+    email: normalizedEmail,
     deletedAt: null
   }).select('+passwordHash');
 
