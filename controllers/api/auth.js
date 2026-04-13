@@ -84,7 +84,6 @@ module.exports.register = async (req, res) => {
 
   await user.save();
 
-
   // Send verification email (non-blocking - don't fail registration if email fails)
   verifyEndUsers(
     user.email,
