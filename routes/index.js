@@ -27,6 +27,9 @@ router.use('/', webUserRoutes);
 router.use('/app', webAppRoutes);
 router.use('/', developerSettingsRoutes);
 
+const { verifyEndUserJWT } = require('../middleware/verifyEndUserJWT');
+router.use('/api', verifyEndUserJWT);
+
 // Mount API Routes
 router.use('/api/auth', apiAuthRoutes);
 router.use('/api/sessions', sessionRoutes);

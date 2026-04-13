@@ -9,9 +9,8 @@ const { apiLimiter } = require('../../middleware/rateLimiters');
 const verifyClient = require('../../middleware/verifyClient').verifyClient;
 const authController = require('../../controllers/api/auth');
 
-const { verifyEndUserJWT } = require('../../middleware/verifyEndUserJWT');
-
 const requireEndUserAuth = require('../../middleware/requireEndUserAuth');
+const requireActiveEndUser = require('../../middleware/requireActiveEndUser');
 
 const { authLimiter } = require('../../middleware/rateLimiters');
 
@@ -34,6 +33,6 @@ router.post('/register', validate(schemas.registerSchema), verifyClient, validat
 
 router.post('/login', validate(schemas.loginSchema), verifyClient, authLimiter, validateCallbackUrl, catchAsync(authController.login));  
 
-router.post('/logout', verifyClient, requireEndUserAuth, authLimiter, validateCallbackUrl, catchAsync(authController.logout));
+router.post('/logout', verifyClient, requireEndUserAuth, requireActiveEndUser, authLimiter, validateCallbackUrl, catchAsync(authController.logout));
 
 module.exports = router;

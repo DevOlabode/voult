@@ -5,14 +5,14 @@ const controller = require('../../controllers/api/session');
 
 const {verifyClient} = require('../../middleware/verifyClient');
 const requireEndUserAuth = require('../../middleware/requireEndUserAuth');
-const {verifyEndUserJWT} = require('../../middleware/verifyEndUserJWT')
+const requireActiveEndUser = require('../../middleware/requireActiveEndUser');
 
 const catchAsync = require('../../utils/catchAsync');
 
-router.get('/', requireEndUserAuth, catchAsync(controller.listSessions));
+router.get('/', requireEndUserAuth, requireActiveEndUser, catchAsync(controller.listSessions));
 
-router.get('/revoke/:sessionId', requireEndUserAuth, catchAsync(controller.revokeSession));
+router.get('/revoke/:sessionId', requireEndUserAuth, requireActiveEndUser, catchAsync(controller.revokeSession));
 
-router.get('/refresh', requireEndUserAuth, catchAsync(controller.refresh));                                               
+router.get('/refresh', requireEndUserAuth, requireActiveEndUser, catchAsync(controller.refresh));                                               
 
 module.exports = router;

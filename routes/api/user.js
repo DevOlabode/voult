@@ -7,9 +7,8 @@ const { apiLimiter } = require('../../middleware/rateLimiters');
 const { verifyClient } = require('../../middleware/verifyClient');
 const authController = require('../../controllers/api/auth');
 
-const { verifyEndUserJWT } = require('../../middleware/verifyEndUserJWT');
-
 const requireEndUserAuth = require('../../middleware/requireEndUserAuth');
+const requireActiveEndUser = require('../../middleware/requireActiveEndUser');
 
 const { authLimiter } = require('../../middleware/rateLimiters');
 
@@ -22,7 +21,7 @@ const validateCallbackUrl = require('../../middleware/validateCallbackUrl');
 
 const controller = require('../../controllers/api/user');
 
-router.get('/me', verifyEndUserJWT, catchAsync(controller.me));
+router.get('/me', catchAsync(controller.me));
 
 router.post('/forgot-password', verifyClient, catchAsync(controller.forgotPassword));
 
@@ -30,10 +29,10 @@ router.post('/reset-password', verifyClient, catchAsync(controller.resetPassword
 
 router.get('/verify-email', catchAsync(controller.verifyEmail));
 
-router.post('/disable', verifyEndUserJWT, requireEndUserAuth, catchAsync(controller.disableAccount));
+router.post('/disable', requireEndUserAuth, requireActiveEndUser, catchAsync(controller.disableAccount));
 
 router.post('/reenable', requireEndUserAuth, catchAsync(controller.reenableAccount));
 
-router.patch('/me', verifyEndUserJWT, catchAsync(controller.updateProfile));
+router.patch('/me', requireEndUserAuth, requireActiveEndUser, catchAsync(controller.updateProfile));
 
 module.exports = router;

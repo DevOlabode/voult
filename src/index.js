@@ -57,6 +57,7 @@ const corsOptions = {
     'Content-Type',
     'x-client-secret',
     'X-Client-Id',
+    'x-client-token',
     'Authorization'
   ]
 };

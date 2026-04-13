@@ -1,52 +1,34 @@
-const jwt = require('jsonwebtoken');
-const EndUser = require('../models/endUser');
 const { ApiError } = require('../utils/apiError');
 
-module.exports = async function requireEndUserAuth(req, res, next) {
-  const authHeader = req.headers['x-client-token'];
+function appIdFromPayload(payload) {
+  if (!payload) return null;
+  const raw = payload.appId != null ? payload.appId : payload.app;
+  return raw != null ? String(raw) : null;
+}
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(
-      401,
-      'UNAUTHORIZED',
-      'Authentication token is required'
-    );
-  };
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const payload = jwt.verify(token, process.env.ENDUSER_JWT_SECRET);
-
-    const user = await EndUser.findById(payload.sub).select('+linkedProviders');
-
-    if (!user) {
-      throw new ApiError(
-        401,
-        'INVALID_TOKEN',
-        'Invalid or expired token'
-      );
-    }
-
-    if (user.tokenVersion !== payload.tokenVersion) {
-      throw new ApiError(
-        401,
-        'TOKEN_REVOKED',
-        'Token has been revoked'
-      );
-    }
-
-    req.endUser = user;
-    req.appId = payload.app;
-
-    next();
-  } catch (err) {
-    if (err instanceof ApiError) throw err;
-
-    throw new ApiError(
-      401,
-      'INVALID_TOKEN',
-      'Invalid or expired token'
+/**
+ * Enforces an authenticated end user (after global `verifyEndUserJWT`).
+ * Use after `verifyClient` when the route must also match the app embedded in the JWT.
+ */
+module.exports = function requireEndUserAuth(req, res, next) {
+  if (!req.endUser) {
+    return next(
+      new ApiError(401, 'UNAUTHORIZED', 'Authentication required')
     );
   }
+
+  if (req.appClient && req.tokenPayload) {
+    const tokenAppId = appIdFromPayload(req.tokenPayload);
+    if (tokenAppId && tokenAppId !== String(req.appClient._id)) {
+      return next(
+        new ApiError(
+          403,
+          'TOKEN_APP_MISMATCH',
+          'Token does not belong to this application'
+        )
+      );
+    }
+  }
+
+  next();
 };

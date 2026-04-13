@@ -1,74 +1,66 @@
 const jwt = require('jsonwebtoken');
 const EndUser = require('../models/endUser');
-const { ApiError } = require('../utils/apiError');
 
 const JWT_SECRET = process.env.ENDUSER_JWT_SECRET;
 
+/**
+ * Reads `Authorization: Bearer <token>` first, then legacy `x-client-token: Bearer <token>`.
+ */
+function getBearerToken(req) {
+  const auth = req.headers.authorization;
+  if (auth && typeof auth === 'string' && auth.startsWith('Bearer ')) {
+    return auth.slice(7).trim();
+  }
+  const legacy = req.headers['x-client-token'];
+  if (legacy && typeof legacy === 'string' && legacy.startsWith('Bearer ')) {
+    return legacy.slice(7).trim();
+  }
+  return null;
+}
+
+function appIdFromPayload(payload) {
+  if (!payload) return null;
+  const raw = payload.appId != null ? payload.appId : payload.app;
+  return raw != null ? String(raw) : null;
+}
+
+/**
+ * Soft JWT identity: parses and verifies when a Bearer token is present, attaches
+ * `req.endUser`, `req.user` (safe shape), and `req.tokenPayload`. Never throws;
+ * invalid or missing auth continues without attachment.
+ */
 module.exports.verifyEndUserJWT = async (req, res, next) => {
-  const authHeader = req.headers['x-client-token'];
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(
-      401,
-      'UNAUTHORIZED',
-      'Authentication token is required'
-    );
-  };
-
-  const token = authHeader.split(' ')[1];
-
   try {
+    const token = getBearerToken(req);
+    if (!token) {
+      return next();
+    }
+
     const payload = jwt.verify(token, JWT_SECRET);
 
     const endUser = await EndUser.findById(payload.sub).select('+linkedProviders');
 
     if (!endUser) {
-      throw new ApiError(
-        401,
-        'INVALID_TOKEN',
-        'Invalid authentication token'
-      );
+      return next();
     }
-
-    if (!endUser.isActive) {
-      throw new ApiError(
-        403,
-        'ACCOUNT_DISABLED',
-        'This account has been disabled'
-      );
-    }
-    
 
     if (endUser.tokenVersion !== payload.tokenVersion) {
-      throw new ApiError(
-        401,
-        'TOKEN_REVOKED',
-        'Token has been revoked'
-      );
+      return next();
     }
+
+    const tokenAppId = appIdFromPayload(payload);
+
+    req.tokenPayload = payload;
+    req.appId = tokenAppId || endUser.app;
 
     req.endUser = endUser;
-    req.tokenPayload = payload;
+    req.user = {
+      id: endUser._id,
+      email: endUser.email,
+    };
+
     next();
-
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      console.warn(`[AUTH] Expired token used`);
-      throw new ApiError(
-        401,
-        'TOKEN_EXPIRED',
-        'Authentication token has expired'
-      );
-    }
-
-    if (err instanceof ApiError) {
-      throw err;
-    }
-
-    throw new ApiError(
-      401,
-      'INVALID_TOKEN',
-      'Invalid authentication token'
-    );
+    next();
   }
 };
