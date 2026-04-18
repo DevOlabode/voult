@@ -1,0 +1,19 @@
+<div class="form">
+  <% if(!app.googleOAuth || !app.googleOAuth.enabled) { %>
+    <h2>Enable Google OAuth</h2>
+    <form method="POST">
+      <input name="clientId" placeholder="Client ID" required />
+      <input name="clientSecret" type="password" placeholder="Client Secret" required />
+      <input name="redirectUri" placeholder="https://yourapp.com/callback" required />
+      <button type="submit">Enable</button>
+    </form>
+  <% } else { %>
+    <h2>Update Google OAuth</h2>
+    <form method="POST" action="/app/<%= app._id %>/update-google-oauth">
+      <input name="clientId" value="<%= app.googleOAuth.clientId %>" required />
+      <input name="clientSecret" type="password" placeholder="Leave blank to keep current" />
+      <input name="redirectUri" value="<%= app.googleOAuth.redirectUri %>" required />
+      <button>Update</button>
+    </form>
+  <% } %>
+</div>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Voult OAuth SDK Demo</title></head>
+<body>
+  <h1>Google OAuth Demo</h1>
+  <button onclick="startGoogleAuth('register')">Register w/ Google</button>
+  <button onclick="startGoogleAuth('login')">Login w/ Google</button>
+  <div id="result"></div>
+
+  <script>
+    const APP_ID = 'YOUR_APP_ID_HERE'; // Get from dashboard
+
+    async function startGoogleAuth(intent) {
+      const res = await fetch('/api/google/authorize', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-App-ID': APP_ID
+        },
+        body: JSON.stringify({ 
+          intent, 
+          redirectUri: `${location.origin}/callback.html` 
+        })
+      });
+      const { authUrl } = await res.json();
+      window.location.href = authUrl;
+    }
+  </script>
+</body>
+</html>
