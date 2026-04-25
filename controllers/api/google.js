@@ -8,6 +8,31 @@ const {welcomeOAuthUser} = require('../../services/emailService');
 
 const App = require('../../models/app');
 
+const getAccessToken = async () => {
+  const params = new URLSearchParams({
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+    grant_type: 'refresh_token',
+  });
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params,
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Token request failed: ${err}`);
+  }
+
+  const data = await res.json();
+  return data.access_token;
+};
+
 module.exports.googleLogin = async (req, res) => {
   const { idToken } = req.body;
   const app = req.appClient;
