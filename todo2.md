@@ -23,6 +23,3 @@ TOODO In another codebase
 - [ ] Test Linkeldn oauth
 - [ ] Test Apple oauth
 - [ ] Improve voult codebase.
-- [ ]
-- [ ]
-- [ ]
