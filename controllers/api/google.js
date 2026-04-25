@@ -3,43 +3,84 @@ const { ApiError } = require('../../utils/apiError');
 const { signAccessToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
 const { OAuth2Client } = require('google-auth-library');
+const fetch = require('node-fetch'); // or global fetch (Node 18+)
 
-const {welcomeOAuthUser} = require('../../services/emailService');
-
+const { welcomeOAuthUser } = require('../../services/emailService');
 const App = require('../../models/app');
 
-const getAccessToken = async () => {
-  const params = new URLSearchParams({
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-    grant_type: 'refresh_token',
-  });
+async function getGooglePayload({ idToken, accessToken, clientId }) {
+  // -------- 1. Try ID TOKEN (preferred) --------
+  if (idToken) {
+    const client = new OAuth2Client(clientId);
 
-  const res = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params,
-  });
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: clientId
+      });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Token request failed: ${err}`);
+      return {
+        ...ticket.getPayload(),
+        _tokenType: 'id_token'
+      };
+    } catch (err) {
+      // If accessToken exists, fallback. Otherwise fail.
+      if (!accessToken) {
+        throw new ApiError(
+          401,
+          'INVALID_GOOGLE_TOKEN',
+          'Invalid Google ID token'
+        );
+      }
+    }
   }
 
-  const data = await res.json();
-  return data.access_token;
-};
+  // -------- 2. Fallback: ACCESS TOKEN --------
+  if (accessToken) {
+    const res = await fetch(
+      'https://www.googleapis.com/oauth2/v3/userinfo',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
 
+    if (!res.ok) {
+      throw new ApiError(
+        401,
+        'INVALID_GOOGLE_TOKEN',
+        'Invalid Google access token'
+      );
+    }
+
+    const data = await res.json();
+
+    return {
+      sub: data.sub,
+      email: data.email,
+      email_verified: data.email_verified,
+      name: data.name,
+      given_name: data.given_name,
+      family_name: data.family_name,
+      _tokenType: 'access_token'
+    };
+  }
+
+  // -------- 3. No credential provided --------
+  throw new ApiError(
+    400,
+    'VALIDATION_ERROR',
+    'idToken or accessToken is required'
+  );
+}
+
+/* =========================================================
+   GOOGLE LOGIN
+========================================================= */
 module.exports.googleLogin = async (req, res) => {
-  const { idToken } = req.body;
+  const { idToken, accessToken } = req.body;
   const app = req.appClient;
-
-  if (!idToken) {
-    throw new ApiError(400, 'VALIDATION_ERROR', 'idToken is required');
-  }
 
   if (!app.googleOAuth?.clientId) {
     throw new ApiError(
@@ -49,29 +90,25 @@ module.exports.googleLogin = async (req, res) => {
     );
   }
 
-  /* -------- Verify Google ID token -------- */
-  const client = new OAuth2Client(app.googleOAuth.clientId);
-
-  let payload;
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: app.googleOAuth.clientId
-    });
-    payload = ticket.getPayload();
-  } catch (err) {
-    throw new ApiError(401, 'INVALID_GOOGLE_TOKEN', 'Invalid Google ID token');
-  }
+  /* -------- Verify token (id_token or access_token) -------- */
+  const payload = await getGooglePayload({
+    idToken,
+    accessToken,
+    clientId: app.googleOAuth.clientId
+  });
 
   const {
     sub: googleId,
     email,
-    email_verified,
-    name
+    email_verified
   } = payload;
 
-  if (!email_verified) {
-    throw new ApiError(403, 'EMAIL_NOT_VERIFIED', 'Google email not verified');
+  if (!email || !email_verified) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_VERIFIED',
+      'Google email not verified'
+    );
   }
 
   /* -------- Find existing user -------- */
@@ -90,7 +127,11 @@ module.exports.googleLogin = async (req, res) => {
   }
 
   if (!user.isActive) {
-    throw new ApiError(403, 'ACCOUNT_DISABLED', 'Account is disabled');
+    throw new ApiError(
+      403,
+      'ACCOUNT_DISABLED',
+      'Account is disabled'
+    );
   }
 
   /* -------- Link Google if not linked -------- */
@@ -104,7 +145,7 @@ module.exports.googleLogin = async (req, res) => {
   await user.save();
 
   /* -------- Issue tokens -------- */
-  const accessToken = signAccessToken(user, app);
+  const accessTokenJwt = signAccessToken(user, app);
 
   const { rawToken: refreshToken } = await createRefreshToken({
     endUser: user,
@@ -115,7 +156,7 @@ module.exports.googleLogin = async (req, res) => {
 
   res.status(200).json({
     message: 'Google login successful',
-    accessToken,
+    accessToken: accessTokenJwt,
     refreshToken,
     user: {
       id: user._id,
@@ -124,14 +165,12 @@ module.exports.googleLogin = async (req, res) => {
   });
 };
 
+/* =========================================================
+   GOOGLE REGISTER
+========================================================= */
 module.exports.googleRegister = async (req, res) => {
-  const { idToken } = req.body;
+  const { idToken, accessToken } = req.body;
   const app = req.appClient;
-
-  /* ---------- Validation ---------- */
-  if (!idToken) {
-    throw new ApiError(400, 'VALIDATION_ERROR', 'idToken is required');
-  }
 
   if (!app.googleOAuth?.clientId) {
     throw new ApiError(
@@ -141,23 +180,12 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  /* ---------- Verify Google ID Token ---------- */
-  const client = new OAuth2Client(app.googleOAuth.clientId);
-
-  let payload;
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: app.googleOAuth.clientId
-    });
-    payload = ticket.getPayload();
-  } catch {
-    throw new ApiError(
-      401,
-      'INVALID_GOOGLE_TOKEN',
-      'Invalid Google ID token'
-    );
-  }
+  /* -------- Verify token (id_token or access_token) -------- */
+  const payload = await getGooglePayload({
+    idToken,
+    accessToken,
+    clientId: app.googleOAuth.clientId
+  });
 
   const {
     sub: googleId,
@@ -176,13 +204,13 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  /* ---------- Fallback-safe fullName ---------- */
+  /* -------- Build full name safely -------- */
   const fullName =
     (given_name && family_name && `${given_name} ${family_name}`) ||
     name ||
-    null; // IMPORTANT: do not fake names
+    null;
 
-  /* ---------- Prevent duplicates ---------- */
+  /* -------- Prevent duplicates -------- */
   const existingUser = await EndUser.findOne({
     app: app._id,
     email,
@@ -197,11 +225,11 @@ module.exports.googleRegister = async (req, res) => {
     );
   }
 
-  /* ---------- Create user ---------- */
+  /* -------- Create user -------- */
   const user = await EndUser.create({
     app: app._id,
     email,
-    fullName,          // may be null
+    fullName,
     googleId,
     authProvider: 'google',
     isEmailVerified: true,
@@ -214,7 +242,7 @@ module.exports.googleRegister = async (req, res) => {
     { $inc: { 'usage.totalRegistrations': 1 } }
   );
 
-  /* ---------- Welcome email (non-blocking UX assumed) ---------- */
+  /* -------- Send welcome email -------- */
   await welcomeOAuthUser({
     to: email,
     name: fullName,
@@ -222,8 +250,8 @@ module.exports.googleRegister = async (req, res) => {
     provider: 'Google'
   });
 
-  /* ---------- Issue tokens ---------- */
-  const accessToken = signAccessToken(user, app);
+  /* -------- Issue tokens -------- */
+  const accessTokenJwt = signAccessToken(user, app);
 
   const { rawToken: refreshToken } = await createRefreshToken({
     endUser: user,
@@ -232,10 +260,9 @@ module.exports.googleRegister = async (req, res) => {
     userAgent: req.headers['user-agent']
   });
 
-  /* ---------- Response ---------- */
   res.status(201).json({
     message: 'Google registration successful',
-    accessToken,
+    accessToken: accessTokenJwt,
     refreshToken,
     user: {
       id: user._id,
