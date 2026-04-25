@@ -12,3 +12,17 @@
 - NOTIFICATION VIA ...
 
 - TEST THE LINK GOOGLE AND GITHUB FEATURE IN THE SETTINGS PAGE AFTER UNSUSPENDING THE MAIN SITE.
+
+
+TOODO In another codebase
+- [ ] Test google oauth in another codebase.
+- [ ] Test custom oauth (email + password)
+- [ ] Test github oauth
+- [ ] Test microsoft oauth
+- [ ] Test Facebook oauth
+- [ ] Test Linkeldn oauth
+- [ ] Test Apple oauth
+- [ ] Improve voult codebase.
+- [ ]
+- [ ]
+- [ ]
