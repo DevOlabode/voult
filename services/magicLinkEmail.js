@@ -43,12 +43,12 @@ module.exports.magicLinkEmail = (to, magicLinkURL) => {
                   <tr><td height="10"></td></tr>
   
                   <!-- Body text -->
-                  <tr>
-                    <td style="font-size:14px; color:#444; line-height:1.6;">
-                      Click the button below to securely sign in to your account.
-                      This link will expire in 10 minutes.
-                    </td>
-                  </tr>
+                <tr>
+                <td style="font-size:14px; color:#444; line-height:1.6;">
+                    Click the button below to securely sign in to your existing account.
+                    This link will expire in 10 minutes.
+                </td>
+                </tr>
   
                   <!-- Spacer -->
                   <tr><td height="24"></td></tr>

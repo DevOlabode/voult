@@ -11,16 +11,41 @@
 
 const { magicLinkEmail } = require('../../services/magicLinkEmail');
 const MagicLinkToken = require('../../models/MagicLinkToken');
+const EndUser = require('../../models/endUser');
+const App = require('../../models/app');
+const { createTokens } = require('../../utils/createTokens');
 const crypto = require('crypto');
 
+/**
+ * Send Magic Link
+ * POST /api/send-magic-link
+ * Body: { email: string, clientId: string }
+ */
 module.exports.sendLink = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, clientId } = req.body;
 
+    // Validate input
     if (!email || !email.includes('@')) {
       return res.status(400).json({
         success: false,
         message: 'A valid email address is required'
+      });
+    }
+
+    if (!clientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Client ID (appId) is required'
+      });
+    }
+
+    // Find the app
+    const app = await App.findOne({ clientId });
+    if (!app || !app.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'App not found or inactive'
       });
     }
 
@@ -33,6 +58,7 @@ module.exports.sendLink = async (req, res) => {
     // Create and save the token record
     const tokenDoc = new MagicLinkToken({
       email: email.toLowerCase().trim(),
+      app: app._id,
       tokenHash: MagicLinkToken.hashToken(rawToken),
       expiresAt
     });
@@ -48,7 +74,7 @@ module.exports.sendLink = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Magic link sent successfully. Please check your email'
+      message: 'Magic link sent successfully. Please check your email.'
     });
 
   } catch (err) {
@@ -60,6 +86,11 @@ module.exports.sendLink = async (req, res) => {
   }
 };
 
+/**
+ * Validate Magic Link Token and Authenticate User
+ * POST /api/validate-magic-link
+ * Body: { token: string }
+ */
 module.exports.validateToken = async (req, res) => {
   try {
     const { token } = req.body;
@@ -71,6 +102,7 @@ module.exports.validateToken = async (req, res) => {
       });
     }
 
+    // Find and validate the token
     const tokenDoc = await MagicLinkToken.findAndValidateToken(token);
 
     if (!tokenDoc) {
@@ -80,13 +112,52 @@ module.exports.validateToken = async (req, res) => {
       });
     }
 
+    // Find or create the end user
+    let user = await EndUser.findOne({ 
+      email: tokenDoc.email, 
+      app: tokenDoc.app 
+    });
+
+    if (!user) {
+      // User doesn't exist - this is an error per requirements
+      // Mark token as used to prevent reuse
+      await tokenDoc.markAsUsed();
+      
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email. Please register first.'
+      });
+    }
+
     // Mark token as used
     await tokenDoc.markAsUsed();
 
+    // Update user's last login and email verification
+    user.lastLoginAt = new Date();
+    user.isEmailVerified = true;
+    await user.save();
+
+    // Generate JWT tokens
+    const { accessToken, refreshToken } = await createTokens({
+      user,
+      app: tokenDoc.app,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+
     res.status(200).json({
       success: true,
-      message: 'Token is valid',
-      email: tokenDoc.email
+      message: 'Authentication successful',
+      data: {
+        accessToken,
+        refreshToken,
+        user: {
+          id: user._id,
+          email: user.email,
+          fullName: user.fullName,
+          isEmailVerified: user.isEmailVerified
+        }
+      }
     });
 
   } catch (err) {

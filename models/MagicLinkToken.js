@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
+const {Schema} = mongoose;
 const crypto = require('crypto');
 
-const magicLinkTokenSchema = new mongoose.Schema({
+const magicLinkTokenSchema = new Schema({
   email: {
     type: String,
     required: true,
     lowercase: true,
     trim: true
+  },
+  app :{
+    type : Schema.Types.ObjectId,
+    ref : 'App',
+    required : true
   },
   tokenHash: {
     type: String,
