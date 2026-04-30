@@ -7,7 +7,7 @@ module.exports.getProviderVisibility = async (req, res) => {
     
     const app = await App.findOne({clientId});
     
-    if (!app & !app.isActive) {
+    if (!app || !app.isActive) {
       throw new ApiError(
         404,
         'APP_NOT_FOUND',
