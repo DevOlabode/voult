@@ -1,6 +1,6 @@
 /**
  * WHAT WORKS (Magic Link):
- * Generates a token and send it via email.
+ * Generates a token and send it in a URL via email.
  * Validates that the token is valid and not expired.
  * 
  * TODO:
