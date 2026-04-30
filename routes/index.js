@@ -5,7 +5,7 @@ const router = express.Router();
 const webAuthRoutes = require('./web/auth');
 const webUserRoutes = require('./web/user');
 const webAppRoutes = require('./web/app');
-const developerSettingsRoutes = require('./web/settings')
+const developerSettingsRoutes = require('./web/settings');
 
 // API Routes
 const apiAuthRoutes = require('./api/auth');

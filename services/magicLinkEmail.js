@@ -2,7 +2,7 @@ const {transporter} = require('../config/mailer');
 
 module.exports.magicLinkEmail = (to, magicLinkURL) => {
     return transporter.sendMail({
-      from: '"Voult" <noreply@voult.dev>',
+      from: '"Voult" <olabodeoluwapelumi838@gmail.com>',
       to,
       subject: "Your secure sign-in link",
       html: `
