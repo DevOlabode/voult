@@ -1,3 +1,14 @@
+/**
+ * WHAT WORKS (Magic Link):
+ * Generates a token and send it via email.
+ * Validates that the token is valid and not expired.
+ * 
+ * TODO:
+ * Find the user in the db. If user is not found return error.
+ * Generate JWT tokens for authentication
+ * Log the user into their app.
+ */
+
 const { magicLinkEmail } = require('../../services/magicLinkEmail');
 const MagicLinkToken = require('../../models/MagicLinkToken');
 const crypto = require('crypto');
@@ -37,7 +48,7 @@ module.exports.sendLink = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Magic link sent successfully. Please check your email.'
+      message: 'Magic link sent successfully. Please check your email'
     });
 
   } catch (err) {
