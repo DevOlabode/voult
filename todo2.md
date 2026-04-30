@@ -11,10 +11,7 @@
 - SECURITY KEY
 - NOTIFICATION VIA ...
 
-- TEST THE LINK GOOGLE AND GITHUB FEATURE IN THE SETTINGS PAGE AFTER UNSUSPENDING THE MAIN SITE.
-
-
-TOODO In another codebase
+TODO In another codebase
 - [ ] Test google oauth in another codebase.
 - [ ] Test custom oauth (email + password)
 - [ ] Test github oauth

@@ -98,6 +98,8 @@ A centralized authentication-as-a-service platform for developers.
   - [x] Microsoft App ID & Secret
 - [ ] OAuth redirect URI allowlist *
 - [x] Environment-specific OAuth configs (dev / prod)
+- [ ] Add passwordless authentication
+    - [ ] Magic Link
 
 ---
 
@@ -108,13 +110,14 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Add settings page to the frontend of the app.
 - [x] Enable developer google oauth login and register
 - [x] Enable developer github oauth login and register
+- [ ] Let user decide the password format/logic for their app.
 
 ## Frontend Features.
 - [ ] Look for a good template and good color pallete for this app.
 - [ ] Create a good/captivating landing page.
 - [ ] Restyle the entire app.
 - [ ] Add API Usage Page to the main app
-- [ ] Differentiate between the dashboard page and the apps list page
+- [x] Differentiate between the dashboard page and the apps list page
 - [ ] Add more features to the main app.
 
 ### 📊 App Insights & Auditing
