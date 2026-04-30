@@ -20,6 +20,7 @@ const oauthLinking = require('./api/oauthLinking');
 const oauth = require('./api/oauth');
 const providerVisibility = require('./api/providerVisibility');
 const userOAuthAccounts = require('./api/userOAuthAccounts');
+const magicLinkRoutes = require('./api/magicLink');
 
 // Mount Web Routes
 router.use('/', webAuthRoutes);
@@ -43,6 +44,7 @@ router.use('/api', oauthLinking);
 router.use('/api', oauth);
 router.use('/api', providerVisibility);
 router.use('/api', userOAuthAccounts);
+router.use('/api', magicLinkRoutes);
 // router.use('/api/health', healthRoutes);
 
 router.use(require('../middleware/apiErrorHandler'));
