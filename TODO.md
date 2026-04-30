@@ -111,6 +111,7 @@ A centralized authentication-as-a-service platform for developers.
 - [x] Enable developer google oauth login and register
 - [x] Enable developer github oauth login and register
 - [ ] Let user decide the password format/logic for their app.
+- [ ] Add a copy button to the appID and maybe the clientSecret
 
 ## Frontend Features.
 - [ ] Look for a good template and good color pallete for this app.
