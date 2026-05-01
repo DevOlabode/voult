@@ -4,7 +4,7 @@ This guide explains how to use the magic link authentication feature to authenti
 
 ## Overview
 
-The magic link system allows users to authenticate by clicking a link sent to their email. The link redirects to the **developer's app URL** (not voult.dev), and the developer's frontend then exchanges the token for JWT authentication tokens.
+The magic link system allows users to authenticate by clicking a link sent to their email. The link redirects to the **developer's app URL**, and the developer's frontend then exchanges the token for JWT authentication tokens.
 
 ## How It Works
 

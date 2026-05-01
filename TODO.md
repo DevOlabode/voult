@@ -99,7 +99,7 @@ A centralized authentication-as-a-service platform for developers.
 - [ ] OAuth redirect URI allowlist *
 - [x] Environment-specific OAuth configs (dev / prod)
 - [ ] Add passwordless authentication
-    - [ ] Magic Link
+    - [x] Magic Link
 
 ---
 
