@@ -27,7 +27,11 @@ const magicLinkTokenSchema = new Schema({
     type: Boolean,
     default: false
   },
-  usedAt: Date
+  usedAt: Date,
+  redirectUri: {
+    type: String,
+    required: true
+  }
 }, { timestamps: true });
 
 // Index for cleanup and lookup

@@ -1,314 +1,38 @@
 # Magic Link Authentication Implementation Guide
 
-This guide explains how to complete the magic link authentication feature to find users, generate JWT tokens, and log them into their app.
+This guide explains how to use the magic link authentication feature to authenticate users into their apps using the developer's own redirect URI.
 
-## Current State
+## Overview
 
-The magic link system currently:
-- ✅ Generates secure tokens
-- ✅ Stores tokens in the database with expiration
-- ✅ Sends tokens via email
-- ✅ Validates tokens when users click the link
+The magic link system allows users to authenticate by clicking a link sent to their email. The link redirects to the **developer's app URL** (not voult.dev), and the developer's frontend then exchanges the token for JWT authentication tokens.
 
-**What's missing:**
-- ❌ Finding/creating the end user
-- ❌ Generating JWT tokens for authentication
-- ❌ Logging the user into their app
+## How It Works
 
-## Implementation Steps
+1. **Developer sends magic link request** with user email, clientId, and their app's redirect URI
+2. **System generates a secure token** and stores it in the database
+3. **Email is sent** with a link to the developer's redirect URI (including the token)
+4. **User clicks the link** and is redirected to the developer's app
+5. **Developer's frontend extracts the token** from the URL
+6. **Developer's frontend calls `/api/validate-magic-link`** with the token
+7. **System validates token**, finds the user, generates JWT tokens, and returns them
+8. **Developer's app stores tokens** and logs the user in
 
-### Step 1: Update the Magic Link Token Model
+## API Endpoints
 
-The `MagicLinkToken` model needs to store the app association so we know which app the user is logging into.
+### 1. Send Magic Link
 
-**File: `models/MagicLinkToken.js`**
+**POST** `/api/send-magic-link`
 
-```javascript
-const mongoose = require('mongoose');
-const crypto = require('crypto');
-
-const magicLinkTokenSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true
-  },
-  app: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'App',
-    required: true
-  },
-  tokenHash: {
-    type: String,
-    required: true,
-    select: false
-  },
-  expiresAt: {
-    type: Date,
-    required: true
-  },
-  used: {
-    type: Boolean,
-    default: false
-  },
-  usedAt: Date
-}, { timestamps: true });
-
-// Index for cleanup and lookup
-magicLinkTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-magicLinkTokenSchema.index({ email: 1 });
-
-// Static method to hash tokens
-magicLinkTokenSchema.statics.hashToken = function(token) {
-  return crypto
-    .createHash('sha256')
-    .update(token)
-    .digest('hex');
-};
-
-// Static method to find and validate a token
-magicLinkTokenSchema.statics.findAndValidateToken = async function(rawToken) {
-  const tokenHash = this.hashToken(rawToken);
-  const tokenDoc = await this.findOne({ tokenHash, used: false })
-    .select('+tokenHash')
-    .populate('app');
-  
-  if (!tokenDoc) {
-    return null;
-  }
-  
-  if (tokenDoc.expiresAt < new Date()) {
-    // Token expired, delete it
-    await this.deleteOne({ _id: tokenDoc._id });
-    return null;
-  }
-  
-  return tokenDoc;
-};
-
-// Method to mark token as used
-magicLinkTokenSchema.methods.markAsUsed = function() {
-  this.used = true;
-  this.usedAt = new Date();
-  return this.save();
-};
-
-module.exports = mongoose.models.MagicLinkToken || mongoose.model('MagicLinkToken', magicLinkTokenSchema);
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "clientId": "app_abc123def456",
+  "redirectUri": "https://developer-app.com/auth/callback"
+}
 ```
 
-### Step 2: Update the Magic Link Controller
-
-**File: `controllers/api/magicLink.js`**
-
-```javascript
-const { magicLinkEmail } = require('../../services/magicLinkEmail');
-const MagicLinkToken = require('../../models/MagicLinkToken');
-const EndUser = require('../../models/endUser');
-const App = require('../../models/app');
-const { createTokens } = require('../../utils/createTokens');
-const crypto = require('crypto');
-
-/**
- * Send Magic Link
- * POST /api/send-magic-link
- * Body: { email: string, clientId: string }
- */
-module.exports.sendLink = async (req, res) => {
-  try {
-    const { email, clientId } = req.body;
-
-    // Validate input
-    if (!email || !email.includes('@')) {
-      return res.status(400).json({
-        success: false,
-        message: 'A valid email address is required'
-      });
-    }
-
-    if (!clientId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Client ID (appId) is required'
-      });
-    }
-
-    // Find the app
-    const app = await App.findOne({ clientId });
-    if (!app || !app.isActive) {
-      return res.status(404).json({
-        success: false,
-        message: 'App not found or inactive'
-      });
-    }
-
-    // Generate a secure random token
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    
-    // Set token expiration (10 minutes)
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    
-    // Create and save the token record
-    const tokenDoc = new MagicLinkToken({
-      email: email.toLowerCase().trim(),
-      app: app._id,
-      tokenHash: MagicLinkToken.hashToken(rawToken),
-      expiresAt
-    });
-    
-    await tokenDoc.save();
-
-    // Build the magic link URL
-    const baseUrl = process.env.APP_URL || 'https://voult.dev';
-    const magicLinkURL = `${baseUrl}/magic-link?token=${rawToken}`;
-
-    // Send the email
-    await magicLinkEmail(email, magicLinkURL);
-
-    res.status(200).json({
-      success: true,
-      message: 'Magic link sent successfully. Please check your email.'
-    });
-
-  } catch (err) {
-    console.error('Magic link error:', err);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to send magic link. Please try again later.'
-    });
-  }
-};
-
-/**
- * Validate Magic Link Token and Authenticate User
- * POST /api/validate-magic-link
- * Body: { token: string }
- */
-module.exports.validateToken = async (req, res) => {
-  try {
-    const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token is required'
-      });
-    }
-
-    // Find and validate the token
-    const tokenDoc = await MagicLinkToken.findAndValidateToken(token);
-
-    if (!tokenDoc) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired token'
-      });
-    }
-
-    // Find or create the end user
-    let user = await EndUser.findOne({ 
-      email: tokenDoc.email, 
-      app: tokenDoc.app 
-    });
-
-    if (!user) {
-      // User doesn't exist - this is an error per requirements
-      // Mark token as used to prevent reuse
-      await tokenDoc.markAsUsed();
-      
-      return res.status(404).json({
-        success: false,
-        message: 'No account found with this email. Please register first.'
-      });
-    }
-
-    // Mark token as used
-    await tokenDoc.markAsUsed();
-
-    // Update user's last login and email verification
-    user.lastLoginAt = new Date();
-    user.isEmailVerified = true;
-    await user.save();
-
-    // Generate JWT tokens
-    const { accessToken, refreshToken } = await createTokens({
-      user,
-      app: tokenDoc.app,
-      ipAddress: req.ip,
-      userAgent: req.get('User-Agent')
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Authentication successful',
-      data: {
-        accessToken,
-        refreshToken,
-        user: {
-          id: user._id,
-          email: user.email,
-          fullName: user.fullName,
-          isEmailVerified: user.isEmailVerified
-        }
-      }
-    });
-
-  } catch (err) {
-    console.error('Token validation error:', err);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to validate token'
-    });
-  }
-};
-```
-
-### Step 3: Update Routes
-
-**File: `routes/api/magicLink.js`**
-
-```javascript
-const express = require('express');
-const router = express.Router();
-const controller = require('../../controllers/api/magicLink');
-const catchAsync = require('../../utils/catchAsync');
-
-router.post('/send-magic-link', catchAsync(controller.sendLink));
-router.post('/validate-magic-link', catchAsync(controller.validateToken));
-
-module.exports = router;
-```
-
-### Step 4: Update the Email Service (Optional)
-
-You might want to update the email to mention that the user must already have an account:
-
-**File: `services/magicLinkEmail.js`**
-
-Update the email body text to:
-```html
-<tr>
-  <td style="font-size:14px; color:#444; line-height:1.6;">
-    Click the button below to securely sign in to your existing account.
-    This link will expire in 10 minutes.
-  </td>
-</tr>
-```
-
-## API Usage Examples
-
-### 1. Request Magic Link
-
-```bash
-curl -X POST http://localhost:3000/api/send-magic-link \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "clientId": "app_abc123def456"
-  }'
-```
-
-**Response:**
+**Response (Success):**
 ```json
 {
   "success": true,
@@ -316,17 +40,26 @@ curl -X POST http://localhost:3000/api/send-magic-link \
 }
 ```
 
-### 2. Validate Token and Login
-
-```bash
-curl -X POST http://localhost:3000/api/validate-magic-link \
-  -H "Content-Type: application/json" \
-  -d '{
-    "token": "abc123...xyz789"
-  }'
+**Response (Error - Missing redirectUri):**
+```json
+{
+  "success": false,
+  "message": "Redirect URI (developer app URL) is required"
+}
 ```
 
-**Success Response:**
+### 2. Validate Magic Link Token
+
+**POST** `/api/validate-magic-link`
+
+**Request Body:**
+```json
+{
+  "token": "abc123...xyz789"
+}
+```
+
+**Response (Success):**
 ```json
 {
   "success": true,
@@ -344,7 +77,7 @@ curl -X POST http://localhost:3000/api/validate-magic-link \
 }
 ```
 
-**Error Response (User Not Found):**
+**Response (Error - User Not Found):**
 ```json
 {
   "success": false,
@@ -352,72 +85,207 @@ curl -X POST http://localhost:3000/api/validate-magic-link \
 }
 ```
 
-## Frontend Integration Example
+**Response (Error - Invalid/Expired Token):**
+```json
+{
+  "success": false,
+  "message": "Invalid or expired token"
+}
+```
+
+## Database Schema
+
+### MagicLinkToken Model
 
 ```javascript
-// 1. Request magic link
-async function requestMagicLink(email, clientId) {
-  const response = await fetch('/api/send-magic-link', {
+{
+  email: String,           // User's email
+  app: ObjectId,           // Reference to App
+  tokenHash: String,       // Hashed token (not returned)
+  expiresAt: Date,         // Token expiration (10 minutes)
+  used: Boolean,           // Whether token has been used
+  usedAt: Date,            // When token was used
+  redirectUri: String,     // Developer's app URL
+  createdAt: Date,         // When token was created
+  updatedAt: Date          // Last update
+}
+```
+
+## Implementation Details
+
+### Token Generation & Storage
+
+- Tokens are 32-byte random hex strings (256-bit security)
+- Tokens are hashed using SHA-256 before storage
+- Tokens expire after 10 minutes
+- Expired tokens are automatically deleted on access attempt
+- Tokens can only be used once
+
+### Email Content
+
+The email contains a link to the **developer's redirect URI** with the token as a query parameter:
+
+```
+https://developer-app.com/auth/callback?token=abc123...xyz789
+```
+
+### User Authentication Flow
+
+1. When `validateToken` is called:
+   - Token is validated (exists, not expired, not used)
+   - User is looked up by email + app
+   - If user not found, returns 404 error
+   - Token is marked as used
+   - User's `lastLoginAt` is updated
+   - User's `isEmailVerified` is set to true
+   - JWT access and refresh tokens are generated
+   - Tokens are returned to the caller
+
+## Frontend Integration Example
+
+Here's how a developer would integrate magic link authentication into their app:
+
+```javascript
+// 1. Request magic link (from developer's login page)
+async function requestMagicLink(email) {
+  const response = await fetch('https://voult.dev/api/send-magic-link', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, clientId })
+    body: JSON.stringify({
+      email: email,
+      clientId: 'app_abc123def456',
+      redirectUri: 'https://myapp.com/auth/callback'
+    })
   });
   return await response.json();
 }
 
-// 2. Validate token and login
-async function validateMagicLink(token) {
-  const response = await fetch('/api/validate-magic-link', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token })
-  });
-  const data = await response.json();
+// 2. Handle magic link callback (at /auth/callback route)
+function handleMagicLinkCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
   
-  if (data.success) {
-    // Store tokens
-    localStorage.setItem('accessToken', data.data.accessToken);
-    localStorage.setItem('refreshToken', data.data.refreshToken);
-    localStorage.setItem('user', JSON.stringify(data.data.user));
+  if (!token) {
+    // No token in URL, redirect to login
+    window.location.href = '/login';
+    return;
+  }
+  
+  // Clear the URL
+  window.history.replaceState({}, document.title, '/auth/callback');
+  
+  // Validate token and get JWTs
+  validateMagicLink(token);
+}
+
+// 3. Validate token and login
+async function validateMagicLink(token) {
+  try {
+    const response = await fetch('https://voult.dev/api/validate-magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
     
-    // Redirect to dashboard
-    window.location.href = '/dashboard';
-  } else {
-    alert(data.message);
+    const data = await response.json();
+    
+    if (data.success) {
+      // Store tokens securely
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      // Set up authorization header for future requests
+      setupAuthHeader(data.data.accessToken);
+      
+      // Redirect to dashboard or intended destination
+      window.location.href = '/dashboard';
+    } else {
+      // Show error
+      alert(data.message);
+      window.location.href = '/login';
+    }
+  } catch (error) {
+    console.error('Magic link validation error:', error);
+    alert('Authentication failed. Please try again.');
+    window.location.href = '/login';
   }
 }
 
-// 3. Handle magic link click
-// If user clicks link: https://voult.dev/magic-link?token=abc123
-const urlParams = new URLSearchParams(window.location.search);
-const token = urlParams.get('token');
-if (token) {
-  validateMagicLink(token);
+// 4. Helper to set up auth header
+function setupAuthHeader(accessToken) {
+  // This would be called before each API request
+  // Example: axios.interceptors.request.use(config => {
+  //   config.headers.Authorization = `Bearer ${accessToken}`;
+  //   return config;
+  // });
+}
+
+// Initialize on page load
+if (window.location.pathname === '/auth/callback') {
+  handleMagicLinkCallback();
 }
 ```
 
-## Testing Checklist
+## Testing
 
-- [ ] Send magic link with valid email and clientId
-- [ ] Verify email is received
-- [ ] Click magic link with valid token for existing user
-- [ ] Verify JWT tokens are returned
-- [ ] Verify user is logged in
-- [ ] Test with non-existent user (should return error)
-- [ ] Test with expired token (should return error)
-- [ ] Test with invalid token (should return error)
-- [ ] Test token can only be used once
-- [ ] Verify lastLoginAt is updated
-- [ ] Verify isEmailVerified is set to true
+### Test Request Magic Link
+
+```bash
+curl -X POST http://localhost:3000/api/send-magic-link \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "clientId": "app_abc123def456",
+    "redirectUri": "https://myapp.com/auth/callback"
+  }'
+```
+
+### Test Validate Token
+
+```bash
+curl -X POST http://localhost:3000/api/validate-magic-link \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "abc123...xyz789"
+  }'
+```
 
 ## Security Considerations
 
 1. **Token Expiration**: Tokens expire after 10 minutes
 2. **One-Time Use**: Tokens are marked as used after validation
-3. **HTTPS Only**: Magic links should only be sent over HTTPS in production
-4. **Rate Limiting**: Consider adding rate limiting to prevent email spam
+3. **HTTPS Only**: Always use HTTPS for magic links in production
+4. **Rate Limiting**: Implement rate limiting on the send-magic-link endpoint
 5. **User Existence**: The system only works for existing users (no auto-registration)
+6. **Redirect URI Validation**: The redirectUri must be a valid URL
+7. **Token Hashing**: Tokens are hashed before storage for security
+
+## Error Handling
+
+| Error | HTTP Status | Description |
+|-------|-------------|-------------|
+| Missing email | 400 | Email address is required |
+| Invalid email | 400 | Email format is invalid |
+| Missing clientId | 400 | Client ID is required |
+| Missing redirectUri | 400 | Redirect URI is required |
+| Invalid redirectUri | 400 | Redirect URI must be a valid URL |
+| App not found | 404 | App with given clientId doesn't exist |
+| App inactive | 404 | App has been deactivated |
+| User not found | 404 | No account with this email exists |
+| Invalid token | 400 | Token doesn't exist or is invalid |
+| Expired token | 400 | Token has expired |
+| Token already used | 400 | Token has already been used |
+
+## Best Practices
+
+1. **Store tokens securely**: Use httpOnly cookies or secure storage
+2. **Implement token refresh**: Use the refresh token to get new access tokens
+3. **Handle errors gracefully**: Show user-friendly error messages
+4. **Clear URL after token extraction**: Remove token from URL for security
+5. **Validate redirectUri**: Ensure it's a valid URL belonging to the developer
+6. **Monitor usage**: Track magic link requests to detect abuse
 
 ## Next Steps
 
-After implementing this guide, the magic link authentication will be complete and ready for production use.
+The magic link authentication system is now complete and ready for production use. Developers can integrate it into their applications by following the frontend integration example above.

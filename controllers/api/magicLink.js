@@ -19,11 +19,15 @@ const crypto = require('crypto');
 /**
  * Send Magic Link
  * POST /api/send-magic-link
- * Body: { email: string, clientId: string }
+ * Body: { email: string, clientId: string, redirectUri: string }
+ * 
+ * The redirectUri is the developer's app URL where the user should be sent
+ * after clicking the magic link. The developer's app will receive the token
+ * and then call /api/validate-magic-link to get JWT tokens.
  */
 module.exports.sendLink = async (req, res) => {
   try {
-    const { email, clientId } = req.body;
+    const { email, clientId, redirectUri } = req.body;
 
     // Validate input
     if (!email || !email.includes('@')) {
@@ -37,6 +41,23 @@ module.exports.sendLink = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Client ID (appId) is required'
+      });
+    }
+
+    if (!redirectUri) {
+      return res.status(400).json({
+        success: false,
+        message: 'Redirect URI (developer app URL) is required'
+      });
+    }
+
+    // Validate redirectUri format (must be a valid URL)
+    try {
+      new URL(redirectUri);
+    } catch (e) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid redirect URI format. Must be a valid URL.'
       });
     }
 
@@ -60,14 +81,15 @@ module.exports.sendLink = async (req, res) => {
       email: email.toLowerCase().trim(),
       app: app._id,
       tokenHash: MagicLinkToken.hashToken(rawToken),
-      expiresAt
+      expiresAt,
+      redirectUri
     });
     
     await tokenDoc.save();
 
-    // Build the magic link URL
-    const baseUrl = process.env.APP_URL || 'https://voult.dev';
-    const magicLinkURL = `${baseUrl}/magic-link?token=${rawToken}`;
+    // Build the magic link URL pointing to the developer's app
+    // The token is passed as a query parameter to the developer's redirect URI
+    const magicLinkURL = `${redirectUri}?token=${rawToken}`;
 
     // Send the email
     await magicLinkEmail(email, magicLinkURL);
