@@ -113,7 +113,7 @@ const LOCK_TIME = 15 * 60 * 1000;
 // =======================
 // LOGIN
 // =======================
-module.exports.login = async (req, res) => {
+module.exports.emailLogin = async (req, res) => {
   const { email, password } = req.body;
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   const app = req.appClient;
@@ -205,6 +205,10 @@ module.exports.login = async (req, res) => {
       email: user.email
     }
   });
+};
+
+module.exports.usernameLogin = async (req, res) => {
+
 };
 
 // =======================
