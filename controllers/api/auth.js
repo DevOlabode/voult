@@ -208,7 +208,8 @@ module.exports.emailLogin = async (req, res) => {
 };
 
 module.exports.usernameLogin = async (req, res) => {
-
+  const { username, password } = req.body;
+  res.send(req.body);
 };
 
 // =======================
