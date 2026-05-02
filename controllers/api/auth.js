@@ -137,6 +137,127 @@ module.exports.register = async (req, res) => {
   });
 };
 
+// =======================
+// USERNAME REGISTER
+// =======================
+module.exports.usernameRegister = async (req, res) => {
+  const { username, password, fullName, email } = req.body;
+  const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  const app = req.appClient;
+
+  // Username and password are required
+  if (!normalizedUsername || !password) {
+    throw new ApiError(
+      400,
+      'VALIDATION_ERROR',
+      'Username and password are required'
+    );
+  }
+
+  // Validate username format
+  const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
+  if (!usernameRegex.test(normalizedUsername)) {
+    throw new ApiError(
+      400,
+      'INVALID_USERNAME',
+      'Username must be 3-30 characters, alphanumeric and underscores only'
+    );
+  }
+
+  // Check if username is already taken
+  const existingUsernameUser = await EndUser.findOne({
+    app: app._id,
+    username: normalizedUsername,
+    deletedAt: null
+  });
+
+  if (existingUsernameUser) {
+    throw new ApiError(
+      409,
+      'USERNAME_TAKEN',
+      'Username is already taken'
+    );
+  }
+
+  // Check if email is already taken (if provided)
+  if (normalizedEmail) {
+    const existingEmailUser = await EndUser.findOne({
+      app: app._id,
+      email: normalizedEmail,
+      deletedAt: null
+    });
+
+    if (existingEmailUser) {
+      throw new ApiError(
+        409,
+        'USER_EXISTS',
+        'User with that email already exists'
+      );
+    }
+  }
+
+  // Validate password strength
+  if (!validatePassword(password)) {
+    throw new ApiError(
+      400,
+      'WEAK_PASSWORD',
+      PASSWORD_RULES_MESSAGE
+    );
+  }
+
+  // Create user with username (email is optional)
+  const user = new EndUser({
+    fullName,
+    app: app._id,
+    username: normalizedUsername,
+    email: normalizedEmail || undefined
+  });
+
+  await user.setPassword(password);
+
+  const appO = await App.findById(app._id);
+
+  const userPerApp = await EndUser.countDocuments({ app: appO._id });
+  appO.usage.totalRegistrations = userPerApp;
+
+  await appO.save();
+
+  const verifyToken = await user.generateEmailVerificationToken();
+
+  const baseUrl = (process.env.BASE_URL || '').trim();
+  if (!baseUrl) {
+    throw new ApiError(500, 'CONFIG_ERROR', 'BASE_URL is not set. Set BASE_URL in .env (e.g. BASE_URL=https://www.voult.dev) with no spaces around =.');
+  }
+  const verifyUrl = `${baseUrl}/api/user/verify-email?token=${verifyToken}&appId=${app._id}`;
+
+  const token = signEndUserToken(user, app);
+
+  await user.save();
+
+  // Send verification email if email was provided (non-blocking)
+  if (normalizedEmail) {
+    verifyEndUsers(
+      user.email,
+      app.name,
+      verifyUrl,
+    ).catch(err => {
+      console.error('Failed to send verification email:', err.message);
+    });
+  }
+
+  res.status(201).json({
+    message: 'User registered successfully',
+    token,
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
+  });
+};
+
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME = 15 * 60 * 1000;
 

@@ -31,6 +31,8 @@ router.use(apiLimiter);
 
 router.post('/register', validate(schemas.registerSchema), verifyClient, validateCallbackUrl, authLimiter, catchAsync(authController.register));
 
+router.post('/username-register', validate(schemas.usernameRegisterSchema), verifyClient, validateCallbackUrl, authLimiter, catchAsync(authController.usernameRegister));
+
 router.post('/email-login', validate(schemas.loginSchema), verifyClient, authLimiter, validateCallbackUrl, catchAsync(authController.emailLogin));  
 
 router.post('/username-login', validate(schemas.usernameLoginSchema), verifyClient, authLimiter, validateCallbackUrl, catchAsync(authController.usernameLogin));
