@@ -8,7 +8,7 @@ module.exports.accountLockedEmail = async (
     supportUrl
   ) => {
     return transporter.sendMail({
-      from: '"voult.dev" <solabode499@gmail.com>',
+      from: '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
       to,
       subject: 'Your voult.dev account has been temporarily locked',
       html: `

@@ -10,7 +10,7 @@ const shouldSendEmails = process.env.SEND_EMAILS === 'true' || !isDevelopment;
 
 module.exports.welcomeEmail = async(to, name, verifyUrl) =>{
     return transporter.sendMail({
-        from : '"voult.dev" <solabode499@gmail.com>',
+        from : '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
         to,
         subject : "Welcome to voult.dev",
         html: `
@@ -72,7 +72,7 @@ module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
   // }
 
   return transporter.sendMail({
-    from : '"voult.dev" <solabode499@gmail.com>',
+    from : '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
     subject : `Welcome to ${name}`,
     to,
     html : `
@@ -126,7 +126,7 @@ module.exports.verifyEndUsers = async(to, name, verifyUrl)=>{
  */
 module.exports.sendEmailChangeVerification = async (to, name, verifyUrl) => {
   return transporter.sendMail({
-    from: '"voult.dev" <solabode499@gmail.com>',
+    from: '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
     to,
     subject: 'Confirm your new email address – voult.dev',
     html: `
@@ -158,7 +158,7 @@ module.exports.sendPasswordResetEmail = async (to, appName, resetUrl) => {
 //   }
 
   return transporter.sendMail({
-    from: '"voult.dev" <solabode499@gmail.com>',
+    from: '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
     to,
     subject: `Reset your ${appName} password`,
     html: `
@@ -190,7 +190,7 @@ module.exports.welcomeOAuthUser = async ({
   // }
 
   return transporter.sendMail({
-    from: '"voult.dev" <solabode499@gmail.com>',
+    from: '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
     to,
     subject: `Welcome to ${appName}`,
     html: `

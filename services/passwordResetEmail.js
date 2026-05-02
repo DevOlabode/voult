@@ -2,7 +2,7 @@ const { transporter } = require('../config/mailer');
 
 module.exports.forgottenPasswordEmail = (name, to, resetUrl)=>{
     return transporter.sendMail({
-      from : '"voult.dev" <solabode499@gmail.com>',
+      from : '"voult.dev" <olabodeoluwapelumi838@gmail.com>',
       to,
       subject : "Reset your voult.dev password",
       html: `
