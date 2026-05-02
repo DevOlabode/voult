@@ -209,7 +209,54 @@ module.exports.emailLogin = async (req, res) => {
 
 module.exports.usernameLogin = async (req, res) => {
   const { username, password } = req.body;
-  res.send(req.body);
+  const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
+  const app = req.appClient;
+
+  if (!normalizedUsername || !password) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Username and password are required');
+  }
+  
+  const user = await EndUser.findOne({
+    app: app._id,
+    username: normalizedUsername,
+    deletedAt: null
+  }).select('+passwordHash');
+  
+  if (!user) {
+    throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid username or password');
+  }
+
+  const isValid = await user.verifyPassword(password);
+
+  if (!isValid) {
+    throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid username or password');
+  }
+  
+  user.lastLoginAt = new Date();
+
+  const appO = await App.findById(app._id);
+  appO.usage.totalLogins += 1;
+  await appO.save();
+
+  const accessToken = signAccessToken(user, app);
+  const { rawToken: refreshToken } = await createRefreshToken({
+    endUser: user,
+    app,
+    ipAddress: req.ip,
+    userAgent: req.headers['user-agent']
+  });
+  
+  await user.save();
+
+  res.status(200).json({
+    message: 'Login successful',
+    accessToken,
+    refreshToken,
+    user: {
+      id: user._id,
+      username: user.username
+    }
+  });
 };
 
 // =======================
