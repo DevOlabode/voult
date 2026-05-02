@@ -23,8 +23,9 @@ const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
 // REGISTER
 // =======================
 module.exports.register = async (req, res) => {
-  const { email, password, fullName } = req.body;
+  const { email, password, fullName, username } = req.body;
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
 
   const app = req.appClient;
 
@@ -34,6 +35,33 @@ module.exports.register = async (req, res) => {
       'VALIDATION_ERROR',
       'Email and password are required'
     );
+  }
+
+  // Validate username format if provided
+  if (normalizedUsername) {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
+    if (!usernameRegex.test(normalizedUsername)) {
+      throw new ApiError(
+        400,
+        'INVALID_USERNAME',
+        'Username must be 3-30 characters, alphanumeric and underscores only'
+      );
+    }
+
+    // Check if username is already taken
+    const existingUsernameUser = await EndUser.findOne({
+      app: app._id,
+      username: normalizedUsername,
+      deletedAt: null
+    });
+
+    if (existingUsernameUser) {
+      throw new ApiError(
+        409,
+        'USERNAME_TAKEN',
+        'Username is already taken'
+      );
+    }
   }
 
   const existingUser = await EndUser.findOne({
@@ -61,7 +89,8 @@ module.exports.register = async (req, res) => {
   const user = new EndUser({
     fullName,
     app: app._id,
-    email: normalizedEmail
+    email: normalizedEmail,
+    username: normalizedUsername || undefined
   });
 
   await user.setPassword(password);
@@ -102,7 +131,8 @@ module.exports.register = async (req, res) => {
     token,
     user: {
       id: user._id,
-      email: user.email
+      email: user.email,
+      username: user.username
     }
   });
 };
@@ -226,10 +256,53 @@ module.exports.usernameLogin = async (req, res) => {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid username or password');
   }
 
+  // 🔒 Account locked check
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    throw new ApiError(
+      423,
+      'ACCOUNT_LOCKED',
+      'Too many failed login attempts. Try again later.'
+    );
+  }
+
   const isValid = await user.verifyPassword(password);
 
+  // Wrong password - track failed attempts
   if (!isValid) {
+    user.failedLoginAttempts += 1;
+
+    if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+      user.lockUntil = new Date(Date.now() + LOCK_TIME);
+      console.log("App Name: ", app.name);
+
+      // Send lock email ONCE
+      try {
+        await accountLockedEmail(
+          user.email,
+          user.email,
+          app.name,
+          user.lockUntil,
+          'https://voult.dev/support'
+        );
+      } catch (err) {
+        console.error('Account Lock Email Failed: ', err.message);
+      }
+    }
+    
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Invalid username or password');
+  }
+
+  // ✅ Success → reset lock state
+  user.failedLoginAttempts = 0;
+  user.lockUntil = null;
+
+  // Check email verification (if user has an email)
+  if (user.email && !user.isEmailVerified) {
+    throw new ApiError(403, 'EMAIL_NOT_VERIFIED', 'Please verify your email');
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(403, 'ACCOUNT_DISABLED', 'Account is disabled');
   }
   
   user.lastLoginAt = new Date();
@@ -254,7 +327,8 @@ module.exports.usernameLogin = async (req, res) => {
     refreshToken,
     user: {
       id: user._id,
-      username: user.username
+      username: user.username,
+      email: user.email
     }
   });
 };

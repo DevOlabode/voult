@@ -38,6 +38,14 @@ const EndUserSchema = new Schema(
       lowercase: true
     },
 
+    username: {
+      type: String,
+      required: false,
+      trim: true,
+      lowercase: true,
+      maxlength: 30
+    },
+
     passwordHash: {
       type: String,
       select: false
@@ -113,6 +121,9 @@ const EndUserSchema = new Schema(
 
 /* Ensure email is unique per app when present; sparse allows multiple null (e.g. Facebook users without email) */
 EndUserSchema.index({ app: 1, email: 1 }, { unique: true, sparse: true });
+
+/* Ensure username is unique per app when present; sparse allows multiple null (e.g. users without username) */
+EndUserSchema.index({ app: 1, username: 1 }, { unique: true, sparse: true });
 
 /* Password helpers */
 EndUserSchema.methods.setPassword = async function (password) {
