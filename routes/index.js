@@ -43,7 +43,6 @@ router.use('/api/auth/linkedin', apiLinkedin);
 router.use('/api/auth/microsoft', apiMicorsoft);
 router.use('/api', oauthLinking);
 router.use('/api', magicLinkRoutes);
-router.use('/api', providerVisibility);
 router.use('/api', userOAuthAccounts);
 // router.use('/api/health', healthRoutes);
 

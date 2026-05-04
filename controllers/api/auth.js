@@ -358,6 +358,10 @@ module.exports.emailLogin = async (req, res) => {
   });
 };
 
+// =======================
+// USERNAME LOGIN
+// =======================
+
 module.exports.usernameLogin = async (req, res) => {
   const { username, password } = req.body;
   const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
