@@ -38,7 +38,7 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
 
     const payload = jwt.verify(token, JWT_SECRET);
 
-    const endUser = await EndUser.findById(payload.sub).select('+linkedProviders');
+    const endUser = await EndUser.findById(payload.sub).select('email username +linkedProviders').lean();
 
     if (!endUser) {
       return next();
@@ -57,6 +57,7 @@ module.exports.verifyEndUserJWT = async (req, res, next) => {
     req.user = {
       id: endUser._id,
       email: endUser.email,
+      username: endUser.username
     };
 
     next();
