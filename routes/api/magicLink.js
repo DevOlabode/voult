@@ -3,7 +3,9 @@ const router = express.Router();
 const controller = require('../../controllers/api/magicLink');
 const catchAsync = require('../../utils/catchAsync');
 
-router.post('/send-magic-link', catchAsync(controller.sendLink));
-router.post('/validate-magic-link', catchAsync(controller.validateToken));
+const { apiLimiter, authLimiter } = require('../../middleware/rateLimiters');
+
+router.post('/send-magic-link', apiLimiter, catchAsync(controller.sendLink));
+router.post('/validate-magic-link', authLimiter, catchAsync(controller.validateToken));
 
 module.exports = router;

@@ -46,29 +46,35 @@ magicLinkTokenSchema.statics.hashToken = function(token) {
     .digest('hex');
 };
 
-// Static method to find and validate a token
-magicLinkTokenSchema.statics.findAndValidateToken = async function(rawToken) {
+// Atomic claim: validates + marks as used in a single DB operation
+magicLinkTokenSchema.statics.claimValidToken = async function(rawToken) {
   const tokenHash = this.hashToken(rawToken);
-  const tokenDoc = await this.findOne({ tokenHash, used: false }).select('+tokenHash');
-  
+
+  const now = new Date();
+
+  // findOneAndUpdate is atomic: the first caller wins
+  const tokenDoc = await this.findOneAndUpdate(
+    {
+      tokenHash,
+      used: false,
+      expiresAt: { $gt: now }
+    },
+    {
+      $set: {
+        used: true,
+        usedAt: now
+      }
+    },
+    {
+      new: true
+    }
+  ).select('+tokenHash');
+
   if (!tokenDoc) {
     return null;
   }
-  
-  if (tokenDoc.expiresAt < new Date()) {
-    // Token expired, delete it
-    await this.deleteOne({ _id: tokenDoc._id });
-    return null;
-  }
-  
-  return tokenDoc;
-};
 
-// Method to mark token as used
-magicLinkTokenSchema.methods.markAsUsed = function() {
-  this.used = true;
-  this.usedAt = new Date();
-  return this.save();
+  return tokenDoc;
 };
 
 module.exports = mongoose.models.MagicLinkToken || mongoose.model('MagicLinkToken', magicLinkTokenSchema);
