@@ -133,6 +133,7 @@ app.use((err, req, res, next) => {
 
   // API error handler
   if (req.originalUrl.startsWith('/api')) {
+    console.error(err);
     return res.status(status).json({
       error: err.message || 'Something went wrong'
     });
