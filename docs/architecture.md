@@ -1299,7 +1299,7 @@ Controllers simply consume from `req` — they don't need to re-query for things
 │                                    │ + Body: { idToken or accessToken }       │
 ├────────────────────────────────────┼──────────────────────────────────────────┤
 │ Send magic link                    │ (none — just Body: { email, clientId,    │
-│                                    │  redirectUri })                           │
+│                                    │  redirectUri })                          │
 │ Validate magic link token          │ (none — just Body: { token })            │
 ├────────────────────────────────────┼──────────────────────────────────────────┤
 │ Forgot password                    │ X-Client-Id + X-Client-Secret            │
