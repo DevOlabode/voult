@@ -9,11 +9,11 @@ const sessionConfig = {
         secure: isProduction,  
         httpOnly: true,       
         sameSite: 'strict',     
-        domain: isProduction ? '.voult.dev' : 'localhost',  // ✅ Restrict domain
+        domain: isProduction ? 'https://www.voult.dev' : 'http://localhost:3000/', 
         path: '/',
         maxAge: isProduction 
-            ? 1000 * 60 * 60 * 1  // 1 hour in production
-            : 1000 * 60 * 60 * 24 * 7  // 7 days in development
+            ? 1000 * 60 * 60 * 1
+            : 1000 * 60 * 60 * 24 * 7  
     }
 };
 
