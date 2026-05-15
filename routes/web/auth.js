@@ -33,14 +33,7 @@ router.get('/auth/google',
   })
 );
 
-router.get('/auth/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/login'
-  }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
+router.get('/auth/google/callback', controller.googleCallback);
 
 router.get('/auth/google/link', isLoggedIn, controller.startLinkGoogle);
 router.get('/auth/google/link/callback', controller.googleLinkCallback);
@@ -51,14 +44,7 @@ router.get('/auth/github',
   })
 );
 
-router.get('/auth/github/callback',
-  passport.authenticate('github', {
-    failureRedirect: '/login'
-  }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
+router.get('/auth/github/callback', controller.githubCallback);
 
 router.get('/auth/github/link', isLoggedIn, controller.startLinkGithub);
 router.get('/auth/github/link/callback', controller.githubLinkCallback);

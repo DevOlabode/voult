@@ -1,47 +1,27 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github').Strategy;
-const LocalStrategy = require('passport-local').Strategy;
 const Developer = require('../models/developer');
 
-// Local strategy for email/password authentication
-passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-  try {
-    const developer = await Developer.findOne({ email: email.toLowerCase() });
-    
-    if (!developer) {
-      return done(null, false, { message: 'Invalid credentials. Please try again.' });
-    }
-    
-    developer.authenticate(password, (err, user, error) => {
-      if (err) {
-        return done(err);
-      }
-      if (error) {
-        return done(null, false, { message: 'Invalid credentials. Please try again.' });
-      }
-      return done(null, user);
-    });
-  } catch (err) {
-    return done(err);
-  }
-}));
+function getBaseUrl() {
+  return (process.env.BASE_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
+}
 
 passport.use(Developer.createStrategy());
-
-passport.serializeUser(Developer.serializeUser());
-passport.deserializeUser(Developer.deserializeUser());
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://voult.dev/auth/google/callback'
+  callbackURL: `${getBaseUrl()}/auth/google/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-
     const googleId = profile.id;
-    const email = profile.emails?.[0]?.value;
+    const email = profile.emails?.[0]?.value?.toLowerCase()?.trim();
     const avatar = profile.photos?.[0]?.value;
+
+    if (!email) {
+      return done(null, false, { message: 'Google did not provide an email address.' });
+    }
 
     let developer = await Developer.findOne({ googleId });
 
@@ -54,8 +34,8 @@ passport.use(new GoogleStrategy({
     if (developer) {
       developer.googleId = googleId;
       if (!developer.avatar) developer.avatar = avatar;
+      developer.isVerified = true;
       await developer.save();
-
       return done(null, developer);
     }
 
@@ -63,12 +43,12 @@ passport.use(new GoogleStrategy({
       email,
       googleId,
       avatar,
-      name: profile.displayName,
+      name: profile.displayName?.trim() || email.split('@')[0],
       hasPassword: false,
+      isVerified: true,
     });
 
     return done(null, developer);
-
   } catch (err) {
     return done(err, null);
   }
@@ -77,13 +57,11 @@ passport.use(new GoogleStrategy({
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  // callbackURL: 'https://voult.dev/auth/github/callback',
-  callbackURL : "https://www.voult.dev/auth/github/callback"
+  callbackURL: `${getBaseUrl()}/auth/github/callback`,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-
     const githubId = profile.id;
-    const email = profile.emails?.[0]?.value; 
+    const email = profile.emails?.[0]?.value?.toLowerCase()?.trim();
     const avatar = profile.photos?.[0]?.value;
 
     let developer = await Developer.findOne({ githubId });
@@ -94,21 +72,26 @@ passport.use(new GitHubStrategy({
       if (developer) {
         developer.githubId = githubId;
         if (!developer.avatar) developer.avatar = avatar;
+        developer.isVerified = true;
         await developer.save();
         return done(null, developer);
       }
+    }
+
+    if (!email) {
+      return done(null, false, { message: 'GitHub did not provide an email address.' });
     }
 
     developer = await Developer.create({
       email,
       githubId,
       avatar,
-      name: profile.displayName || profile.username,
+      name: profile.displayName?.trim() || profile.username,
       hasPassword: false,
+      isVerified: true,
     });
 
     return done(null, developer);
-
   } catch (err) {
     return done(err, null);
   }
@@ -119,8 +102,13 @@ passport.serializeUser((developer, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const developer = await Developer.findById(id);
-  done(null, developer);
+  try {
+    if (!id) return done(null, false);
+    const developer = await Developer.findById(id);
+    done(null, developer);
+  } catch (err) {
+    done(err);
+  }
 });
 
 module.exports = passport;

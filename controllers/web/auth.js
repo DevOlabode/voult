@@ -3,7 +3,37 @@ const passport = require('passport');
 const { welcomeEmail } = require('../../services/emailService');
 const crypto = require('crypto');
 
-const baseUrl = () => (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+const baseUrl = () => (process.env.BASE_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
+
+function oauthCallback(strategy, req, res, next) {
+  passport.authenticate(strategy, (err, user, info) => {
+    if (err) {
+      console.error(`${strategy} OAuth error:`, err);
+      req.flash('error', 'Sign-in failed. Please try again.');
+      return res.redirect('/login');
+    }
+    if (!user) {
+      const message = info?.message || 'Sign-in was cancelled or failed.';
+      req.flash('error', message);
+      return res.redirect('/login');
+    }
+    req.login(user, async (loginErr) => {
+      if (loginErr) {
+        console.error(`${strategy} session error:`, loginErr);
+        req.flash('error', 'Could not sign you in. Please try again.');
+        return res.redirect('/login');
+      }
+      try {
+        user.lastLoginAt = new Date();
+        await user.save();
+        req.flash('success', 'Welcome back');
+        res.redirect(res.locals.returnTo || '/');
+      } catch (saveErr) {
+        next(saveErr);
+      }
+    });
+  })(req, res, next);
+}
 
 module.exports.loginForm = (req, res)=>{
     res.render('auth/login', {title : "Login Page"})
@@ -61,6 +91,10 @@ module.exports.register =  async (req, res) => {
       res.redirect('/register');
     }
   };
+
+module.exports.googleCallback = (req, res, next) => oauthCallback('google', req, res, next);
+
+module.exports.githubCallback = (req, res, next) => oauthCallback('github', req, res, next);
 
 module.exports.logout = (req, res, next) => {
   req.logout(err => {
