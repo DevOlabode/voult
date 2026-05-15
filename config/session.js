@@ -10,10 +10,10 @@ const sessionConfig = {
         secure: isProduction,
         httpOnly: true,
 
-        sameSite: isProduction ? 'lax' : 'lax',
+        sameSite: isProduction ? 'strict' : 'lax',
 
         // IMPORTANT: hostname only
-        // domain: isProduction ? '.voult.dev' : undefined,
+        domain: isProduction ? '.voult.dev' : 'localhost',
 
         path: '/',
 
