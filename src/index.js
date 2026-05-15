@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'production' && (!process.env.SECRET || !String(pro
 const express = require('express');
 const app = express();
 
-app.set('trust-proxy', 1);
+app.set('trust proxy', 1);
 
 const ejsMate = require('ejs-mate');
 const path = require('path');
