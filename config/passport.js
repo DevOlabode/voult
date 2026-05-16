@@ -8,8 +8,8 @@ const Developer = require('../models/developer');
  * (see passport-oauth2/lib/strategy.js). That keeps redirect_uri aligned with
  * whichever host the developer used (localhost, www, apex, Render URL).
  */
-const GOOGLE_CB = '/auth/google/callback';
-const GITHUB_CB = '/auth/github/callback';
+const GOOGLE_CB = `${process.env.BASE_URL}/auth/google/callback`;
+const GITHUB_CB = `${process.env.BASE_URL}/auth/github/callback`;
 
 passport.use(Developer.createStrategy());
 
