@@ -25,6 +25,8 @@ const flash = require('connect-flash');
 const passport = require('../config/passport');
 const { listGoogleRedirectUris } = require('../utils/resolveOAuthCallbackUrl');
 
+const { csrfProtection, generateCsrfToken } = require('../middleware/csrfProtection');
+
 const sessionConfig = require('../config/session');
 
 if (!process.env.GOOGLE_CLIENT_ID?.trim() || !process.env.GOOGLE_CLIENT_SECRET?.trim()) {
@@ -91,6 +93,12 @@ require('../config/database')();
 app.use(session(sessionConfig));
 app.use(flash());
 
+// CSRF protection for all routes.
+app.use(csrfProtection);
+
+// Generate CSRF token for all templates
+app.use(generateCsrfToken);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -111,7 +119,17 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf, encoding) => {
+      // For API endpoints that need CSRF
+      if (req.path.startsWith('/api') && !req.path.startsWith('/api/public')) {
+          if (!req.headers['x-csrf-token'] && !req.query._csrf) {
+              throw new Error('CSRF token missing');
+          }
+      }
+  }
+}));
+
 app.use(express.urlencoded({ 
   extended: true,
   limit : '10kb'
