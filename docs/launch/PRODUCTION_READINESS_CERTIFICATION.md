@@ -330,7 +330,7 @@ Upon completion of all security hardening measures outlined in the **SECURITY_HA
 - [x] Verify HTTPOnly flag enforcement
 
 **CSRF Protection:**
-- [ ] Install `csurf` package
+- [x] Install `csurf` package
 - [ ] Create `middleware/csrfProtection.js`
 - [ ] Integrate CSRF into all forms
 - [ ] Add CSRF token endpoint for APIs
