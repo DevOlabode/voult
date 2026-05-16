@@ -30,6 +30,7 @@ router.post('/register', webAuthLimiter, catchAsync(controller.register));
 router.get('/auth/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
+    callbackURL: '/auth/google/callback',
   })
 );
 
@@ -41,6 +42,7 @@ router.get('/auth/google/link/callback', controller.googleLinkCallback);
 router.get('/auth/github',
   passport.authenticate('github', {
     scope: ['user:email'],
+    callbackURL: '/auth/github/callback',
   })
 );
 

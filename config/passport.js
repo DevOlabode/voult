@@ -4,12 +4,20 @@ const GitHubStrategy = require('passport-github').Strategy;
 const Developer = require('../models/developer');
 
 /**
- * Relative URLs: passport-oauth2 resolves them against the current request origin
- * (see passport-oauth2/lib/strategy.js). That keeps redirect_uri aligned with
- * whichever host the developer used (localhost, www, apex, Render URL).
+ * OAuth redirect URIs must be identical on:
+ *  1) authorize redirect to Google, and
+ *  2) token exchange.
+ *
+ * Use relative paths only — passport-oauth2 resolves them from the current
+ * request (protocol + host via X-Forwarded-* when proxy: true).
+ *
+ * Do NOT mix BASE_URL here with a relative callbackURL in authenticate():
+ * /auth/google uses authenticate without overriding callback → strategy default;
+ * /auth/google/callback passes relative path → if strategy used BASE_URL you'd
+ * get mismatched redirect_uri and Google's token step fails.
  */
-const GOOGLE_CB = `${process.env.BASE_URL}/auth/google/callback`;
-const GITHUB_CB = `${process.env.BASE_URL}/auth/github/callback`;
+const GOOGLE_CB = '/auth/google/callback';
+const GITHUB_CB = '/auth/github/callback';
 
 passport.use(Developer.createStrategy());
 
@@ -17,6 +25,7 @@ passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: GOOGLE_CB,
+  proxy: true,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const googleId = profile.id;
@@ -76,6 +85,7 @@ passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
   callbackURL: GITHUB_CB,
+  proxy: true,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const githubId = String(profile.id);

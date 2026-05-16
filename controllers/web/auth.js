@@ -10,16 +10,26 @@ const AUTH_CALLBACK_PATH = {
 
 function oauthErrorMessage(strategy, err) {
   const inner = err.oauthError;
-  const blob = [
+  const parts = [
     err.message,
     inner && inner.message,
-    inner && inner.data,
+    typeof inner?.data === 'string' ? inner.data : '',
     inner && inner.statusCode,
     err.code,
     inner && inner.code,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  ].filter(Boolean);
+
+  let blob = parts.join(' ');
+  if (typeof inner?.data === 'string') {
+    try {
+      const j = JSON.parse(inner.data);
+      if (j?.error || j?.error_description) {
+        blob += ` ${j.error || ''} ${j.error_description || ''}`;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
 
   if (
     err.code === 'invalid_grant' ||
@@ -38,8 +48,12 @@ function oauthErrorMessage(strategy, err) {
     return 'Sign-in was cancelled.';
   }
 
-  console.error(`${strategy} OAuth error:`, err);
-  return 'Sign-in failed. Please try again.';
+  const hint =
+    err.name === 'GooglePlusAPIError' || err.name === 'UserInfoError'
+      ? ' Could not load your Google profile.'
+      : '';
+  console.error(`${strategy} OAuth error (${err.name || 'Error'}):`, err.message, inner?.data || '');
+  return `Sign-in failed.${hint} Please try again.`;
 }
 
 function oauthCallback(strategy, req, res, next) {
