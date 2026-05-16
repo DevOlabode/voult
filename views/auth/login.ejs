@@ -5,6 +5,7 @@
   <p class="auth-subtext">Login to your developer dashboard.</p>
 
   <form action="/login" method="POST" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%=csrfToken %>">
     <div class="form-group">
       <label for="email">Email</label>
       <input

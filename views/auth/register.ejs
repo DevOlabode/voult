@@ -5,6 +5,7 @@
   <p class="auth-subtext">Get your API key and start building.</p>
 
   <form action="/register" method="POST" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%=csrfToken %>">
     <div class="form-group">
       <label for="name">Name</label>
       <input
