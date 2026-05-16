@@ -104,12 +104,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
-  console.log("SESSION ID:", req.sessionID);
-  console.log("USER:", req.user);
-  next();
-});
-
 app.use(express.json());
 app.use(express.urlencoded({ 
   extended: true,

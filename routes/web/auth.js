@@ -27,24 +27,14 @@ router.get('/register', redirectIfLoggedIn, controller.registerForm);
 
 router.post('/register', webAuthLimiter, catchAsync(controller.register));
 
-router.get('/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email'],
-    callbackURL: '/auth/google/callback',
-  })
-);
+router.get('/auth/google', controller.startGoogle);
 
 router.get('/auth/google/callback', controller.googleCallback);
 
 router.get('/auth/google/link', isLoggedIn, controller.startLinkGoogle);
 router.get('/auth/google/link/callback', controller.googleLinkCallback);
 
-router.get('/auth/github',
-  passport.authenticate('github', {
-    scope: ['user:email'],
-    callbackURL: '/auth/github/callback',
-  })
-);
+router.get('/auth/github', controller.startGithub);
 
 router.get('/auth/github/callback', controller.githubCallback);
 

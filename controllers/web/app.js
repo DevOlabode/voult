@@ -14,7 +14,7 @@ module.exports.newApp = async (req, res) => {
     description,
     owner: req.user._id,
     isActive: true,
-    allowedCallbackUrls : callbackUrl
+    allowedCallbackUrls: callbackUrl ? [callbackUrl] : [],
   });
 
   app.generateClientId();
@@ -112,7 +112,9 @@ module.exports.updateApp = async (req, res) => {
   
     app.name = name;
     app.description = description;
-    app.callbackUrl = callbackUrl;
+    if (callbackUrl !== undefined && callbackUrl !== '') {
+      app.allowedCallbackUrls = [callbackUrl];
+    }
     app.isActive = isActive === 'true';
   
     await app.save();

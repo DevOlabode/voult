@@ -41,7 +41,7 @@
         type="url"
         id="callbackUrl"
         name="callbackUrl"
-        value="<%= app.callbackUrl %>"
+        value="<%= (app.allowedCallbackUrls && app.allowedCallbackUrls[0]) || '' %>"
         placeholder="https://yourapp.com/callback"
         required
       />
