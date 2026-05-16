@@ -87,7 +87,7 @@ voult/
 - [x] OAuth middleware integration for multi-provider support
 - [x] Comprehensive TODO documentation with detailed feature tracking
 - [x] Email service configuration updates for consistency
-- [x] Javascript SDK (WIP)
+- [x] Javascript SDK
 
 ---
 This project is 4 months away from launch.
