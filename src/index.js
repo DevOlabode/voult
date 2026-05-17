@@ -90,6 +90,14 @@ const ExpressError = require('../utils/ExpressError');
 const routes = require('../routes/index');
 
 require('../config/database')();
+
+// Body parsers BEFORE session/flash so req.body is available
+app.use(express.json());
+app.use(express.urlencoded({ 
+  extended: true,
+  limit: '10kb'
+}));
+
 app.use(session(sessionConfig));
 app.use(flash());
 
@@ -111,6 +119,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(methodOverride('_method'));
 
+// Set res.locals BEFORE mounting routes so EJS templates always have these vars
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
@@ -119,24 +128,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.json({
-  verify: (req, res, buf, encoding) => {
-      // For API endpoints that need CSRF
-      if (req.path.startsWith('/api') && !req.path.startsWith('/api/public')) {
-          if (!req.headers['x-csrf-token'] && !req.query._csrf) {
-              throw new Error('CSRF token missing');
-          }
-      }
-  }
-}));
-
-app.use(express.urlencoded({ 
-  extended: true,
-  limit : '10kb'
-}));
-
 const {requestLogger} = require('../middleware/requestLogger');
-app.use(requestLogger)
+app.use(requestLogger);
 
 app.use(routes); 
 
@@ -153,7 +146,23 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const status = err.statusCode || 500;
+  const status = err.statusCode || err.status || 500;
+
+  // Handle CSRF errors specifically
+  if (err.code === 'EBADCSRFTOKEN') {
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(403).json({
+        error: {
+          code: 'INVALID_CSRF_TOKEN',
+          message: 'CSRF token validation failed',
+          status: 403
+        }
+      });
+    }
+    // For web routes, flash and redirect
+    req.flash('error', 'Form session expired. Please try again.');
+    return res.redirect('back');
+  }
 
   // API error handler
   if (req.originalUrl.startsWith('/api')) {
@@ -163,12 +172,17 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Web error handler
+  // Web error handler - ensure locals exist for EJS
+  res.locals.success = res.locals.success || [];
+  res.locals.error = res.locals.error || [];
+  res.locals.info = res.locals.info || [];
+  res.locals.currentUser = res.locals.currentUser || null;
+
   if (status === 404) {
-    return res.status(404).render('error/404', {title : 'Page Not Found'});
+    return res.status(404).render('error/404', { title: 'Page Not Found' });
   }
   
-  res.status(status).render('error/500', {title : 'Internal Server Error'});
+  res.status(status).render('error/500', { title: 'Internal Server Error' });
 });
   
 const PORT = process.env.PORT || 3000;
