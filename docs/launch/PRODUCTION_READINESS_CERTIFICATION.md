@@ -333,9 +333,9 @@ Upon completion of all security hardening measures outlined in the **SECURITY_HA
 - [x] Install `csurf` package
 - [x] Create `middleware/csrfProtection.js`
 - [x] Integrate CSRF into all forms
-- [ ] Add CSRF token endpoint for APIs
-- [ ] Update all POST/PUT/DELETE routes
-- [ ] Test CSRF rejection for missing tokens
+- [x] Add CSRF token endpoint for APIs
+- [x] Update all POST/PUT/DELETE routes
+- [x] Test CSRF rejection for missing tokens
 - [ ] Document CSRF token handling for clients
 
 **XSS Prevention:**
