@@ -48,4 +48,9 @@ router.post('/logout', csrfProtection, controller.logout);
 
 router.get('/verify/:token', catchAsync(controller.verifyAccount));
 
+// CSRF token endpoint for JavaScript clients
+router.get('/csrf-token', (req, res) => {
+  res.json({ token: req.csrfToken() });
+});
+
 module.exports = router;

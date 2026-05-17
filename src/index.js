@@ -171,10 +171,15 @@ app.use((err, req, res, next) => {
   res.status(status).render('error/500', {title : 'Internal Server Error'});
 });
   
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`App is listening on PORT ${PORT}`);
-  console.log('Google OAuth — add these Authorized redirect URIs in Google Cloud Console:');
-  listGoogleRedirectUris().forEach((uri) => console.log(`  • ${uri}`));
-});
+
+// Only start server if this file is run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`App is listening on PORT ${PORT}`);
+    console.log('Google OAuth — add these Authorized redirect URIs in Google Cloud Console:');
+    listGoogleRedirectUris().forEach((uri) => console.log(`  • ${uri}`));
+  });
+}
+
+module.exports = app;
