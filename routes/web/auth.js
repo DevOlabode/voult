@@ -11,9 +11,12 @@ const { redirectIfLoggedIn, storeReturnTo, isLoggedIn } = require('../../middlew
 
 const { webAuthLimiter } = require('../../middleware/rateLimiters');
 
+const { csrfProtection } = require('../../middleware/csrfProtection');
+
 router.get('/login', redirectIfLoggedIn, controller.loginForm);
 
 router.post('/login', 
+  csrfProtection,
   storeReturnTo, 
   webAuthLimiter,
   passport.authenticate('local', {
@@ -25,7 +28,7 @@ router.post('/login',
 
 router.get('/register', redirectIfLoggedIn, controller.registerForm);
 
-router.post('/register', webAuthLimiter, catchAsync(controller.register));
+router.post('/register', csrfProtection, webAuthLimiter, catchAsync(controller.register));
 
 router.get('/auth/google', controller.startGoogle);
 
@@ -41,7 +44,7 @@ router.get('/auth/github/callback', controller.githubCallback);
 router.get('/auth/github/link', isLoggedIn, controller.startLinkGithub);
 router.get('/auth/github/link/callback', controller.githubLinkCallback);
 
-router.post('/logout', controller.logout);
+router.post('/logout', csrfProtection, controller.logout);
 
 router.get('/verify/:token', catchAsync(controller.verifyAccount));
 
