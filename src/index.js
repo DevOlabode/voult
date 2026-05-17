@@ -91,15 +91,15 @@ const routes = require('../routes/index');
 
 require('../config/database')();
 
-// Body parsers BEFORE session/flash so req.body is available
+app.use(session(sessionConfig));
+app.use(flash());
+
+// Body parsers AFTER session so csurf (which needs session) works correctly
 app.use(express.json());
 app.use(express.urlencoded({ 
   extended: true,
   limit: '10kb'
 }));
-
-app.use(session(sessionConfig));
-app.use(flash());
 
 // CSRF protection for all routes.
 app.use(csrfProtection);
