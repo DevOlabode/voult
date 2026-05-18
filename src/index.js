@@ -40,10 +40,8 @@ const methodOverride = require('method-override');
 
 const cors = require('cors');
 
-// CORS configuration - allow multiple origins for flexibility
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
@@ -92,23 +90,41 @@ const routes = require('../routes/index');
 
 require('../config/database')();
 
+// Session must come before everything that needs it (flash, passport, csrf)
 app.use(session(sessionConfig));
 app.use(flash());
 
 app.use(securityHeaders);
 
-// Body parsers AFTER session so csurf (which needs session) works correctly
+// -----------------------------------------------------------------------
+// Body parsers MUST come before csrfProtection so that csurf can read
+// the _csrf field from urlencoded form bodies (and JSON bodies).
+// -----------------------------------------------------------------------
 app.use(express.json());
 app.use(express.urlencoded({ 
   extended: true,
   limit: '10kb'
 }));
 
-// CSRF protection for all routes.
+// CSRF protection applied after body parsers so the token can be read from req.body
 app.use(csrfProtection);
 
-// Generate CSRF token for all templates
-app.use(generateCsrfToken);
+// Generate csrfToken for EJS templates on web (non-API) routes only.
+// API routes don't render views, and calling req.csrfToken() there is fine
+// but setting res.locals is harmless either way.
+app.use((req, res, next) => {
+  // Only generate for non-API routes to keep API responses clean.
+  // req.csrfToken() is available on all routes because csrfProtection is global.
+  if (!req.path.startsWith('/api')) {
+    try {
+      res.locals.csrfToken = req.csrfToken();
+    } catch (err) {
+      // If CSRF middleware isn't ready (e.g. certain edge cases), don't crash
+      res.locals.csrfToken = '';
+    }
+  }
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -136,7 +152,7 @@ app.use(requestLogger);
 
 app.use(routes); 
 
-// Error Handler.  
+// Error Handler
 const { sendError } = require('../utils/apiError');
 
 app.use('/api', (err, req, res, next) => {
