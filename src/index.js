@@ -101,20 +101,13 @@ app.use(express.urlencoded({
   limit: '10kb'
 }));
 
-// CSRF protection applied after body parsers so the token can be read from req.body
 app.use(csrfProtection);
 
-// Generate csrfToken for EJS templates on web (non-API) routes only.
-// API routes don't render views, and calling req.csrfToken() there is fine
-// but setting res.locals is harmless either way.
 app.use((req, res, next) => {
-  // Only generate for non-API routes to keep API responses clean.
-  // req.csrfToken() is available on all routes because csrfProtection is global.
   if (!req.path.startsWith('/api')) {
     try {
       res.locals.csrfToken = req.csrfToken();
     } catch (err) {
-      // If CSRF middleware isn't ready (e.g. certain edge cases), don't crash
       res.locals.csrfToken = '';
     }
   }
