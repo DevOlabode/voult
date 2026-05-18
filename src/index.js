@@ -26,6 +26,7 @@ const passport = require('../config/passport');
 const { listGoogleRedirectUris } = require('../utils/resolveOAuthCallbackUrl');
 
 const { csrfProtection, generateCsrfToken } = require('../middleware/csrfProtection');
+const securityHeaders = require('../middleware/securityHeaders');
 
 const sessionConfig = require('../config/session');
 
@@ -93,6 +94,8 @@ require('../config/database')();
 
 app.use(session(sessionConfig));
 app.use(flash());
+
+app.use(securityHeaders);
 
 // Body parsers AFTER session so csurf (which needs session) works correctly
 app.use(express.json());
@@ -191,8 +194,6 @@ const PORT = process.env.PORT || 3000;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`App is listening on PORT ${PORT}`);
-    console.log('Google OAuth — add these Authorized redirect URIs in Google Cloud Console:');
-    listGoogleRedirectUris().forEach((uri) => console.log(`  • ${uri}`));
   });
 }
 
