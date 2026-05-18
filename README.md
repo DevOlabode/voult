@@ -55,7 +55,46 @@ Live: https://www.voult.dev
 - **Templating**: EJS (for emails & views)
 - **Security**: bcrypt, rate limiting, validation middleware, atomic transactions
 - **Frontend (Landing / Docs)**: HTML, CSS, JavaScript, React.js
+## CSRF Token Handling for Clients
 
+This application uses `csurf` to protect all state-changing routes.
+
+### Browser forms
+- HTML forms include a hidden field named `_csrf`.
+- The CSRF token is injected into EJS templates as `csrfToken`.
+- Example:
+  ```html
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  ```
+
+### JavaScript clients / API calls
+- A client can fetch a fresh token from `GET /auth/csrf-token`.
+- The app exposes this endpoint for JS-based workflows.
+- Use the token in subsequent requests with the `X-CSRF-Token` header.
+
+Example fetch flow:
+```javascript
+const response = await fetch('/auth/csrf-token', {
+  method: 'GET',
+  credentials: 'include'
+});
+const { token } = await response.json();
+
+const loginResponse = await fetch('/api/auth/login', {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRF-Token': token
+  },
+  body: JSON.stringify({ email, password })
+});
+```
+
+### Notes
+- CSRF protection applies to web routes and API routes that mutate state.
+- API requests require either the `X-CSRF-Token` header or `_csrf` query/body token.
+- The server also uses session-based CSRF tokens, so `credentials: 'include'` is required for cross-origin-safe requests.
 ---
 
 ## 📂 Project Structure
