@@ -18,6 +18,9 @@ const { authLimiter } = require('../../middleware/rateLimiters');
 const { validate } = require('../../validators/validate');
 const schemas = require('../../validators/api/endUserAuth');
 
+// Input sanitization and validation
+const { validators, handleValidationErrors } = require('../../middleware/inputSanitization');
+
 const catchAsync  = require('../../utils/catchAsync');
 
 const validateCallbackUrl = require('../../middleware/validateCallbackUrl');

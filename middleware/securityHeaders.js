@@ -12,8 +12,7 @@ const securityHeadersMiddleware = helmet({
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"],
-            formAction: ["'self'"],
-            upgradeInsecureRequests: process.env.NODE_ENV === 'production'
+            formAction: ["'self'"]
         }
     },
     crossOriginEmbedderPolicy: true,

@@ -14,6 +14,8 @@ const RefreshToken = require('../../models/refreshToken');
 const { signAccessToken, signRefreshToken } = require('../../utils/jwt');
 const { createRefreshToken } = require('../../utils/refreshToken');
 
+// INPUT SANITIZATION
+const { sanitize } = require('../../middleware/inputSanitization');
 
 // PASSWORDS RULES
 const { validatePassword } = require('../../validators/password');
@@ -24,12 +26,15 @@ const { PASSWORD_RULES_MESSAGE } = require('../../constants/passwordRules');
 // =======================
 module.exports.register = async (req, res) => {
   const { email, password, fullName, username } = req.body;
-  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
-  const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
+  
+  // Sanitize inputs
+  const sanitizedEmail = sanitize(typeof email === 'string' ? email.trim().toLowerCase() : '');
+  const sanitizedUsername = sanitize(typeof username === 'string' ? username.trim().toLowerCase() : '');
+  const sanitizedFullName = sanitize(fullName || '');
 
   const app = req.appClient;
 
-  if (!normalizedEmail || !password) {
+  if (!sanitizedEmail || !password) {
     throw new ApiError(
       400,
       'VALIDATION_ERROR',
@@ -38,9 +43,9 @@ module.exports.register = async (req, res) => {
   }
 
   // Validate username format if provided
-  if (normalizedUsername) {
+  if (sanitizedUsername) {
     const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
-    if (!usernameRegex.test(normalizedUsername)) {
+    if (!usernameRegex.test(sanitizedUsername)) {
       throw new ApiError(
         400,
         'INVALID_USERNAME',
@@ -51,7 +56,7 @@ module.exports.register = async (req, res) => {
     // Check if username is already taken
     const existingUsernameUser = await EndUser.findOne({
       app: app._id,
-      username: normalizedUsername,
+      username: sanitizedUsername,
       deletedAt: null
     });
 
@@ -66,7 +71,7 @@ module.exports.register = async (req, res) => {
 
   const existingUser = await EndUser.findOne({
     app: app._id,
-    email: normalizedEmail
+    email: sanitizedEmail
   });
 
   if (existingUser) {
@@ -87,10 +92,10 @@ module.exports.register = async (req, res) => {
   
 
   const user = new EndUser({
-    fullName,
+    fullName: sanitizedFullName,
     app: app._id,
-    email: normalizedEmail,
-    username: normalizedUsername || undefined
+    email: sanitizedEmail,
+    username: sanitizedUsername || undefined
   });
 
   await user.setPassword(password);
@@ -140,13 +145,16 @@ module.exports.register = async (req, res) => {
 // =======================
 module.exports.usernameRegister = async (req, res) => {
   const { username, password, fullName, email } = req.body;
-  const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
-  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  
+  // Sanitize inputs
+  const sanitizedUsername = sanitize(typeof username === 'string' ? username.trim().toLowerCase() : '');
+  const sanitizedEmail = sanitize(typeof email === 'string' ? email.trim().toLowerCase() : '');
+  const sanitizedFullName = sanitize(fullName || '');
 
   const app = req.appClient;
 
   // Username and password are required
-  if (!normalizedUsername || !password) {
+  if (!sanitizedUsername || !password) {
     throw new ApiError(
       400,
       'VALIDATION_ERROR',
@@ -156,7 +164,7 @@ module.exports.usernameRegister = async (req, res) => {
 
   // Validate username format
   const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
-  if (!usernameRegex.test(normalizedUsername)) {
+  if (!usernameRegex.test(sanitizedUsername)) {
     throw new ApiError(
       400,
       'INVALID_USERNAME',
@@ -167,7 +175,7 @@ module.exports.usernameRegister = async (req, res) => {
   // Check if username is already taken
   const existingUsernameUser = await EndUser.findOne({
     app: app._id,
-    username: normalizedUsername,
+    username: sanitizedUsername,
     deletedAt: null
   });
 
@@ -180,10 +188,10 @@ module.exports.usernameRegister = async (req, res) => {
   }
 
   // Check if email is already taken (if provided)
-  if (normalizedEmail) {
+  if (sanitizedEmail) {
     const existingEmailUser = await EndUser.findOne({
       app: app._id,
-      email: normalizedEmail,
+      email: sanitizedEmail,
       deletedAt: null
     });
 
@@ -207,10 +215,10 @@ module.exports.usernameRegister = async (req, res) => {
 
   // Create user with username (email is optional)
   const user = new EndUser({
-    fullName,
+    fullName: sanitizedFullName,
     app: app._id,
-    username: normalizedUsername,
-    email: normalizedEmail || undefined
+    username: sanitizedUsername,
+    email: sanitizedEmail || undefined
   });
 
   await user.setPassword(password);
