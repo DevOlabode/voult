@@ -194,7 +194,6 @@ what you add
   - `POST /forgot-password`
 - `views/forgottenPassword/reset-password.ejs`
   - `POST /reset-password/<%= token %>`
-
 - `views/user/settings.ejs`
   - `POST /settings`
   - `POST /settings/email/request-change`
@@ -253,11 +252,13 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 ## Web routes
 
 ### Auth
+
 - `POST /login`
 - `POST /register`
 - `POST /logout`
 
 ### User account
+
 - `POST /forgot-password`
 - `POST /reset-password/:token`
 - `POST /settings`
@@ -268,6 +269,7 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 - `POST /delete-account`
 
 ### App management
+
 - `POST /app`
 - `POST /app/:id/toggle`
 - `DELETE /app/:id`
@@ -289,6 +291,7 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 ## API routes
 
 ### Auth
+
 - `POST /api/auth/register`
 - `POST /api/auth/username-register`
 - `POST /api/auth/email-login`
@@ -296,6 +299,7 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 - `POST /api/auth/logout`
 
 ### User
+
 - `POST /api/user/forgot-password`
 - `POST /api/user/reset-password`
 - `POST /api/user/disable`
@@ -303,6 +307,7 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 - `PATCH /api/user/me`
 
 ### OAuth providers
+
 - `POST /api/auth/google/register`
 - `POST /api/auth/google/login`
 - `POST /api/auth/github/register`
@@ -317,9 +322,11 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 - `POST /api/auth/apple/login`
 
 ### Sessions
+
 - `POST /api/sessions/refresh`
 
 ### OAuth / provider linking
+
 - `POST /api/:provider/authorize`
 - `POST /api/oauth/:provider/link`
 - `POST /api/me/set-password`
@@ -327,9 +334,9 @@ router.post('/api/auth/login', csrfProtection, async (req, res) => {
 - `DELETE /api/me/oauth/:provider`
 
 ### Magic link
+
 - `POST /api/send-magic-link`
 - `POST /api/validate-magic-link`
-
 
 Client-side (JavaScript):
 
@@ -506,7 +513,8 @@ npm install isomorphic-dompurify
 
 **Step 4: Update Authentication Controller**
 
-Update `controllers/api/auth.js`:
+## WHERE AM AT.
+Update `controllers/api/auth.js`
 
 ```javascript
 const { ApiError } = require('../../utils/apiError');
